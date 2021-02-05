@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtWebApi", "JwtWebApi\JwtW
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtWebApi.Api", "JwtWebApi.Api\JwtWebApi.Api.csproj", "{6C7F88CD-8035-46A9-B7DF-B4C6789DA077}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtWebApi.DataProviders.Common", "JwtWebApi.DataProviders.Common\JwtWebApi.DataProviders.Common.csproj", "{D27EB4BC-B004-43D8-A37F-2F0824D5C5BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{6C7F88CD-8035-46A9-B7DF-B4C6789DA077}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C7F88CD-8035-46A9-B7DF-B4C6789DA077}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C7F88CD-8035-46A9-B7DF-B4C6789DA077}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D27EB4BC-B004-43D8-A37F-2F0824D5C5BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D27EB4BC-B004-43D8-A37F-2F0824D5C5BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D27EB4BC-B004-43D8-A37F-2F0824D5C5BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D27EB4BC-B004-43D8-A37F-2F0824D5C5BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

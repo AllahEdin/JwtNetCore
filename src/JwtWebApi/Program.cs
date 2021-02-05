@@ -1,5 +1,7 @@
+using System.IO;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 
 namespace JwtWebApi
 {
@@ -7,14 +9,15 @@ namespace JwtWebApi
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        public static IWebHost CreateHostBuilder(string[] args) =>
+	        WebHost.CreateDefaultBuilder(args)
+		        .UseKestrel()
+                .ConfigureServices(s => s.AddAutofac())
+		        .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseStartup<Startup>()
+	            .Build();
     }
 }
