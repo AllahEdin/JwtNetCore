@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
+using JwtWebApi.Common.Services;
+using JwtWebApi.MigrationProvider;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,6 +29,8 @@ namespace JwtWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+	        services.MigrateFrom(Configuration["TravelDbConnectionString"]);
+	     
 	        services.AddAuthentication(options =>
 		        {
 			        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -81,6 +83,18 @@ namespace JwtWebApi
             {
 	            endpoints.MapControllers();
             });
+
+
+            foreach (IInitializeModule initializeModule in app.ApplicationServices
+	            .GetServices<IInitializeModule>()
+	            .OrderBy(t => t.Order)
+	            .ToArray())
+            {
+	            initializeModule.Initialize()
+		            .ConfigureAwait(false)
+		            .GetAwaiter()
+		            .GetResult();
+            }
         }
 
         private static Assembly[] GetAssemblies()
