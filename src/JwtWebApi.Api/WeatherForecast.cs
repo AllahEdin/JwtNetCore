@@ -1,6 +1,6 @@
 using System;
 
-namespace JwtWebApi
+namespace JWTWebApi.Services.Api
 {
     public class WeatherForecast
     {
