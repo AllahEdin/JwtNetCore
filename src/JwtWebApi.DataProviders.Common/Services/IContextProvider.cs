@@ -10,5 +10,7 @@ namespace JwtWebApi.DataProviders.Common.Services
 		IQueryable<T> GetTable<T>() where T : class;
 
 		Task<T> InsertAsync<T>(T entity) where T : class, IEntity;
+
+		Task<T> InsertNonEntityAsync<T>(T entity) where T : class;
 	}
 }

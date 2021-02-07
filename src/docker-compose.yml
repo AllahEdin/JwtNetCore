@@ -3,10 +3,10 @@ services:
   webapp:
     image: cheekibreeki228/test_repos:dev
     ports:
-      - 8080:80
+      - 22111:22111
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:22111
     volumes:
       - ~/.aspnet/https:/https:ro
     networks:

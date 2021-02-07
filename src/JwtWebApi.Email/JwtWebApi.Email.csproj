@@ -6,6 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.0.0" />
+    <PackageReference Include="MailKit" Version="2.10.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.Email.Services\JwtWebApi.Email.Services.csproj" />
   </ItemGroup>
 
 </Project>

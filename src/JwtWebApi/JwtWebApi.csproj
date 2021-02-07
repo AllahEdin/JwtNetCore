@@ -22,6 +22,7 @@
     <ProjectReference Include="..\JwtWebApi.Api\JwtWebApi.Api.csproj" />
     <ProjectReference Include="..\JwtWebApi.Common\JwtWebApi.Common.csproj" />
     <ProjectReference Include="..\JwtWebApi.DataProviders.Common\JwtWebApi.DataProviders.Common.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Email\JwtWebApi.Email.csproj" />
     <ProjectReference Include="..\JwtWebApi.MigrationProvider\JwtWebApi.MigrationProvider.csproj" />
   </ItemGroup>
 
