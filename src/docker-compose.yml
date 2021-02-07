@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  webapp:
+    image: cheekibreeki228/test_repos:dev
+    ports:
+      - 8080:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    networks:
+      - backend
+networks:
+  backend:
+    external:
+      name: dev

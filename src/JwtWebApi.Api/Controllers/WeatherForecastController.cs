@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace JwtWebApi.Controllers
+namespace JwtWebApi.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

@@ -14,8 +14,15 @@ namespace JwtWebApi
 
         public static IWebHost CreateHostBuilder(string[] args) =>
 	        WebHost.CreateDefaultBuilder(args)
-		        .UseKestrel()
-                .ConfigureServices(s => s.AddAutofac())
+				//.ConfigureAppConfiguration((host, builder) =>
+				//{
+				//	builder.Sources.Clear();
+				//	builder
+				//	   .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+				//		.AddJsonFile($"appsettings.{host.HostingEnvironment.EnvironmentName}.json", true, true);
+				//})
+				.UseKestrel()
+				.ConfigureServices(s => s.AddAutofac())
 		        .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
 	            .Build();

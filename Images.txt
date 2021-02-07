@@ -1,0 +1,8 @@
+web
+
+docker build -t cheekibreeki228/test_repos .
+
+
+db
+
+docker build -t cheekibreeki228/db_repo .

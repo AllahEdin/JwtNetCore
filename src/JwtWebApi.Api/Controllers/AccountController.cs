@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace JwtWebApi.Controllers
+namespace JwtWebApi.Api.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
