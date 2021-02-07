@@ -8,6 +8,7 @@ using JwtWebApi.Api.Models;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Email.Services.Services;
 using JwtWebApi.Link2DbProvider;
+using LinqToDB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -71,8 +72,9 @@ namespace JwtWebApi.Api.Controllers
 				{
 					Email = model.Email,
 					EmailConfirmed = false,
-					Id = Guid.NewGuid().ToString(),
+					UserId = Guid.NewGuid().ToString(),
 					UserName = model.UserName,
+					SecurityStamp = Guid.NewGuid().ToString()
 				};
 
 			var hashedPassword =
@@ -84,9 +86,35 @@ namespace JwtWebApi.Api.Controllers
 			AspNetUser res =
 				await _contextProviderFactory.Create().InsertNonEntityAsync(usr);
 
-			//_emailService.SendMessage()
+			_emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={res.UserId}&signature={usr.SecurityStamp}", res.Email);
 
 			return Ok(model);
+		}
+
+
+		[HttpGet(nameof(ConfirmEmail))]
+		public async Task<IActionResult> ConfirmEmail(string user, string signature)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.FirstOrDefault(t => t.UserId == user && t.SecurityStamp == signature);
+
+				if (found == null)
+				{
+					return BadRequest();
+				}
+
+				await contextProvider.GetTable<AspNetUser>()
+					.Where(t => t.UserId == user && t.SecurityStamp == signature)
+					.UpdateAsync(netUser =>  new AspNetUser()
+					{
+						EmailConfirmed = true
+					});
+
+				return Ok();
+			}
 		}
 
 		private async Task<ClaimsIdentity> GetIdentity(string email, string password)

@@ -60,11 +60,13 @@ namespace JwtWebApi.Link2DbProvider
 	[Table(Schema="aspnet", Name="AspNetUsers")]
 	public partial class AspNetUser
 	{
-		[PrimaryKey, NotNull    ] public string Id             { get; set; } // character varying(128)
+		[Column,     NotNull    ] public string UserId         { get; set; } // character varying(128)
 		[Column,     NotNull    ] public string UserName       { get; set; } // character varying(255)
 		[Column,     NotNull    ] public string Email          { get; set; } // character varying(255)
 		[Column,        Nullable] public string PasswordHash   { get; set; } // character varying(255)
 		[Column,        Nullable] public bool?  EmailConfirmed { get; set; } // boolean
+		[Column,        Nullable] public string SecurityStamp  { get; set; } // character varying(255)
+		[PrimaryKey, Identity   ] public int    Id             { get; set; } // integer
 	}
 
 	[Table(Schema="content", Name="__MyMigrationsHistory")]
