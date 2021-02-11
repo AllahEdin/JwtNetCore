@@ -9,6 +9,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.DataProviders.Common\JwtWebApi.DataProviders.Common.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Email.Services\JwtWebApi.Email.Services.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Link2DbProvider\JwtWebApi.Link2DbProvider.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Services\JwtWebApi.Services.csproj" />
+  </ItemGroup>
 
 
 </Project>

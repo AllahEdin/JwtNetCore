@@ -1,0 +1,89 @@
+﻿<#@ template language="C#" debug="True" hostSpecific="True"                           #>
+<#@ output extension=".generated.cs"                                                  #>
+<#@ include file="$(SolutionDir).tools\linq2db.t4models\LinqToDB.Templates\LinqToDB.PostgreSQL.Tools.ttinclude" #>
+<#@ include file="$(SolutionDir).tools\linq2db.t4models\LinqToDB.Templates\PluralizationService.ttinclude"     #>
+<#
+	NamespaceName = "JwtWebApi.Link2DbProvider.Dto";
+	var schema = "content, aspnet";
+
+	this.GetSchemaOptions.IncludedSchemas = 
+		new []{schema};
+
+	IsUpdateSequenceNameAttribute = true;
+	IsUpdateColumnComments = true;
+	IsUpdateTableComments = true;
+	IsUpdateDateTimeType = true;
+	IsUpdateViewIsNotNull = true;
+	Is_Id_FirstColumnInView = true;
+
+	string serverPsqlName = "localhost";
+	string portPsqlName = "7777";
+	string dataBasePsqlName = "db_test_1";
+	string uidPsqlName = "test";
+	string passwordPsqlName = "test";
+	
+	LoadPostgreSQLMetadata(serverPsqlName, portPsqlName, dataBasePsqlName, uidPsqlName, passwordPsqlName);
+	
+	GenerateFindExtensions = false;
+	GenerateAssociationExtensions = false;
+	GenerateAssociations = false;
+	GenerateViews = true;
+	GenerateDatabaseName = false;
+
+	Tables.Remove("SBrokerDatas");
+	Tables.Remove("SBrokerDataHistories");
+
+	Procedures.Clear();
+
+	DataContextObject.AccessModifier = AccessModifier.Internal;
+	DataContextObject.Name = "MarketPlaysDbProvider";
+	GenerateDatabaseName = false;
+
+	foreach (KeyValuePair<string, Procedure> pr in Procedures)
+	{
+		pr.Value.AccessModifier = AccessModifier.Internal;
+		if (pr.Value.ResultTable != null)
+		{
+			pr.Value.ResultTable.AccessModifier = AccessModifier.Internal;
+		}
+	}
+	
+	Procedures.Clear();
+	
+	var migrationKey = 
+		Tables.Keys
+			.FirstOrDefault(key => key.IndexOf("__MyMigrationsHistory", 
+												StringComparison.OrdinalIgnoreCase) > -1);
+	Tables.Remove(migrationKey);
+
+	foreach (var t in Tables.Values
+							.Where(tl => !tl.TableName
+											.StartsWith("AspNet", StringComparison.OrdinalIgnoreCase)))
+	{
+	    if (t.TableName == "__MyMigrationsHistory")
+		{
+			continue;
+		}
+
+		foreach (var c in t.Columns.Values)
+		{
+			if (c.IsPrimaryKey)
+			{
+				c.MemberName = "Id";
+			}
+			else if (c.MemberName == "BirthData")
+			{
+				c.MemberName = "BirthDate";
+			}
+			else if ((t.TableName == "Accesses" && c.MemberName == "Rights") ||
+					 (t.TableName == "AccessesUserTemplates" && c.MemberName == "Right"))
+			{
+				c.Type = "SamGMU.DcpIS.Common.AccessRight";
+			}
+		}
+		
+		t.BaseClass = "SamGMU.DataProvider.IEntity";
+	}
+
+	GenerateModel();
+#>

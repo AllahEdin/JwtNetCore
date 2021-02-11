@@ -22,12 +22,10 @@ namespace JwtWebApi.DataProviders.Common.Extensions
         /// <typeparam name="T">Тип обновляемой сущности</typeparam>
         /// <param name="query">Запрос</param>
         /// <param name="setter">Выражение обновления</param>
-        /// <param name="userId">Идентификатор пользователя</param>
-        /// <returns></returns>
+	    /// <returns></returns>
         public static Task<int> UpdateAsync<T>(
           this IQueryable<T> query,
-          Expression<Func<T, T>> setter,
-          int userId)
+          Expression<Func<T, T>> setter)
           where T : class, IEntity
         {
             ParameterExpression parameterExpression;

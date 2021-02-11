@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="linq2db" Version="3.2.3" />
+    <PackageReference Include="linq2db.PostgreSQL" Version="3.2.3" />
+    <PackageReference Include="linq2db.t4models" Version="3.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.DataProviders.Common\JwtWebApi.DataProviders.Common.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Update="Dto\SimpleGenerator.tt">
+      <LastGenOutput>SimpleGenerator.generated.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Dto\SimpleGenerator.generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SimpleGenerator.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+
+</Project>

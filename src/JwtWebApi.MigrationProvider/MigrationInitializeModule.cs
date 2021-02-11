@@ -13,7 +13,7 @@ namespace JwtWebApi.MigrationProvider
 		private readonly bool _dataMigration;
 
 		/// <inheritdoc />
-		public MigrationInitializeModule(IConnectionStringProvider connectionStringProvider,
+		public MigrationInitializeModule(IConnectionStringProvider connectionStringProvider, 
 			IConfiguration configuration)
 		{
 			_connectionStringProvider = connectionStringProvider;

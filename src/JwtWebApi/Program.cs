@@ -1,23 +1,40 @@
 using System.IO;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore;
+using JwtWebApi.Impl;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace JwtWebApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+	   
+
+		public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Run();
+	        var host = Host.CreateDefaultBuilder(args)
+		        .ConfigureAppConfiguration((hostingContext, config) =>
+		        {
+			        config.AddInMemoryCollection(SecretsProvider.GetSecrets());
+		        })
+				.UseServiceProviderFactory(new AutofacServiceProviderFactory())
+		        .ConfigureWebHostDefaults(webHostBuilder =>
+		        {
+			        webHostBuilder.UseKestrel()
+				        .ConfigureServices(s => s.AddAutofac())
+				        .UseContentRoot(Directory.GetCurrentDirectory())
+				        .UseStartup<Startup>();
+		        })
+		        .Build();
+            
+	        host.Run();
         }
 
-        public static IWebHost CreateHostBuilder(string[] args) =>
-	        WebHost.CreateDefaultBuilder(args)
-		        .UseKestrel()
-                .ConfigureServices(s => s.AddAutofac())
-		        .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseStartup<Startup>()
-	            .Build();
+        //public static IWebHost CreateHostBuilder(string[] args)
+        //{
+	       // return ;
+        //}
+	        
     }
 }

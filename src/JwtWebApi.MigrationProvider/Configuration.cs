@@ -1,4 +1,5 @@
-﻿using JwtWebApi.MigrationProvider.Models;
+﻿using JwtWebApi.MigrationProvider.Migrations.DataUpdates;
+using JwtWebApi.MigrationProvider.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace JwtWebApi.MigrationProvider
@@ -6,12 +7,10 @@ namespace JwtWebApi.MigrationProvider
 	/// <inheritdoc />
 	internal sealed class Configuration : DbMigrationConfiguration<MigrationPostgreSqlContext>
 	{
-		//private static readonly IMigrationDataUpdate[] DataUpdateServices =
-		//{
-		//	new EntityTypesServicesDataUpdate(),
-		//	new RoleAccessesServicesDataUpdate(),
-		//	new StatusesDataUpdate(),
-		//};
+		private static readonly IMigrationDataUpdate[] DataUpdateServices =
+		{
+			new RolesMigrationDataUpdate()
+		};
 
 		/// <inheritdoc />
 		public Configuration()
@@ -22,10 +21,10 @@ namespace JwtWebApi.MigrationProvider
 		/// <inheritdoc />
 		protected override void Seed(MigrationPostgreSqlContext context)
 		{
-			//foreach (IMigrationDataUpdate migrationDataUpdate in DataUpdateServices)
-			//{
-			//	migrationDataUpdate.Update(context);
-			//}
+			foreach (IMigrationDataUpdate migrationDataUpdate in DataUpdateServices)
+			{
+				migrationDataUpdate.Update(context);
+			}
 		}
 	}
 

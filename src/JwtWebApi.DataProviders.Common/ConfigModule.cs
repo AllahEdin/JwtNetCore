@@ -10,8 +10,8 @@ namespace JwtWebApi.DataProviders.Common
 		{
 			base.Load(builder);
 
-			builder.RegisterType<PostgresSqlDbProvider>()
-				.As<IContextProvider>()
+			builder.RegisterType<PostgreSqlLink2DbContextProviderFactory>()
+				.As<IContextProviderFactory>()
 				.SingleInstance();
 		}
 	}

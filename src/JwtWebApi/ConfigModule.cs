@@ -1,5 +1,9 @@
 ﻿using Autofac;
 using JwtWebApi.Common.Services;
+using JwtWebApi.Impl;
+using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 
 namespace JwtWebApi
@@ -8,7 +12,7 @@ namespace JwtWebApi
 	{
 		internal class ConnectionStringProvider : IConnectionStringProvider
 		{
-			private IConfiguration _configuration;
+			private readonly IConfiguration _configuration;
 
 			public ConnectionStringProvider(IConfiguration configuration)
 			{
@@ -27,6 +31,22 @@ namespace JwtWebApi
 
 			builder.RegisterType<ConnectionStringProvider>()
 				.As<IConnectionStringProvider>()
+				.SingleInstance();
+
+			builder.RegisterType<InitializeModule>()
+				.As<IInitializeModule>()
+				.SingleInstance();
+
+			builder.RegisterType<PasswordHasher<AspNetUser>>()
+				.As<IPasswordHasher<AspNetUser>>()
+				.SingleInstance();
+
+			builder.RegisterType<JwtKeyProvider>()
+				.As<IJwtKeyProvider>()
+				.SingleInstance();
+
+			builder.RegisterType<GoogleSecretKeyProvider>()
+				.As<IGoogleSecretKeyProvider>()
 				.SingleInstance();
 		}
 	}

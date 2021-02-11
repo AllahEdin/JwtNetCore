@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  webapp:
+    image: cheekibreeki228/test_repos:dev
+    ports:
+      - 22111:22111
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:22111
+    secrets:
+      - TravelDbConnectionString
+    networks:
+      - backend
+networks:
+  backend:
+    external:
+      name: dev
+secrets:
+   TravelDbConnectionString:
+      file: ./connection_string.txt
+      

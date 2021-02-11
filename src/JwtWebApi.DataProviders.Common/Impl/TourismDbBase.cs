@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using JwtWebApi.DataProviders.Common.DataObjects;
@@ -32,10 +33,17 @@ namespace JwtWebApi.DataProviders.Common.Impl
 	    /// <inheritdoc />
         public async Task<T> InsertAsync<T>(T entity) where T : class, IEntity
         {
-            int num = await this.InsertAsync<T>(entity, (string)null, (string)null, (string)null, (string)null, TableOptions.NotSet, CancellationToken.None);
+            int num = await this.InsertAsync<T>(entity, null, null, null, (string)null, TableOptions.NotSet, CancellationToken.None);
 
             return entity;
         }
 
+
+	    public async Task<T> InsertNonEntityAsync<T>(T entity) where T : class
+	    {
+			int num = await this.InsertAsync<T>(entity, null, null, null, null, TableOptions.NotSet, CancellationToken.None);
+
+			return entity;
+		}
     }
 }
