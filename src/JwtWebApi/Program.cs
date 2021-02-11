@@ -1,17 +1,24 @@
 using System.IO;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore;
+using JwtWebApi.Impl;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace JwtWebApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+	   
+
+		public static void Main(string[] args)
         {
 	        var host = Host.CreateDefaultBuilder(args)
-		        .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+		        .ConfigureAppConfiguration((hostingContext, config) =>
+		        {
+			        config.AddInMemoryCollection(SecretsProvider.GetSecrets());
+		        })
+				.UseServiceProviderFactory(new AutofacServiceProviderFactory())
 		        .ConfigureWebHostDefaults(webHostBuilder =>
 		        {
 			        webHostBuilder.UseKestrel()

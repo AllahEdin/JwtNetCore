@@ -8,6 +8,7 @@
 #pragma warning disable 1591
 
 using System;
+using System.Collections.Generic;
 
 using LinqToDB;
 using LinqToDB.Configuration;
@@ -22,7 +23,9 @@ namespace JwtWebApi.Link2DbProvider
 	/// </summary>
 	public partial class DbTest1DB : LinqToDB.Data.DataConnection
 	{
+		public ITable<AspNetRole>          AspNetRoles           { get { return this.GetTable<AspNetRole>(); } }
 		public ITable<AspNetUser>          AspNetUsers           { get { return this.GetTable<AspNetUser>(); } }
+		public ITable<AspNetUserRole>      AspNetUserRoles       { get { return this.GetTable<AspNetUserRole>(); } }
 		public ITable<MyMigrationsHistory> MyMigrationsHistories { get { return this.GetTable<MyMigrationsHistory>(); } }
 		/// <summary>
 		/// Идентификатор
@@ -57,16 +60,30 @@ namespace JwtWebApi.Link2DbProvider
 		partial void InitMappingSchema();
 	}
 
+	[Table(Schema="aspnet", Name="AspNetRoles")]
+	public partial class AspNetRole
+	{
+		[PrimaryKey, Identity] public int    Id       { get; set; } // integer
+		[Column,     Nullable] public string RoleName { get; set; } // character varying(40)
+	}
+
 	[Table(Schema="aspnet", Name="AspNetUsers")]
 	public partial class AspNetUser
 	{
-		[Column,     NotNull    ] public string UserId         { get; set; } // character varying(128)
+		[PrimaryKey, NotNull    ] public string Id             { get; set; } // character varying(128)
 		[Column,     NotNull    ] public string UserName       { get; set; } // character varying(255)
 		[Column,     NotNull    ] public string Email          { get; set; } // character varying(255)
 		[Column,        Nullable] public string PasswordHash   { get; set; } // character varying(255)
 		[Column,        Nullable] public bool?  EmailConfirmed { get; set; } // boolean
 		[Column,        Nullable] public string SecurityStamp  { get; set; } // character varying(255)
-		[PrimaryKey, Identity   ] public int    Id             { get; set; } // integer
+	}
+
+	[Table(Schema="aspnet", Name="AspNetUserRoles")]
+	public partial class AspNetUserRole
+	{
+		[PrimaryKey, Identity] public int    Id           { get; set; } // integer
+		[Column,     Nullable] public string AspNetUserId { get; set; } // character varying
+		[Column,     Nullable] public int?   RoleId       { get; set; } // integer
 	}
 
 	[Table(Schema="content", Name="__MyMigrationsHistory")]

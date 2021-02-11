@@ -17,8 +17,10 @@ namespace JwtWebApi.MigrationProvider.Models
         {
         }
 
+        public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
+        public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
-
+      
         public virtual DbSet<Objects> Objects { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -33,6 +35,43 @@ namespace JwtWebApi.MigrationProvider.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "en_US.utf8");
+
+            modelBuilder.Entity<AspNetRoles>(entity =>
+            {
+                entity.ToTable("AspNetRoles", "aspnet");
+
+                entity.HasIndex(e => e.RoleName, "IX_RoleName")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.RoleName).HasMaxLength(40);
+            });
+
+            modelBuilder.Entity<AspNetUserRoles>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("AspNetUserRoles", "aspnet");
+
+                entity.HasIndex(e => e.AspNetUserId, "IX_AspNetUserRoles_AspNetUserId");
+
+                entity.HasIndex(e => e.RoleId, "IX_AspNetUserRoles_RoleId");
+
+                entity.Property(e => e.AspNetUserId).HasColumnType("character varying");
+
+                entity.HasOne(d => d.AspNetUser)
+                    .WithMany()
+                    .HasForeignKey(d => d.AspNetUserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_AspNetUsers");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany()
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_AspNetRoles");
+            });
 
             modelBuilder.Entity<AspNetUsers>(entity =>
             {
@@ -53,7 +92,6 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
             });
 
-    
 
             modelBuilder.Entity<Objects>(entity =>
             {

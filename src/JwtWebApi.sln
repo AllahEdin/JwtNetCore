@@ -15,9 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtWebApi.Common", "JwtWebA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtWebApi.Link2DbProvider", "JwtWebApi.Link2DbProvider\JwtWebApi.Link2DbProvider.csproj", "{246AD846-818A-4EE5-9ED1-59055CB93379}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtWebApi.Email", "JwtWebApi.Email\JwtWebApi.Email.csproj", "{CCAF4A7A-4A0E-409B-BCC0-1A8950A331CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtWebApi.Email", "JwtWebApi.Email\JwtWebApi.Email.csproj", "{CCAF4A7A-4A0E-409B-BCC0-1A8950A331CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtWebApi.Email.Services", "JwtWebApi.Email.Services\JwtWebApi.Email.Services.csproj", "{DB3C5962-6C35-4E5C-A84B-FD7FA86C14EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtWebApi.Email.Services", "JwtWebApi.Email.Services\JwtWebApi.Email.Services.csproj", "{DB3C5962-6C35-4E5C-A84B-FD7FA86C14EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtWebApi.Services", "JwtWebApi.Services\JwtWebApi.Services.csproj", "{8A7D547D-B743-4C32-A19C-27E3BE989010}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{DB3C5962-6C35-4E5C-A84B-FD7FA86C14EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB3C5962-6C35-4E5C-A84B-FD7FA86C14EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB3C5962-6C35-4E5C-A84B-FD7FA86C14EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A7D547D-B743-4C32-A19C-27E3BE989010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A7D547D-B743-4C32-A19C-27E3BE989010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A7D547D-B743-4C32-A19C-27E3BE989010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A7D547D-B743-4C32-A19C-27E3BE989010}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

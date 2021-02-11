@@ -8,6 +8,7 @@ using JwtWebApi.Api.Models;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Email.Services.Services;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services;
 using LinqToDB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -22,20 +23,20 @@ namespace JwtWebApi.Api.Controllers
 	[Produces("application/json")]
 	public class AccountController : Controller
 	{
-		private readonly IConfiguration _configuration;
 		private readonly IContextProviderFactory _contextProviderFactory;
 		private readonly IPasswordHasher<AspNetUser> _passwordHasher;
 		private readonly IEmailService _emailService;
+		private readonly IJwtGenerator _jwtGenerator;
 
-		public AccountController(IConfiguration configuration ,
-			IContextProviderFactory contextProviderFactory,
+		public AccountController(IContextProviderFactory contextProviderFactory,
 			IPasswordHasher<AspNetUser> passwordHasher,
-			IEmailService emailService)
+			IEmailService emailService,
+			IJwtGenerator jwtGenerator)
 		{
-			_configuration = configuration;
 			_contextProviderFactory = contextProviderFactory;
 			_passwordHasher = passwordHasher;
 			_emailService = emailService;
+			_jwtGenerator = jwtGenerator;
 		}
 
 		[ProducesResponseType(typeof(string),200)]
@@ -43,21 +44,13 @@ namespace JwtWebApi.Api.Controllers
 		[AllowAnonymous]
 		public async Task<IActionResult> Login(string email, string password)
 		{
-			var identity = await GetIdentity(email, password);
-			if (identity == null)
+			if (!await GetIdentity(email, password, out string name, out string role))
 			{
-				return BadRequest(new { errorText = "Invalid username or password." });
+				return BadRequest();
 			}
 
-			var now = DateTime.UtcNow;
-
-			// создаем JWT-токен
-			var jwt = new JwtSecurityToken(
-				claims: identity.Claims,
-				expires: now.Add(TimeSpan.FromSeconds(40)),
-				signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWTKey"])),
-					SecurityAlgorithms.HmacSha256));
-			string encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+			var encodedJwt =
+				await _jwtGenerator.Generate(name, role);
 
 			return Ok(encodedJwt);
         }
@@ -67,12 +60,20 @@ namespace JwtWebApi.Api.Controllers
 		[AllowAnonymous]
 		public async Task<IActionResult> Register([FromBody] RegistrationModel model)
 		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				if (contextProvider.GetTable<AspNetUser>().Any(t => t.Email == model.Email))
+				{
+					return BadRequest("Пользователь уже существует");
+				}
+			}
+
 			var usr =
 				new AspNetUser()
 				{
+					Id = Guid.NewGuid().ToString(),
 					Email = model.Email,
 					EmailConfirmed = false,
-					UserId = Guid.NewGuid().ToString(),
 					UserName = model.UserName,
 					SecurityStamp = Guid.NewGuid().ToString()
 				};
@@ -86,11 +87,59 @@ namespace JwtWebApi.Api.Controllers
 			AspNetUser res =
 				await _contextProviderFactory.Create().InsertNonEntityAsync(usr);
 
-			_emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={res.UserId}&signature={usr.SecurityStamp}", res.Email);
+			await _emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={res.Id}&signature={usr.SecurityStamp}", res.Email);
 
 			return Ok(model);
 		}
 
+		[ProducesResponseType(typeof(bool), 200)]
+		[HttpPost(nameof(ResendEmail))]
+		[AllowAnonymous]
+		public async Task<IActionResult> ResendEmail(string email)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var usrs =
+					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email);
+
+				if (usrs.Count() > 1)
+				{
+					throw new InvalidOperationException("Нарушена структура бд!!");
+				}
+
+				if (!usrs.Any())
+				{
+					return BadRequest("Пользователя с такой почтой не существует");
+				}
+
+
+				var usr =
+					usrs.Single();
+
+				if (usr.EmailConfirmed ?? false)
+				{
+					return Ok(false);
+				}
+
+				var count =
+					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email)
+						.UpdateAsync(u => new AspNetUser()
+						{
+							SecurityStamp =
+								Guid.NewGuid().ToString()
+						});
+
+
+				var updatedUsr =
+					contextProvider.GetTable<AspNetUser>().First(t => t.Email == email);
+
+
+				await _emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={updatedUsr.Id}&signature={updatedUsr.SecurityStamp}", updatedUsr.Email);
+
+				return Ok();
+			}
+
+		}
 
 		[HttpGet(nameof(ConfirmEmail))]
 		public async Task<IActionResult> ConfirmEmail(string user, string signature)
@@ -99,7 +148,7 @@ namespace JwtWebApi.Api.Controllers
 			{
 				var found =
 					contextProvider.GetTable<AspNetUser>()
-						.FirstOrDefault(t => t.UserId == user && t.SecurityStamp == signature);
+						.FirstOrDefault(t => t.Id == user && t.SecurityStamp == signature);
 
 				if (found == null)
 				{
@@ -107,7 +156,7 @@ namespace JwtWebApi.Api.Controllers
 				}
 
 				await contextProvider.GetTable<AspNetUser>()
-					.Where(t => t.UserId == user && t.SecurityStamp == signature)
+					.Where(t => t.Id == user && t.SecurityStamp == signature)
 					.UpdateAsync(netUser =>  new AspNetUser()
 					{
 						EmailConfirmed = true
@@ -117,23 +166,27 @@ namespace JwtWebApi.Api.Controllers
 			}
 		}
 
-		private async Task<ClaimsIdentity> GetIdentity(string email, string password)
+		private Task<bool> GetIdentity(string email, string password, out string name, out string role)
 		{
 			using (var provider = _contextProviderFactory.Create())
 			{
 				var user= 
 					provider.GetTable<AspNetUser>()
-					.FirstOrDefault(t => t.Email == email);
+					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false));
 
 				if (user == null)
 				{
-					return null;
+					name = "";
+					role = "";
+					return Task.FromResult(false);
 				}
 
 				switch (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password))
 				{
 					case PasswordVerificationResult.Failed:
-						return null;
+						name = "";
+						role = "";
+						return Task.FromResult(false);
 					case PasswordVerificationResult.Success:
 						break;
 					case PasswordVerificationResult.SuccessRehashNeeded:
@@ -142,11 +195,14 @@ namespace JwtWebApi.Api.Controllers
 						throw new ArgumentOutOfRangeException();
 				}
 
-				var name = new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName);
-				//TODO
-				var role = new Claim(ClaimsIdentity.DefaultRoleClaimType, "Admin");
-				var claimsIdentity = new ClaimsIdentity(new[] { name, role }, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-				return claimsIdentity;
+				//var name = new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName);
+		
+				//var claimsIdentity = new ClaimsIdentity(new[] { name }, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+				//return claimsIdentity;
+
+				name = user.UserName;
+				role = "user";
+				return Task.FromResult(true);
 			}
 		}
 	}

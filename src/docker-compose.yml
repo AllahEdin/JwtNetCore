@@ -7,11 +7,15 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:22111
-    volumes:
-      - ~/.aspnet/https:/https:ro
+    secrets:
+      - TravelDbConnectionString
     networks:
       - backend
 networks:
   backend:
     external:
       name: dev
+secrets:
+   TravelDbConnectionString:
+      file: ./connection_string.txt
+      
