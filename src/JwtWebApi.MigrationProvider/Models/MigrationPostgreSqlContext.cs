@@ -20,7 +20,8 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
         public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
-      
+        public virtual DbSet<Cities> Cities { get; set; }
+        public virtual DbSet<ObjectTypes> ObjectTypes { get; set; }
         public virtual DbSet<Objects> Objects { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -92,6 +93,30 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
             });
 
+            modelBuilder.Entity<Cities>(entity =>
+            {
+                entity.ToTable("Cities", "content");
+
+                entity.HasIndex(e => e.Name, "IX_Cities_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+      
+            modelBuilder.Entity<ObjectTypes>(entity =>
+            {
+                entity.ToTable("ObjectTypes", "content");
+
+                entity.HasIndex(e => e.Name, "IX_ObjectTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
 
             modelBuilder.Entity<Objects>(entity =>
             {
@@ -100,6 +125,26 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Id)
                     .HasComment("Идентификатор")
                     .UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Address).HasMaxLength(255);
+
+                entity.Property(e => e.Description).HasMaxLength(255);
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+
+                entity.Property(e => e.Preview).HasMaxLength(255);
+
+                entity.HasOne(d => d.City)
+                    .WithMany(p => p.Objects)
+                    .HasForeignKey(d => d.CityId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_CityId");
+
+                entity.HasOne(d => d.ObjectType)
+                    .WithMany(p => p.Objects)
+                    .HasForeignKey(d => d.ObjectTypeId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_ObjectTypeId");
             });
 
             OnModelCreatingPartial(modelBuilder);

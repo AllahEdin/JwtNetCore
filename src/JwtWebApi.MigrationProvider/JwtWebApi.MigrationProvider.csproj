@@ -20,8 +20,4 @@
     <ProjectReference Include="..\JwtWebApi.Common\JwtWebApi.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
 </Project>

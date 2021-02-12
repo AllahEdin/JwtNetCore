@@ -33,6 +33,10 @@
       <DependentUpon>SimpleGenerator.tt</DependentUpon>
     </Compile>
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Dto\Partial\" />
+  </ItemGroup>
 
 
 </Project>

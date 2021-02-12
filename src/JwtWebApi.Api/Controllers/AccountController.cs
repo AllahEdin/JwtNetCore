@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Models;
 using JwtWebApi.DataProviders.Common.Services;
@@ -13,8 +10,6 @@ using LinqToDB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace JwtWebApi.Api.Controllers
 {
@@ -44,13 +39,16 @@ namespace JwtWebApi.Api.Controllers
 		[AllowAnonymous]
 		public async Task<IActionResult> Login(string email, string password)
 		{
-			if (!await GetIdentity(email, password, out string name, out string role))
+			var ident =
+				await GetIdentity(email, password);
+
+			if (!ident.success)
 			{
 				return BadRequest();
 			}
 
 			var encodedJwt =
-				await _jwtGenerator.Generate(name, role);
+				await _jwtGenerator.Generate(ident.name, ident.role);
 
 			return Ok(encodedJwt);
         }
@@ -60,6 +58,8 @@ namespace JwtWebApi.Api.Controllers
 		[AllowAnonymous]
 		public async Task<IActionResult> Register([FromBody] RegistrationModel model)
 		{
+			AspNetUser user;
+			
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
 				if (contextProvider.GetTable<AspNetUser>().Any(t => t.Email == model.Email))
@@ -84,10 +84,16 @@ namespace JwtWebApi.Api.Controllers
 			usr.PasswordHash =
 				hashedPassword;
 
-			AspNetUser res =
-				await _contextProviderFactory.Create().InsertNonEntityAsync(usr);
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				user =
+					await contextProvider.InsertNonEntityAsync(usr);
+			}
 
-			await _emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={res.Id}&signature={usr.SecurityStamp}", res.Email);
+			var role =
+				await SetDefaultRoleToUser(usr.Id);
+
+			await _emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={user.Id}&signature={usr.SecurityStamp}", user.Email);
 
 			return Ok(model);
 		}
@@ -166,27 +172,32 @@ namespace JwtWebApi.Api.Controllers
 			}
 		}
 
-		private Task<bool> GetIdentity(string email, string password, out string name, out string role)
+		private async Task<(bool success, string name, string role)> GetIdentity(string email, string password)
 		{
 			using (var provider = _contextProviderFactory.Create())
 			{
 				var user= 
 					provider.GetTable<AspNetUser>()
 					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false));
-
+				
 				if (user == null)
 				{
-					name = "";
-					role = "";
-					return Task.FromResult(false);
+					return (false, "", "");
 				}
+
+				var userRole =
+					provider
+						.GetTable<AspNetUserRole>()
+						.FirstOrDefault(t => t.AspNetUserId == user.Id) ?? await SetDefaultRoleToUser(user.Id);
+
+				var role =
+					provider.GetTable<AspNetRole>()
+						.FirstOrDefault(t => t.Id == userRole.RoleId) ?? throw new InvalidOperationException("Нарушена целостность бд");
 
 				switch (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password))
 				{
 					case PasswordVerificationResult.Failed:
-						name = "";
-						role = "";
-						return Task.FromResult(false);
+						return (false, "", "");
 					case PasswordVerificationResult.Success:
 						break;
 					case PasswordVerificationResult.SuccessRehashNeeded:
@@ -195,14 +206,38 @@ namespace JwtWebApi.Api.Controllers
 						throw new ArgumentOutOfRangeException();
 				}
 
-				//var name = new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName);
-		
-				//var claimsIdentity = new ClaimsIdentity(new[] { name }, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-				//return claimsIdentity;
+				return (true, user.UserName, role.RoleName);
+			}
+		}
 
-				name = user.UserName;
-				role = "user";
-				return Task.FromResult(true);
+		private async Task<AspNetUserRole> SetDefaultRoleToUser(string userId)
+		{
+			AspNetRole role;
+
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				role =
+					contextProvider
+						.GetTable<AspNetRole>()
+						.FirstOrDefault(t => t.RoleName == "user");
+
+				if (role == null)
+				{
+					throw new InvalidOperationException();
+				}
+
+				var userRole =
+					new AspNetUserRole()
+					{
+						AspNetUserId = userId,
+						RoleId = role.Id,
+					};
+
+
+				AspNetUserRole createdUserRole =
+					await contextProvider.InsertNonEntityAsync(userRole);
+
+				return createdUserRole;
 			}
 		}
 	}

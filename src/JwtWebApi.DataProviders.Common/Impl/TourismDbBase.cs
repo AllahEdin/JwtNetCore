@@ -42,7 +42,6 @@ namespace JwtWebApi.DataProviders.Common.Impl
 	    public async Task<T> InsertNonEntityAsync<T>(T entity) where T : class
 	    {
 			int num = await this.InsertAsync<T>(entity, null, null, null, null, TableOptions.NotSet, CancellationToken.None);
-
 			return entity;
 		}
     }

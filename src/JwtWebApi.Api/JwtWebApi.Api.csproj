@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.Api.Common\JwtWebApi.Api.Common.csproj" />
     <ProjectReference Include="..\JwtWebApi.DataProviders.Common\JwtWebApi.DataProviders.Common.csproj" />
     <ProjectReference Include="..\JwtWebApi.Email.Services\JwtWebApi.Email.Services.csproj" />
     <ProjectReference Include="..\JwtWebApi.Link2DbProvider\JwtWebApi.Link2DbProvider.csproj" />

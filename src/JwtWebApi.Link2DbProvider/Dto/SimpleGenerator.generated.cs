@@ -26,11 +26,13 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<AspNetRole>          AspNetRoles           { get { return this.GetTable<AspNetRole>(); } }
 		public ITable<AspNetUser>          AspNetUsers           { get { return this.GetTable<AspNetUser>(); } }
 		public ITable<AspNetUserRole>      AspNetUserRoles       { get { return this.GetTable<AspNetUserRole>(); } }
+		public ITable<City>                Cities                { get { return this.GetTable<City>(); } }
 		public ITable<MyMigrationsHistory> MyMigrationsHistories { get { return this.GetTable<MyMigrationsHistory>(); } }
 		/// <summary>
 		/// Идентификатор
 		/// </summary>
 		public ITable<Object>              Objects               { get { return this.GetTable<Object>(); } }
+		public ITable<ObjectType>          ObjectTypes           { get { return this.GetTable<ObjectType>(); } }
 
 		partial void InitMappingSchema()
 		{
@@ -81,9 +83,15 @@ namespace JwtWebApi.Link2DbProvider
 	[Table(Schema="aspnet", Name="AspNetUserRoles")]
 	public partial class AspNetUserRole
 	{
-		[PrimaryKey, Identity] public int    Id           { get; set; } // integer
-		[Column,     Nullable] public string AspNetUserId { get; set; } // character varying
-		[Column,     Nullable] public int?   RoleId       { get; set; } // integer
+		[Column, Nullable] public string AspNetUserId { get; set; } // character varying
+		[Column, Nullable] public int?   RoleId       { get; set; } // integer
+	}
+
+	[Table(Schema="content", Name="Cities")]
+	public partial class City : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     Nullable] public string Name { get; set; } // character varying(255)
 	}
 
 	[Table(Schema="content", Name="__MyMigrationsHistory")]
@@ -97,12 +105,25 @@ namespace JwtWebApi.Link2DbProvider
 	/// Идентификатор
 	/// </summary>
 	[Table(Schema="content", Name="Objects")]
-	public partial class Object
+	public partial class Object : JwtWebApi.DataProviders.Common.DataObjects.IEntity
 	{
 		/// <summary>
 		/// Идентификатор
 		/// </summary>
-		[PrimaryKey, Identity] public int Id { get; set; } // integer
+		[PrimaryKey, Identity] public int    Id           { get; set; } // integer
+		[Column,     Nullable] public string Name         { get; set; } // character varying(255)
+		[Column,     Nullable] public int?   ObjectTypeId { get; set; } // integer
+		[Column,     Nullable] public int?   CityId       { get; set; } // integer
+		[Column,     Nullable] public string Preview      { get; set; } // character varying(255)
+		[Column,     Nullable] public string Description  { get; set; } // character varying(255)
+		[Column,     Nullable] public string Address      { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="content", Name="ObjectTypes")]
+	public partial class ObjectType : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     Nullable] public string Name { get; set; } // character varying(255)
 	}
 }
 
