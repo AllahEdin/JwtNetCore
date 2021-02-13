@@ -43,7 +43,7 @@
 	NamespaceName = "JwtWebApi.Link2DbProvider";
 
 	this.GetSchemaOptions.IncludedSchemas = 
-		new []{"content", "aspnet"};
+		new []{"places", "aspnet"};
 
 	string serverPsqlName = "localhost";
 	string portPsqlName = "7777";
@@ -81,15 +81,19 @@
 			}
 		}
 
+		var baseCl = "JwtWebApi.DataProviders.Common.DataObjects.IEntity";
+
 		if (t.Columns.Values.Any(t => t.MemberName == "IsDeleted"))
 		{
-			t.BaseClass = "JwtWebApi.DataProviders.Common.DataObjects.IEntity, JwtWebApi.DataProviders.Common.DataObjects.IDeletable";
-		}
-		else
-		{
-			t.BaseClass = "JwtWebApi.DataProviders.Common.DataObjects.IEntity";
+			baseCl += ",JwtWebApi.DataProviders.Common.DataObjects.IDeletable";
 		}
 		
+		if (t.Columns.Values.Any(t => t.MemberName == "Name"))
+		{
+			baseCl += ",JwtWebApi.DataProviders.Common.DataObjects.INamed";
+		}
+
+		t.BaseClass = baseCl;
 	}
 
 	GenerateModel();

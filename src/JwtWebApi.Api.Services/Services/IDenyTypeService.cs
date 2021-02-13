@@ -1,0 +1,40 @@
+﻿using JwtWebApi.Api.Common.Services;
+using JwtWebApi.Api.Services.Dto;
+
+namespace JwtWebApi.Api.Services.Services
+{
+	public interface IDenyTypeService : IEntityProvider<IDenyType>
+	{
+		
+	}
+
+	public interface ICateringTypeService : IEntityProvider<ICateringType>
+	{
+
+	}
+
+	public interface ICuisineTypeService : IEntityProvider<ICuisineType>
+	{
+
+	}
+
+	public interface ICityService : IEntityProvider<ICity>
+	{
+
+	}
+
+	public interface IEquipmentTypeService : IEntityProvider<IEquipmentType>
+	{
+
+	}
+	public interface IHousingTypeService : IEntityProvider<IHousingType>
+	{
+
+	}
+
+	public interface IServiceTypeService : IEntityProvider<IServiceType>
+	{
+
+	}
+
+}

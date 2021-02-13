@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace JwtWebApi.Api.Controllers
 {
 	[ApiController]
-	[Route("[controller]")]
+	[Route("api/[controller]")]
 	[Produces("application/json")]
 	public class AccountController : Controller
 	{

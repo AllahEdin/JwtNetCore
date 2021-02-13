@@ -5,16 +5,16 @@ using System.Collections.Generic;
 
 namespace JwtWebApi.MigrationProvider.Models
 {
-    public partial class ObjectTypes
+    public partial class HousingTypes
     {
-        public ObjectTypes()
+        public HousingTypes()
         {
-            Objects = new HashSet<Objects>();
+            Hotels = new HashSet<Hotels>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public virtual ICollection<Objects> Objects { get; set; }
+        public virtual ICollection<Hotels> Hotels { get; set; }
     }
 }

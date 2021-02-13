@@ -1,80 +1,139 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using JwtWebApi.Api.Common.Extensions;
+using JwtWebApi.Api.Common.Services;
 using JwtWebApi.DataProviders.Common.DataObjects;
-using JwtWebApi.DataProviders.Common.Extensions;
-using JwtWebApi.DataProviders.Common.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JwtWebApi.Api.Common.ApiController
 {
 	[Route("api/[controller]")]
 	[Produces("application/json")]
-	public abstract class ApiControllerBase<T> : Controller
-	where T : class, IEntity
+	public abstract class ApiControllerBase<TContract,TModel,TService> : Controller
+	where TContract : class, IEntity
+	where TModel : class, TContract, new()
+	where TService : IEntityProvider<TContract>
 	{
-		protected readonly IContextProviderFactory ContextProviderFactory;
+		/// <summary>
+		/// Сервис BL-провайдера
+		/// </summary>
+		protected TService Service { get; }
 
-		protected ApiControllerBase(IContextProviderFactory contextProviderFactory)
+		/// <inheritdoc />
+		protected ApiControllerBase(TService service)
 		{
-			ContextProviderFactory = contextProviderFactory;
+			Service = service;
 		}
 
-		protected virtual async Task<T> Get(int id)
+		/// <summary>
+		///     Возвращает информацию о сущности по её идентификатору <paramref name="id" />
+		/// </summary>
+		/// <param name="id">Идентификатор сущности</param>
+		/// <returns></returns>
+		protected async Task<IActionResult> Get(
+			[Range(1, int.MaxValue)]
+			int id)
 		{
-			using (var provider = ContextProviderFactory.Create())
+			if (!this.IsValidModel(out IActionResult error))
 			{
-				var res =
-					provider.GetTable<T>()
-						.FirstOrDefault(t => t.Id == id);
-
-				return res;
+				return error;
 			}
+
+			TContract entity =
+				await Service.Get(id);
+
+			return Ok(entity);
 		}
 
-		protected virtual async Task<IEnumerable<T>> Get(int page, int pageSize)
+		/// <summary>
+		///     Возвращает постраничный список сущностей
+		/// </summary>
+		/// <param name="page">Номер страницы. Начинается с 1</param>
+		/// <param name="pageSize">Размерность страницы. Начинается с 1</param>
+		protected async Task<IActionResult> Get(int page, int pageSize)
 		{
-			using (var provider = ContextProviderFactory.Create())
+			if (!this.IsValidModel(out IActionResult error))
 			{
-				var res =
-					await provider.GetTable<T>()
-						.Skip((page - 1) * pageSize)
-						.Take(pageSize)
-						.ToArrayAsync();
-
-				return res;
+				return error;
 			}
+
+			var pages =
+				await Service.Get(page, pageSize);
+
+			return Ok(pages);
 		}
 
-		protected virtual async Task<T> Add(T model)
+		/// <summary>
+		/// Возвращает новый объект <paramref name="model"/>
+		/// </summary>
+		/// <param name="model">Создаваемый объект. Обязательное для заполнения</param>
+		protected async Task<IActionResult> Add([Required]TModel model)
 		{
-			if (model.Id != 0)
+			if (!this.IsValidModel(out IActionResult error))
 			{
-				throw new InvalidOperationException();
+				return error;
 			}
 
-			using (var provider = ContextProviderFactory.Create())
+			if (model is IEntity entityModel)
 			{
-				var res =
-					await provider.InsertAsync(model);
-
-				return res;
+				if (entityModel.Id > 0)
+				{
+					return BadRequest();
+				}
 			}
+			else
+			{
+				throw new InvalidCastException($"Модель должна поддерживать преобразование к типу данных {typeof(IEntity).FullName}");
+			}
+
+			TContract entity = await Service.AddOrUpdate(model);
+
+			return Ok(entity);
 		}
 
-		protected virtual async Task<T> Update(T model)
+		/// <summary>
+		///     Возвращает обновленный объект <paramref name="model" />
+		/// </summary>
+		/// <param name="model">Обновляемый объект. Обязательное для заполнения</param>
+		protected async Task<IActionResult> Update([Required] TModel model)
 		{
-			using (var provider = ContextProviderFactory.Create())
+			if (!this.IsValidModel(out IActionResult error))
 			{
-				int res =
-					await 
-						provider.GetTable<T>()
-						.Where(t => t.Id == model.Id)
-						.UpdateAsync(t => model);
-
-				return model;
+				return error;
 			}
+
+
+			if (model is IEntity entityModel)
+			{
+				if (entityModel.Id <= 0)
+				{
+					return BadRequest();
+				}
+			}
+			else
+			{
+				throw new InvalidCastException($"Модель должна поддерживать преобразование к типу данных {typeof(IEntity).FullName}");
+			}
+
+			TContract entity = await Service.AddOrUpdate(model);
+
+			return Ok(entity);
+		}
+
+		/// <summary>
+		///     Возвращает флаг успешно удаленного объекта по идентификатору <paramref name="id" />
+		/// </summary>
+		protected async Task<IActionResult> Delete([Range(1, int.MaxValue)] 
+			int id)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			bool isSuccess = await Service.Delete(id);
+			return Ok(isSuccess);
 		}
 	}
 }
