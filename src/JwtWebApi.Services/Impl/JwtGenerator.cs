@@ -17,12 +17,13 @@ namespace JwtWebApi.Services.Impl
 			_jwtKetProvider = jwtKetProvider;
 		}
 
-		public async Task<string> Generate(string name, string role)
+		public async Task<string> Generate(string name, string role, string userId)
 		{
 			var nameClaim = new Claim(ClaimsIdentity.DefaultNameClaimType, name);
 			var roleClaim = new Claim(ClaimsIdentity.DefaultRoleClaimType, role);
+			var idClaim = new Claim(ClaimsIdentity.DefaultIssuer, userId);
 
-			var claimsIdentity = new ClaimsIdentity(new[] { nameClaim, roleClaim }, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+			var claimsIdentity = new ClaimsIdentity(new[] { nameClaim, roleClaim, idClaim }, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
 
 			var now = DateTime.UtcNow;
 

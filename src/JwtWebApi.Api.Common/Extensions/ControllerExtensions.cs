@@ -29,5 +29,24 @@ namespace JwtWebApi.Api.Common.Extensions
 
 			return false;
 		}
+
+		public static string GetUserId(this Controller controller)
+		{
+			var claim =
+				controller.User.Claims.Where(t => t.Type == "LOCAL AUTHORITY")
+					.ToArray();
+
+			if (claim.Count() > 1)
+			{
+				throw new InvalidOperationException();
+			}
+
+			if (!claim.Any())
+			{
+				return "";
+			}
+
+			return claim.First().Value;
+		}
 	}
 }

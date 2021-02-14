@@ -13,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace JwtWebApi
 {
@@ -28,26 +31,26 @@ namespace JwtWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-	        services.AddCors(opt =>
-	        {
-                opt.AddPolicy("proxyPolicy", builder =>
-                {
-                    builder.SetIsOriginAllowedToAllowWildcardSubdomains()
-	                    .WithOrigins(
-		                    "http://localhost:8080",
-							"http://localhost:8089",
-		                    "https://localhost:8089",
-							"http://localhost:5000",
-							"https://localhost:5000",
-							"http://localhost:5001",
-							"https://localhost:5001",
-							"https://app-novgorod.herokuapp.com/")
-	                    .AllowAnyMethod()
-	                    .AllowAnyHeader()
-	                    .SetIsOriginAllowed(origin => true)
-	                    .AllowCredentials();
-                });
-	        });
+	      //  services.AddCors(opt =>
+	      //  {
+       //         opt.AddPolicy("proxyPolicy", builder =>
+       //         {
+       //             builder.SetIsOriginAllowedToAllowWildcardSubdomains()
+	      //              .WithOrigins(
+		     //               "http://localhost:8080",
+							//"http://localhost:8089",
+		     //               "https://localhost:8089",
+							//"http://localhost:5000",
+							//"https://localhost:5000",
+							//"http://localhost:5001",
+							//"https://localhost:5001",
+							//"https://app-novgorod.herokuapp.com/")
+	      //              .AllowAnyMethod()
+	      //              .AllowAnyHeader()
+	      //              .SetIsOriginAllowed(origin => true)
+	      //              .AllowCredentials();
+       //         });
+	      //  });
 
 	        services.MigrateFrom(Configuration["TravelDbConnectionString"]);
 	     
@@ -72,7 +75,13 @@ namespace JwtWebApi
                
                 });
 
-	        services.AddControllers();
+	        services.AddControllers()
+		        .AddNewtonsoftJson(options =>
+					{
+						options.SerializerSettings.Converters.Add(new StringEnumConverter());
+						options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+						options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+					});;
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "JwtWebApi", Version = "v1" });
@@ -95,7 +104,7 @@ namespace JwtWebApi
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "JwtWebApi v1"));
             app.UseAuthentication();
             app.UseRouting();
-            app.UseCors();
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Email.Services.Services;
@@ -34,6 +37,29 @@ namespace JwtWebApi.Api.Controllers
 			_jwtGenerator = jwtGenerator;
 		}
 
+		[ProducesResponseType(typeof(PagingResult<AspNetUser>), 200)]
+		[HttpGet(nameof(GetPaging))]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> GetPaging([Range(1, int.MaxValue)]int page, [Range(1, int.MaxValue)] int pageSize)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.Skip((page - 1) * pageSize)
+						.Take(pageSize);
+
+				PagingResult<AspNetUser> users =
+					new PagingResult<AspNetUser>()
+					{
+						Items = await found.ToArrayAsync(),
+						Total = contextProvider.GetTable<AspNetUser>().Count()
+					};
+
+				return Ok(users);
+			}
+		}
+
 		[HttpGet(nameof(ConfirmEmail))]
 		[AllowAnonymous]
 		public async Task<IActionResult> ConfirmEmail(string user, string signature)
@@ -60,6 +86,55 @@ namespace JwtWebApi.Api.Controllers
 			}
 		}
 
+		[HttpPost(nameof(ResetPasswordWithStamp))]
+		[AllowAnonymous]
+		public async Task<IActionResult> ResetPasswordWithStamp([FromBody] RecoverPasswordModel model)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Id == model.UserId && 
+						                     !(t.IsBanned ?? false) && 
+						                     t.SecurityStamp == model.Signature &&
+						                     (t.EmailConfirmed ?? false));
+
+				if (!found.Any())
+				{
+					return BadRequest();
+				}
+
+				if (found.Count() > 1)
+				{
+					return BadRequest();
+				}
+
+				var user =
+					found.First();
+
+				var passwordHash =
+					_passwordHasher.HashPassword(user, model.Password);
+
+				var res =
+					await contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Id == model.UserId &&
+						            !(t.IsBanned ?? false) &&
+						            t.SecurityStamp == model.Signature &&
+						            (t.EmailConfirmed ?? false))
+						.UpdateAsync(netUser => new AspNetUser()
+						{
+							PasswordHash = passwordHash
+						});
+
+				if (res != 1)
+				{
+					throw new InvalidOperationException("Нарушена целостность бд!");
+				}
+
+				return Ok(true);
+			}
+		}
+
 
 		[ProducesResponseType(typeof(string), 200)]
 		[HttpPost(nameof(Login))]
@@ -75,7 +150,7 @@ namespace JwtWebApi.Api.Controllers
 			}
 
 			var encodedJwt =
-				await _jwtGenerator.Generate(ident.name, ident.role);
+				await _jwtGenerator.Generate(ident.name, ident.role, ident.id);
 
 			return Ok(encodedJwt);
 		}
@@ -155,8 +230,9 @@ namespace JwtWebApi.Api.Controllers
 			var role =
 				await SetDefaultRoleToUser(usr.Id);
 
-			await _emailService.SendMessage($"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={user.Id}&signature={usr.SecurityStamp}", user.Email);
+			await _emailService.SendMessage($"https://app-novgorod.herokuapp.com/confirm?u={user.Id}&s={usr.SecurityStamp}", user.Email);
 
+			//$"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={user.Id}&signature={usr.SecurityStamp}"
 			return Ok(model);
 		}
 
@@ -202,11 +278,58 @@ namespace JwtWebApi.Api.Controllers
 					contextProvider.GetTable<AspNetUser>().First(t => t.Email == email);
 
 
-				await _emailService.SendMessage($"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={updatedUsr.Id}&signature={updatedUsr.SecurityStamp}", updatedUsr.Email);
-
+				await _emailService.SendMessage($"https://app-novgorod.herokuapp.com/confirm?u={updatedUsr.Id}&s={updatedUsr.SecurityStamp}", updatedUsr.Email);
+				//$"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={updatedUsr.Id}&signature={updatedUsr.SecurityStamp}" 
 				return Ok();
 			}
 
+		}
+
+
+		[ProducesResponseType(typeof(bool), 200)]
+		[HttpPost(nameof(RecoverPassword))]
+		[AllowAnonymous]
+		public async Task<IActionResult> RecoverPassword(string email)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var users =
+					contextProvider.GetTable<AspNetUser>().Where(t =>
+						t.Email == email && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false));
+
+				if (users.Count() > 1)
+				{
+					throw new InvalidOperationException("Нарушена структура бд!!");
+				}
+
+				if (!users.Any())
+				{
+					return BadRequest("Пользователя с такой почтой не существует");
+				}
+
+				var usr =
+					users.Single();
+
+				var stamp =
+					Guid.NewGuid().ToString();
+
+				var res =
+					await contextProvider.GetTable<AspNetUser>().Where(t =>
+							t.Email == email && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false))
+						.UpdateAsync(netUser => new AspNetUser()
+						{
+							SecurityStamp = stamp
+						});
+
+				if (res != 1)
+				{
+					throw new InvalidOperationException("Не удалось обновить SecurityStamp");
+				}
+
+				await _emailService.SendMessage($"Ссылка_с_параметрами_на_восстановление_пароля?userId={usr.Id}&signature={stamp}", email);
+
+				return Ok();
+			}
 		}
 
 
@@ -218,7 +341,7 @@ namespace JwtWebApi.Api.Controllers
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
 				var usrs =
-					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false));
+					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false));
 
 				if (usrs.Count() > 1)
 				{
@@ -233,10 +356,6 @@ namespace JwtWebApi.Api.Controllers
 				var usr =
 					usrs.Single();
 
-				if (!(usr.EmailConfirmed ?? false))
-				{
-					return Ok(false);
-				}
 
 				switch (_passwordHasher.VerifyHashedPassword(usr, usr.PasswordHash, model.OldPassword))
 				{
@@ -254,7 +373,7 @@ namespace JwtWebApi.Api.Controllers
 					_passwordHasher.HashPassword(usr, model.NewPassword);
 
 				var res=
-					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false))
+					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false))
 						.UpdateAsync(netUser => new AspNetUser()
 						{
 							PasswordHash = hashedPassword
@@ -265,9 +384,49 @@ namespace JwtWebApi.Api.Controllers
 
 		}
 
+		[HttpDelete("{id}")]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> Delete(string id)
+		{
+			if(string.IsNullOrEmpty(id))
+			{
+				return BadRequest();
+			}
 
+			if (id == this.GetUserId())
+			{
+				return BadRequest();
+			}
 
-		private async Task<(bool success, string name, string role)> GetIdentity(string email, string password)
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var users =
+					contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Id == id);
+
+				if (!users.Any())
+				{
+					return BadRequest("Пользователь не найден");
+				}
+
+				if (users.Count() > 1)
+				{
+					return BadRequest("Целостность базы нарушена!");
+				}
+
+				var deletedRoles =
+					await contextProvider.GetTable<AspNetUserRole>()
+						.Where(t => t.AspNetUserId == id)
+						.DeleteAsync();
+
+				var res =
+					await users.DeleteAsync();
+
+				return Ok(res == 1);
+			}
+		}
+
+		private async Task<(bool success, string name, string id, string role)> GetIdentity(string email, string password)
 		{
 			using (var provider = _contextProviderFactory.Create())
 			{
@@ -277,7 +436,7 @@ namespace JwtWebApi.Api.Controllers
 				
 				if (user == null)
 				{
-					return (false, "", "");
+					return (false, "", "", "");
 				}
 
 				var userRole =
@@ -292,7 +451,7 @@ namespace JwtWebApi.Api.Controllers
 				switch (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password))
 				{
 					case PasswordVerificationResult.Failed:
-						return (false, "", "");
+						return (false, "", "", "");
 					case PasswordVerificationResult.Success:
 						break;
 					case PasswordVerificationResult.SuccessRehashNeeded:
@@ -301,7 +460,7 @@ namespace JwtWebApi.Api.Controllers
 						throw new ArgumentOutOfRangeException();
 				}
 
-				return (true, user.UserName, role.RoleName);
+				return (true, user.UserName, user.Id ,role.RoleName);
 			}
 		}
 

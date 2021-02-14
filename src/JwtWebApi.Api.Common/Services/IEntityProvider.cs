@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using JwtWebApi.Api.Common.Dto;
 
 namespace JwtWebApi.Api.Common.Services
 {
@@ -18,7 +18,7 @@ namespace JwtWebApi.Api.Common.Services
 		/// <summary>
 		///     Возвращает постраничный список элементов сущности <typeparamref name="T" />
 		/// </summary>
-		Task<IEnumerable<T>> Get(int page, int pageSize);
+		Task<PagingResult<T>> Get(int page, int pageSize);
 
 		/// <summary>
 		///     Возвращает новый/обновленный элемент сущности <paramref name="model" />

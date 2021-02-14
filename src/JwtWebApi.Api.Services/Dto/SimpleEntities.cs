@@ -1,4 +1,5 @@
-﻿using JwtWebApi.DataProviders.Common.DataObjects;
+﻿using System.Runtime.Serialization;
+using JwtWebApi.DataProviders.Common.DataObjects;
 
 namespace JwtWebApi.Api.Services.Dto
 {
