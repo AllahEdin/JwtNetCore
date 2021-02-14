@@ -12,11 +12,12 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Preview { get; set; }
         public string Description { get; set; }
         public int CityId { get; set; }
-        public DateTime BuildDate { get; set; }
+        public DateTimeOffset BuildDate { get; set; }
         public string Address { get; set; }
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public int Duration { get; set; }
+        public string Path { get; set; }
 
         public virtual Cities City { get; set; }
     }

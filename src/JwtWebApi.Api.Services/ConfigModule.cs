@@ -38,6 +38,35 @@ namespace JwtWebApi.Api.Services
 				.As<IHousingTypeService>()
 				.SingleInstance();
 
+
+			builder.RegisterType<RestaurantCuisineTypesService>()
+				.As<IRestaurantCuisineTypesService>()
+				.SingleInstance();
+
+			builder.RegisterType<RestaurantDentTypesService>()
+				.As<IRestaurantDenyTypesService>()
+				.SingleInstance();
+
+			builder.RegisterType<HotelEquipmentTypesService>()
+				.As<IHotelEquipmentTypesService>()
+				.SingleInstance();
+
+			builder.RegisterType<HotelServiceTypesService>()
+				.As<IHotelServiceTypesService>()
+				.SingleInstance();
+
+
+			builder.RegisterType<RestaurantsService>()
+				.As<IRestaurantService>()
+				.SingleInstance();
+
+			builder.RegisterType<HotelService>()
+				.As<IHotelService>()
+				.SingleInstance();
+
+			builder.RegisterType<AttractionService>()
+				.As<IAttractionService>()
+				.SingleInstance();
 		}
 	}
 }

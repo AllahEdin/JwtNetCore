@@ -33,8 +33,8 @@ namespace JwtWebApi.DataProviders.Common.Impl
 	    /// <inheritdoc />
         public async Task<T> InsertAsync<T>(T entity) where T : class, IEntity
         {
-            int num = await this.InsertAsync<T>(entity, null, null, null, (string)null, TableOptions.NotSet, CancellationToken.None);
-
+	        int id = await this.InsertWithInt32IdentityAsync<T>(entity, null, null, null, null, TableOptions.NotSet, CancellationToken.None);
+	        entity.Id = id;
             return entity;
         }
 

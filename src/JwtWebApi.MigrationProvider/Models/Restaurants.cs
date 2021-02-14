@@ -9,7 +9,7 @@ namespace JwtWebApi.MigrationProvider.Models
     {
         public Restaurants()
         {
-            RestaurantCoisineTypes = new HashSet<RestaurantCoisineTypes>();
+            RestaurantCuisineTypes = new HashSet<RestaurantCuisineTypes>();
             RestaurantDenyTypes = new HashSet<RestaurantDenyTypes>();
         }
 
@@ -18,15 +18,16 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Preview { get; set; }
         public string Description { get; set; }
         public int CityId { get; set; }
-        public DateTime BuildDate { get; set; }
+        public DateTimeOffset BuildDate { get; set; }
         public string Address { get; set; }
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public int CateringTypeId { get; set; }
+        public string Path { get; set; }
 
         public virtual CateringTypes CateringType { get; set; }
         public virtual Cities City { get; set; }
-        public virtual ICollection<RestaurantCoisineTypes> RestaurantCoisineTypes { get; set; }
+        public virtual ICollection<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual ICollection<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }
     }
 }

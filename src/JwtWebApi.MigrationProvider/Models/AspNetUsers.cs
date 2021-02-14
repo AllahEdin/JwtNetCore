@@ -13,5 +13,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public string PasswordHash { get; set; }
         public bool? EmailConfirmed { get; set; }
         public string SecurityStamp { get; set; }
+        public DateTime? RegistrationDate { get; set; }
+        public bool? IsBanned { get; set; }
     }
 }

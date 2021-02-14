@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace JwtWebApi.MigrationProvider.Migrations
 {
-    public partial class postgresqlMigration_Schema_places : Migration
+    public partial class postgresqlMigration_Schema_Places : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,14 +14,14 @@ namespace JwtWebApi.MigrationProvider.Migrations
             migrationBuilder.EnsureSchema(
                 name: "places");
 
+           
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 schema: "aspnet",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-                    RoleName = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    RoleName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,7 +38,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     PasswordHash = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "boolean", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    SecurityStamp = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    RegistrationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsBanned = table.Column<bool>(type: "boolean", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -148,8 +150,8 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 schema: "aspnet",
                 columns: table => new
                 {
-                    AspNetUserId = table.Column<string>(type: "character varying", nullable: true),
-                    RoleId = table.Column<int>(type: "integer", nullable: true)
+                    AspNetUserId = table.Column<string>(type: "character varying", nullable: false),
+                    RoleId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -180,11 +182,12 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     Preview = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     CityId = table.Column<int>(type: "integer", nullable: false),
-                    BuildDate = table.Column<DateTime>(type: "timestamp(6) with time zone", nullable: false),
+                    BuildDate = table.Column<DateTimeOffset>(type: "timestamp(6) with time zone", nullable: false),
                     Address = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Latitude = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Longitude = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Duration = table.Column<int>(type: "integer", nullable: false)
+                    Duration = table.Column<int>(type: "integer", nullable: false),
+                    Path = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -213,7 +216,8 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     Address = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Latitude = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Longitude = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    CateringTypeId = table.Column<int>(type: "integer", nullable: false)
+                    CateringTypeId = table.Column<int>(type: "integer", nullable: false),
+                    Path = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -245,12 +249,13 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     Preview = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     CityId = table.Column<int>(type: "integer", nullable: false),
-                    BuildDate = table.Column<DateTime>(type: "timestamp(6) with time zone", nullable: false),
+                    BuildDate = table.Column<DateTimeOffset>(type: "timestamp(6) with time zone", nullable: false),
                     Address = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Latitude = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Longitude = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     HousingTypeId = table.Column<int>(type: "integer", nullable: false),
-                    ClassType = table.Column<int>(type: "integer", nullable: false)
+                    ClassType = table.Column<int>(type: "integer", nullable: false),
+                    Path = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -272,18 +277,18 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RestaurantCoisineTypes",
+                name: "RestaurantCuisineTypes",
                 schema: "places",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-                    RestaurantId = table.Column<int>(type: "integer", nullable: true),
-                    CuisineTypeId = table.Column<int>(type: "integer", nullable: true)
+                    RestaurantId = table.Column<int>(type: "integer", nullable: false),
+                    CuisineTypeId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RestaurantCoisineTypes", x => x.Id);
+                    table.PrimaryKey("PK_RestaurantCuisineTypes", x => x.Id);
                     table.ForeignKey(
                         name: "FK_RestaurantCoisineTypes_CousineTypeId",
                         column: x => x.CuisineTypeId,
@@ -307,8 +312,8 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-                    RestaurantId = table.Column<int>(type: "integer", nullable: true),
-                    DenyTypeId = table.Column<int>(type: "integer", nullable: true)
+                    RestaurantId = table.Column<int>(type: "integer", nullable: false),
+                    DenyTypeId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -336,8 +341,8 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-                    HoletId = table.Column<int>(type: "integer", nullable: true),
-                    EquipmentTypeId = table.Column<int>(type: "integer", nullable: true)
+                    HotelId = table.Column<int>(type: "integer", nullable: false),
+                    EquipmentTypeId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -350,8 +355,8 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_HotelEquipmentTypes_HoletId",
-                        column: x => x.HoletId,
+                        name: "FK_HotelEquipmentTypes_HotelId",
+                        column: x => x.HotelId,
                         principalSchema: "places",
                         principalTable: "Hotels",
                         principalColumn: "Id",
@@ -365,15 +370,15 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
-                    HoletId = table.Column<int>(type: "integer", nullable: true),
-                    ServiceTypeId = table.Column<int>(type: "integer", nullable: true)
+                    HotelId = table.Column<int>(type: "integer", nullable: false),
+                    ServiceTypeId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_HotelServiceTypes", x => x.Id);
                     table.ForeignKey(
                         name: "FK_HotelServiceTypes_HoletId",
-                        column: x => x.HoletId,
+                        column: x => x.HotelId,
                         principalSchema: "places",
                         principalTable: "Hotels",
                         principalColumn: "Id",
@@ -388,10 +393,24 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoleName",
+                name: "UIX_AspNetRoles_Id_Name",
+                schema: "aspnet",
+                table: "AspNetRoles",
+                columns: new[] { "Id", "RoleName" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "UIX_AspNetRoles_Name",
                 schema: "aspnet",
                 table: "AspNetRoles",
                 column: "RoleName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "AspNet_UserRoles_AspNetUserRole_RoleId",
+                schema: "aspnet",
+                table: "AspNetUserRoles",
+                columns: new[] { "AspNetUserId", "RoleId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -454,10 +473,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 column: "EquipmentTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HotelEquipmentTypes_HoletId",
+                name: "UIX_HotelEquipmentType_HotelId_EqupmentTypeId",
                 schema: "places",
                 table: "HotelEquipmentTypes",
-                column: "HoletId");
+                columns: new[] { "HotelId", "EquipmentTypeId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Hotels_CityId",
@@ -472,16 +492,17 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 column: "HousingTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HotelServiceTypes_HoletId",
-                schema: "places",
-                table: "HotelServiceTypes",
-                column: "HoletId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_HotelServiceTypes_ServiceTypeId",
                 schema: "places",
                 table: "HotelServiceTypes",
                 column: "ServiceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "UIX_HotelEquipmentType_HotelId_ServiceTypeId",
+                schema: "places",
+                table: "HotelServiceTypes",
+                columns: new[] { "HotelId", "ServiceTypeId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_HousingTypes_Name",
@@ -491,16 +512,17 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RestaurantCoisineTypes_CuisineTypeId",
+                name: "IX_RestaurantCuisineTypes_CuisineTypeId",
                 schema: "places",
-                table: "RestaurantCoisineTypes",
+                table: "RestaurantCuisineTypes",
                 column: "CuisineTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RestaurantCoisineTypes_RestaurantId",
+                name: "UIX_RestaurantCuisineTypes_CuisineTypeId_RestaurantId",
                 schema: "places",
-                table: "RestaurantCoisineTypes",
-                column: "RestaurantId");
+                table: "RestaurantCuisineTypes",
+                columns: new[] { "RestaurantId", "CuisineTypeId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_RestaurantDenyTypes_DenyTypeId",
@@ -509,10 +531,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 column: "DenyTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RestaurantDenyTypes_RestaurantId",
+                name: "UIX_RestaurantDenyTypes_DenyTypeId_RestaurantId",
                 schema: "places",
                 table: "RestaurantDenyTypes",
-                column: "RestaurantId");
+                columns: new[] { "RestaurantId", "DenyTypeId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Restaurants_CateringTypeId",
@@ -553,7 +576,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 schema: "places");
 
             migrationBuilder.DropTable(
-                name: "RestaurantCoisineTypes",
+                name: "RestaurantCuisineTypes",
                 schema: "places");
 
             migrationBuilder.DropTable(

@@ -23,17 +23,19 @@ namespace JwtWebApi.MigrationProvider.Migrations
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AspNetRoles", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityAlwaysColumn();
+                        .HasColumnType("integer");
 
                     b.Property<string>("RoleName")
-                        .HasMaxLength(40)
-                        .HasColumnType("character varying(40)");
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "RoleName" }, "IX_RoleName")
+                    b.HasIndex(new[] { "Id", "RoleName" }, "UIX_AspNetRoles_Id_Name")
+                        .IsUnique();
+
+                    b.HasIndex(new[] { "RoleName" }, "UIX_AspNetRoles_Name")
                         .IsUnique();
 
                     b.ToTable("AspNetRoles", "aspnet");
@@ -42,10 +44,14 @@ namespace JwtWebApi.MigrationProvider.Migrations
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AspNetUserRoles", b =>
                 {
                     b.Property<string>("AspNetUserId")
+                        .IsRequired()
                         .HasColumnType("character varying");
 
-                    b.Property<int?>("RoleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("integer");
+
+                    b.HasIndex(new[] { "AspNetUserId", "RoleId" }, "AspNet_UserRoles_AspNetUserRole_RoleId")
+                        .IsUnique();
 
                     b.HasIndex(new[] { "AspNetUserId" }, "IX_AspNetUserRoles_AspNetUserId");
 
@@ -68,9 +74,15 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Property<bool?>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<bool?>("IsBanned")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PasswordHash")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("RegistrationDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SecurityStamp")
                         .HasMaxLength(255)
@@ -98,7 +110,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<DateTime>("BuildDate")
+                    b.Property<DateTimeOffset>("BuildDate")
                         .HasColumnType("timestamp(6) with time zone");
 
                     b.Property<int>("CityId")
@@ -127,6 +139,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<string>("Preview")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -134,7 +151,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId");
+                    b.HasIndex(new[] { "CityId" }, "IX_Attractions_CityId");
 
                     b.ToTable("Attractions", "places");
                 });
@@ -241,17 +258,18 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasColumnType("integer")
                         .UseIdentityAlwaysColumn();
 
-                    b.Property<int?>("EquipmentTypeId")
+                    b.Property<int>("EquipmentTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("HoletId")
+                    b.Property<int>("HotelId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EquipmentTypeId");
+                    b.HasIndex(new[] { "EquipmentTypeId" }, "IX_HotelEquipmentTypes_EquipmentTypeId");
 
-                    b.HasIndex("HoletId");
+                    b.HasIndex(new[] { "HotelId", "EquipmentTypeId" }, "UIX_HotelEquipmentType_HotelId_EqupmentTypeId")
+                        .IsUnique();
 
                     b.ToTable("HotelEquipmentTypes", "places");
                 });
@@ -263,17 +281,18 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasColumnType("integer")
                         .UseIdentityAlwaysColumn();
 
-                    b.Property<int?>("HoletId")
+                    b.Property<int>("HotelId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ServiceTypeId")
+                    b.Property<int>("ServiceTypeId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HoletId");
+                    b.HasIndex(new[] { "ServiceTypeId" }, "IX_HotelServiceTypes_ServiceTypeId");
 
-                    b.HasIndex("ServiceTypeId");
+                    b.HasIndex(new[] { "HotelId", "ServiceTypeId" }, "UIX_HotelEquipmentType_HotelId_ServiceTypeId")
+                        .IsUnique();
 
                     b.ToTable("HotelServiceTypes", "places");
                 });
@@ -290,7 +309,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<DateTime>("BuildDate")
+                    b.Property<DateTimeOffset>("BuildDate")
                         .HasColumnType("timestamp(6) with time zone");
 
                     b.Property<int>("CityId")
@@ -322,6 +341,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<string>("Preview")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -329,9 +353,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId");
+                    b.HasIndex(new[] { "CityId" }, "IX_Hotels_CityId");
 
-                    b.HasIndex("HousingTypeId");
+                    b.HasIndex(new[] { "HousingTypeId" }, "IX_Hotels_HousingTypeId");
 
                     b.ToTable("Hotels", "places");
                 });
@@ -355,26 +379,27 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.ToTable("HousingTypes", "places");
                 });
 
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RestaurantCoisineTypes", b =>
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RestaurantCuisineTypes", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .UseIdentityAlwaysColumn();
 
-                    b.Property<int?>("CuisineTypeId")
+                    b.Property<int>("CuisineTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("RestaurantId")
+                    b.Property<int>("RestaurantId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CuisineTypeId");
+                    b.HasIndex(new[] { "CuisineTypeId" }, "IX_RestaurantCuisineTypes_CuisineTypeId");
 
-                    b.HasIndex("RestaurantId");
+                    b.HasIndex(new[] { "RestaurantId", "CuisineTypeId" }, "UIX_RestaurantCuisineTypes_CuisineTypeId_RestaurantId")
+                        .IsUnique();
 
-                    b.ToTable("RestaurantCoisineTypes", "places");
+                    b.ToTable("RestaurantCuisineTypes", "places");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RestaurantDenyTypes", b =>
@@ -384,17 +409,18 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasColumnType("integer")
                         .UseIdentityAlwaysColumn();
 
-                    b.Property<int?>("DenyTypeId")
+                    b.Property<int>("DenyTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("RestaurantId")
+                    b.Property<int>("RestaurantId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DenyTypeId");
+                    b.HasIndex(new[] { "DenyTypeId" }, "IX_RestaurantDenyTypes_DenyTypeId");
 
-                    b.HasIndex("RestaurantId");
+                    b.HasIndex(new[] { "RestaurantId", "DenyTypeId" }, "UIX_RestaurantDenyTypes_DenyTypeId_RestaurantId")
+                        .IsUnique();
 
                     b.ToTable("RestaurantDenyTypes", "places");
                 });
@@ -440,6 +466,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<string>("Preview")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -447,9 +478,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CateringTypeId");
+                    b.HasIndex(new[] { "CateringTypeId" }, "IX_Restaurants_CateringTypeId");
 
-                    b.HasIndex("CityId");
+                    b.HasIndex(new[] { "CityId" }, "IX_Restaurants_CityId");
 
                     b.ToTable("Restaurants", "places");
                 });
@@ -479,13 +510,15 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .WithMany()
                         .HasForeignKey("AspNetUserId")
                         .HasConstraintName("FK_AspNetUsers")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("JwtWebApi.MigrationProvider.Models.AspNetRoles", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .HasConstraintName("FK_AspNetRoles")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AspNetUser");
 
@@ -510,34 +543,38 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .WithMany("HotelEquipmentTypes")
                         .HasForeignKey("EquipmentTypeId")
                         .HasConstraintName("FK_HotelEquipmentTypes_CousineTypeId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Hotels", "Holet")
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Hotels", "Hotel")
                         .WithMany("HotelEquipmentTypes")
-                        .HasForeignKey("HoletId")
-                        .HasConstraintName("FK_HotelEquipmentTypes_HoletId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("HotelId")
+                        .HasConstraintName("FK_HotelEquipmentTypes_HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("EquipmentType");
 
-                    b.Navigation("Holet");
+                    b.Navigation("Hotel");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.HotelServiceTypes", b =>
                 {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Hotels", "Holet")
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Hotels", "Hotel")
                         .WithMany("HotelServiceTypes")
-                        .HasForeignKey("HoletId")
+                        .HasForeignKey("HotelId")
                         .HasConstraintName("FK_HotelServiceTypes_HoletId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("JwtWebApi.MigrationProvider.Models.ServiceTypes", "ServiceType")
                         .WithMany("HotelServiceTypes")
                         .HasForeignKey("ServiceTypeId")
                         .HasConstraintName("FK_HotelServiceTypes_ServiceTypeId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Holet");
+                    b.Navigation("Hotel");
 
                     b.Navigation("ServiceType");
                 });
@@ -563,19 +600,21 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Navigation("HousingType");
                 });
 
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RestaurantCoisineTypes", b =>
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RestaurantCuisineTypes", b =>
                 {
                     b.HasOne("JwtWebApi.MigrationProvider.Models.CuisineTypes", "CuisineType")
-                        .WithMany("RestaurantCoisineTypes")
+                        .WithMany("RestaurantCuisineTypes")
                         .HasForeignKey("CuisineTypeId")
                         .HasConstraintName("FK_RestaurantCoisineTypes_CousineTypeId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Restaurants", "Restaurant")
-                        .WithMany("RestaurantCoisineTypes")
+                        .WithMany("RestaurantCuisineTypes")
                         .HasForeignKey("RestaurantId")
                         .HasConstraintName("FK_RestaurantCoisineTypes_RestaurantId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CuisineType");
 
@@ -588,13 +627,15 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .WithMany("RestaurantDenyTypes")
                         .HasForeignKey("DenyTypeId")
                         .HasConstraintName("FK_RestaurantDenyTypes_DenyTypeId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Restaurants", "Restaurant")
                         .WithMany("RestaurantDenyTypes")
                         .HasForeignKey("RestaurantId")
                         .HasConstraintName("FK_RestaurantDenyTypes_RestaurantId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("DenyType");
 
@@ -638,7 +679,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.CuisineTypes", b =>
                 {
-                    b.Navigation("RestaurantCoisineTypes");
+                    b.Navigation("RestaurantCuisineTypes");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.DenyTypes", b =>
@@ -665,7 +706,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Restaurants", b =>
                 {
-                    b.Navigation("RestaurantCoisineTypes");
+                    b.Navigation("RestaurantCuisineTypes");
 
                     b.Navigation("RestaurantDenyTypes");
                 });

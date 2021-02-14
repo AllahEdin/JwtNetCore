@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using JwtWebApi.DataProviders.Common.DataObjects;
 using JwtWebApi.DataProviders.Common.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace JwtWebApi.Api.Common.Services
 {
@@ -59,7 +60,7 @@ namespace JwtWebApi.Api.Common.Services
 
 				return !res.Any()
 					? new T[0]
-					: DtoMapper.Map<T[]>(res.ToArray());
+					: DtoMapper.Map<T[]>(await res.ToArrayAsync());
 			}
 		}
 
@@ -76,9 +77,6 @@ namespace JwtWebApi.Api.Common.Services
 				}
 				else if (model.Id > 0)
 				{
-					var mapped=
-						DtoMapper.Map<TDb>(model);
-
 					var res =
 						await Update(cp, model);
 

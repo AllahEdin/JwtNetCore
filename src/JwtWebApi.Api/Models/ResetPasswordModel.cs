@@ -4,16 +4,15 @@ using System.ComponentModel.DataAnnotations;
 namespace JwtWebApi.Api.Models
 {
 	[Serializable]
-	public class RegistrationModel
+	public class ResetPasswordModel
 	{
 		[Required]
 		public string Email { get; set; }
 
 		[Required]
-		public string UserName { get; set; }
+		public string OldPassword { get; set; }
 
 		[Required]
-		public string Password { get; set; }
-
+		public string NewPassword { get; set; }
 	}
 }

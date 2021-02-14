@@ -34,13 +34,40 @@ namespace JwtWebApi.Api.Controllers
 			_jwtGenerator = jwtGenerator;
 		}
 
-		[ProducesResponseType(typeof(string),200)]
-		[HttpGet(nameof(Login))]
+		[HttpGet(nameof(ConfirmEmail))]
 		[AllowAnonymous]
-		public async Task<IActionResult> Login(string email, string password)
+		public async Task<IActionResult> ConfirmEmail(string user, string signature)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.FirstOrDefault(t => t.Id == user && t.SecurityStamp == signature);
+
+				if (found == null)
+				{
+					return BadRequest();
+				}
+
+				await contextProvider.GetTable<AspNetUser>()
+					.Where(t => t.Id == user && t.SecurityStamp == signature)
+					.UpdateAsync(netUser => new AspNetUser()
+					{
+						EmailConfirmed = true
+					});
+
+				return Ok();
+			}
+		}
+
+
+		[ProducesResponseType(typeof(string), 200)]
+		[HttpPost(nameof(Login))]
+		[AllowAnonymous]
+		public async Task<IActionResult> Login([FromBody] LoginModel model)
 		{
 			var ident =
-				await GetIdentity(email, password);
+				await GetIdentity(model.Email, model.Password);
 
 			if (!ident.success)
 			{
@@ -51,15 +78,48 @@ namespace JwtWebApi.Api.Controllers
 				await _jwtGenerator.Generate(ident.name, ident.role);
 
 			return Ok(encodedJwt);
-        }
+		}
+
+		[HttpPost(nameof(BanUser))]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> BanUser(string email)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Email == email);
+
+				if (!found.Any())
+				{
+					return BadRequest();
+				}
+
+				if (found.Count() > 1)
+				{
+					throw new InvalidOperationException("More 1 user by email!!");
+				}
+
+				await contextProvider.GetTable<AspNetUser>()
+					.Where(t => t.Email == email)
+					.UpdateAsync(netUser => new AspNetUser()
+					{
+						IsBanned = true
+					});
+
+				return Ok();
+			}
+		}
 
 		[ProducesResponseType(typeof(RegistrationModel), 200)]
 		[HttpPost(nameof(Register))]
 		[AllowAnonymous]
 		public async Task<IActionResult> Register([FromBody] RegistrationModel model)
 		{
-			AspNetUser user;
 			
+
+			AspNetUser user;
+
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
 				if (contextProvider.GetTable<AspNetUser>().Any(t => t.Email == model.Email))
@@ -75,7 +135,9 @@ namespace JwtWebApi.Api.Controllers
 					Email = model.Email,
 					EmailConfirmed = false,
 					UserName = model.UserName,
-					SecurityStamp = Guid.NewGuid().ToString()
+					SecurityStamp = Guid.NewGuid().ToString(),
+					IsBanned = false,
+					RegistrationDate = DateTimeOffset.Now
 				};
 
 			var hashedPassword =
@@ -93,7 +155,7 @@ namespace JwtWebApi.Api.Controllers
 			var role =
 				await SetDefaultRoleToUser(usr.Id);
 
-			await _emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={user.Id}&signature={usr.SecurityStamp}", user.Email);
+			await _emailService.SendMessage($"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={user.Id}&signature={usr.SecurityStamp}", user.Email);
 
 			return Ok(model);
 		}
@@ -106,7 +168,7 @@ namespace JwtWebApi.Api.Controllers
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
 				var usrs =
-					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email);
+					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email && !(t.IsBanned ?? false));
 
 				if (usrs.Count() > 1)
 				{
@@ -128,7 +190,7 @@ namespace JwtWebApi.Api.Controllers
 				}
 
 				var count =
-					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email)
+					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email && !(t.IsBanned ?? false))
 						.UpdateAsync(u => new AspNetUser()
 						{
 							SecurityStamp =
@@ -140,37 +202,70 @@ namespace JwtWebApi.Api.Controllers
 					contextProvider.GetTable<AspNetUser>().First(t => t.Email == email);
 
 
-				await _emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={updatedUsr.Id}&signature={updatedUsr.SecurityStamp}", updatedUsr.Email);
+				await _emailService.SendMessage($"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={updatedUsr.Id}&signature={updatedUsr.SecurityStamp}", updatedUsr.Email);
 
 				return Ok();
 			}
 
 		}
 
-		[HttpGet(nameof(ConfirmEmail))]
-		public async Task<IActionResult> ConfirmEmail(string user, string signature)
+
+		[ProducesResponseType(typeof(bool), 200)]
+		[HttpPost(nameof(ResetPassword))]
+		[AllowAnonymous]
+		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
 		{
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
-				var found =
-					contextProvider.GetTable<AspNetUser>()
-						.FirstOrDefault(t => t.Id == user && t.SecurityStamp == signature);
+				var usrs =
+					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false));
 
-				if (found == null)
+				if (usrs.Count() > 1)
 				{
-					return BadRequest();
+					throw new InvalidOperationException("Нарушена структура бд!!");
 				}
 
-				await contextProvider.GetTable<AspNetUser>()
-					.Where(t => t.Id == user && t.SecurityStamp == signature)
-					.UpdateAsync(netUser =>  new AspNetUser()
-					{
-						EmailConfirmed = true
-					});
+				if (!usrs.Any())
+				{
+					return BadRequest("Пользователя с такой почтой не существует");
+				}
 
-				return Ok();
+				var usr =
+					usrs.Single();
+
+				if (!(usr.EmailConfirmed ?? false))
+				{
+					return Ok(false);
+				}
+
+				switch (_passwordHasher.VerifyHashedPassword(usr, usr.PasswordHash, model.OldPassword))
+				{
+					case PasswordVerificationResult.Failed:
+						return Ok(false);
+					case PasswordVerificationResult.Success:
+						break;
+					case PasswordVerificationResult.SuccessRehashNeeded:
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+
+				var hashedPassword =
+					_passwordHasher.HashPassword(usr, model.NewPassword);
+
+				var res=
+					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false))
+						.UpdateAsync(netUser => new AspNetUser()
+						{
+							PasswordHash = hashedPassword
+						});
+
+				return Ok(res == 1);
 			}
+
 		}
+
+
 
 		private async Task<(bool success, string name, string role)> GetIdentity(string email, string password)
 		{
@@ -178,7 +273,7 @@ namespace JwtWebApi.Api.Controllers
 			{
 				var user= 
 					provider.GetTable<AspNetUser>()
-					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false));
+					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false) && !(t.IsBanned ?? false));
 				
 				if (user == null)
 				{

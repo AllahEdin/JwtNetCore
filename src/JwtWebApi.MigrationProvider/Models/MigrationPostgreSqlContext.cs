@@ -30,7 +30,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<HotelServiceTypes> HotelServiceTypes { get; set; }
         public virtual DbSet<Hotels> Hotels { get; set; }
         public virtual DbSet<HousingTypes> HousingTypes { get; set; }
-        public virtual DbSet<RestaurantCoisineTypes> RestaurantCoisineTypes { get; set; }
+        public virtual DbSet<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual DbSet<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }
         public virtual DbSet<Restaurants> Restaurants { get; set; }
         public virtual DbSet<ServiceTypes> ServiceTypes { get; set; }
@@ -52,12 +52,17 @@ namespace JwtWebApi.MigrationProvider.Models
             {
                 entity.ToTable("AspNetRoles", "aspnet");
 
-                entity.HasIndex(e => e.RoleName, "IX_RoleName")
+                entity.HasIndex(e => new { e.Id, e.RoleName }, "UIX_AspNetRoles_Id_Name")
                     .IsUnique();
 
-                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+                entity.HasIndex(e => e.RoleName, "UIX_AspNetRoles_Name")
+                    .IsUnique();
 
-                entity.Property(e => e.RoleName).HasMaxLength(40);
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.RoleName)
+                    .IsRequired()
+                    .HasMaxLength(256);
             });
 
             modelBuilder.Entity<AspNetUserRoles>(entity =>
@@ -66,22 +71,25 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.ToTable("AspNetUserRoles", "aspnet");
 
+                entity.HasIndex(e => new { e.AspNetUserId, e.RoleId }, "AspNet_UserRoles_AspNetUserRole_RoleId")
+                    .IsUnique();
+
                 entity.HasIndex(e => e.AspNetUserId, "IX_AspNetUserRoles_AspNetUserId");
 
                 entity.HasIndex(e => e.RoleId, "IX_AspNetUserRoles_RoleId");
 
-                entity.Property(e => e.AspNetUserId).HasColumnType("character varying");
+                entity.Property(e => e.AspNetUserId)
+                    .IsRequired()
+                    .HasColumnType("character varying");
 
                 entity.HasOne(d => d.AspNetUser)
                     .WithMany()
                     .HasForeignKey(d => d.AspNetUserId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_AspNetUsers");
 
                 entity.HasOne(d => d.Role)
                     .WithMany()
                     .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_AspNetRoles");
             });
 
@@ -97,6 +105,8 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.PasswordHash).HasMaxLength(255);
 
+                entity.Property(e => e.RegistrationDate).HasColumnType("timestamp with time zone");
+
                 entity.Property(e => e.SecurityStamp).HasMaxLength(255);
 
                 entity.Property(e => e.UserName)
@@ -107,6 +117,8 @@ namespace JwtWebApi.MigrationProvider.Models
             modelBuilder.Entity<Attractions>(entity =>
             {
                 entity.ToTable("Attractions", "places");
+
+                entity.HasIndex(e => e.CityId, "IX_Attractions_CityId");
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
@@ -129,6 +141,10 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
 
                 entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Path)
                     .IsRequired()
                     .HasMaxLength(255);
 
@@ -206,43 +222,53 @@ namespace JwtWebApi.MigrationProvider.Models
             {
                 entity.ToTable("HotelEquipmentTypes", "places");
 
+                entity.HasIndex(e => e.EquipmentTypeId, "IX_HotelEquipmentTypes_EquipmentTypeId");
+
+                entity.HasIndex(e => new { e.HotelId, e.EquipmentTypeId }, "UIX_HotelEquipmentType_HotelId_EqupmentTypeId")
+                    .IsUnique();
+
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
                 entity.HasOne(d => d.EquipmentType)
                     .WithMany(p => p.HotelEquipmentTypes)
                     .HasForeignKey(d => d.EquipmentTypeId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_HotelEquipmentTypes_CousineTypeId");
 
-                entity.HasOne(d => d.Holet)
+                entity.HasOne(d => d.Hotel)
                     .WithMany(p => p.HotelEquipmentTypes)
-                    .HasForeignKey(d => d.HoletId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_HotelEquipmentTypes_HoletId");
+                    .HasForeignKey(d => d.HotelId)
+                    .HasConstraintName("FK_HotelEquipmentTypes_HotelId");
             });
 
             modelBuilder.Entity<HotelServiceTypes>(entity =>
             {
                 entity.ToTable("HotelServiceTypes", "places");
 
+                entity.HasIndex(e => e.ServiceTypeId, "IX_HotelServiceTypes_ServiceTypeId");
+
+                entity.HasIndex(e => new { e.HotelId, e.ServiceTypeId }, "UIX_HotelEquipmentType_HotelId_ServiceTypeId")
+                    .IsUnique();
+
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.HasOne(d => d.Holet)
+                entity.HasOne(d => d.Hotel)
                     .WithMany(p => p.HotelServiceTypes)
-                    .HasForeignKey(d => d.HoletId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasForeignKey(d => d.HotelId)
                     .HasConstraintName("FK_HotelServiceTypes_HoletId");
 
                 entity.HasOne(d => d.ServiceType)
                     .WithMany(p => p.HotelServiceTypes)
                     .HasForeignKey(d => d.ServiceTypeId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_HotelServiceTypes_ServiceTypeId");
             });
 
             modelBuilder.Entity<Hotels>(entity =>
             {
                 entity.ToTable("Hotels", "places");
+
+                entity.HasIndex(e => e.CityId, "IX_Hotels_CityId");
+
+                entity.HasIndex(e => e.HousingTypeId, "IX_Hotels_HousingTypeId");
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
@@ -265,6 +291,10 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
 
                 entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Path)
                     .IsRequired()
                     .HasMaxLength(255);
 
@@ -295,22 +325,25 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Name).HasMaxLength(255);
             });
 
-            modelBuilder.Entity<RestaurantCoisineTypes>(entity =>
+            modelBuilder.Entity<RestaurantCuisineTypes>(entity =>
             {
-                entity.ToTable("RestaurantCoisineTypes", "places");
+                entity.ToTable("RestaurantCuisineTypes", "places");
+
+                entity.HasIndex(e => e.CuisineTypeId, "IX_RestaurantCuisineTypes_CuisineTypeId");
+
+                entity.HasIndex(e => new { e.RestaurantId, e.CuisineTypeId }, "UIX_RestaurantCuisineTypes_CuisineTypeId_RestaurantId")
+                    .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
                 entity.HasOne(d => d.CuisineType)
-                    .WithMany(p => p.RestaurantCoisineTypes)
+                    .WithMany(p => p.RestaurantCuisineTypes)
                     .HasForeignKey(d => d.CuisineTypeId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_RestaurantCoisineTypes_CousineTypeId");
 
                 entity.HasOne(d => d.Restaurant)
-                    .WithMany(p => p.RestaurantCoisineTypes)
+                    .WithMany(p => p.RestaurantCuisineTypes)
                     .HasForeignKey(d => d.RestaurantId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_RestaurantCoisineTypes_RestaurantId");
             });
 
@@ -318,24 +351,31 @@ namespace JwtWebApi.MigrationProvider.Models
             {
                 entity.ToTable("RestaurantDenyTypes", "places");
 
+                entity.HasIndex(e => e.DenyTypeId, "IX_RestaurantDenyTypes_DenyTypeId");
+
+                entity.HasIndex(e => new { e.RestaurantId, e.DenyTypeId }, "UIX_RestaurantDenyTypes_DenyTypeId_RestaurantId")
+                    .IsUnique();
+
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
                 entity.HasOne(d => d.DenyType)
                     .WithMany(p => p.RestaurantDenyTypes)
                     .HasForeignKey(d => d.DenyTypeId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_RestaurantDenyTypes_DenyTypeId");
 
                 entity.HasOne(d => d.Restaurant)
                     .WithMany(p => p.RestaurantDenyTypes)
                     .HasForeignKey(d => d.RestaurantId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_RestaurantDenyTypes_RestaurantId");
             });
 
             modelBuilder.Entity<Restaurants>(entity =>
             {
                 entity.ToTable("Restaurants", "places");
+
+                entity.HasIndex(e => e.CateringTypeId, "IX_Restaurants_CateringTypeId");
+
+                entity.HasIndex(e => e.CityId, "IX_Restaurants_CityId");
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
@@ -358,6 +398,10 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
 
                 entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Path)
                     .IsRequired()
                     .HasMaxLength(255);
 
