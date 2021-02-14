@@ -29,7 +29,7 @@ namespace JwtWebApi.Services.Impl
 			// создаем JWT-токен
 			var jwt = new JwtSecurityToken(
 				claims: claimsIdentity.Claims,
-				expires: now.Add(TimeSpan.FromMinutes(5)),
+				expires: now.Add(TimeSpan.FromDays(1)),
 				signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(await _jwtKetProvider.GetKey())),
 					SecurityAlgorithms.HmacSha256));
 			string encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);

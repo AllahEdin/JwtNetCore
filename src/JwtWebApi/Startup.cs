@@ -28,6 +28,27 @@ namespace JwtWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+	        services.AddCors(opt =>
+	        {
+                opt.AddPolicy("proxyPolicy", builder =>
+                {
+                    builder.SetIsOriginAllowedToAllowWildcardSubdomains()
+	                    .WithOrigins(
+		                    "http://localhost:8080",
+							"http://localhost:8089",
+		                    "https://localhost:8089",
+							"http://localhost:5000",
+							"https://localhost:5000",
+							"http://localhost:5001",
+							"https://localhost:5001",
+							"https://app-novgorod.herokuapp.com/")
+	                    .AllowAnyMethod()
+	                    .AllowAnyHeader()
+	                    .SetIsOriginAllowed(origin => true)
+	                    .AllowCredentials();
+                });
+	        });
+
 	        services.MigrateFrom(Configuration["TravelDbConnectionString"]);
 	     
 	        services.AddAuthentication(options =>
@@ -74,6 +95,7 @@ namespace JwtWebApi
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "JwtWebApi v1"));
             app.UseAuthentication();
             app.UseRouting();
+            app.UseCors();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {

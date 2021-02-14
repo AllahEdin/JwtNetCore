@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Models;
 using JwtWebApi.DataProviders.Common.Services;
@@ -13,13 +10,11 @@ using LinqToDB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace JwtWebApi.Api.Controllers
 {
 	[ApiController]
-	[Route("[controller]")]
+	[Route("api/[controller]")]
 	[Produces("application/json")]
 	public class AccountController : Controller
 	{
@@ -39,27 +34,92 @@ namespace JwtWebApi.Api.Controllers
 			_jwtGenerator = jwtGenerator;
 		}
 
-		[ProducesResponseType(typeof(string),200)]
-		[HttpGet(nameof(Login))]
+		[HttpGet(nameof(ConfirmEmail))]
 		[AllowAnonymous]
-		public async Task<IActionResult> Login(string email, string password)
+		public async Task<IActionResult> ConfirmEmail(string user, string signature)
 		{
-			if (!await GetIdentity(email, password, out string name, out string role))
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.FirstOrDefault(t => t.Id == user && t.SecurityStamp == signature);
+
+				if (found == null)
+				{
+					return BadRequest();
+				}
+
+				await contextProvider.GetTable<AspNetUser>()
+					.Where(t => t.Id == user && t.SecurityStamp == signature)
+					.UpdateAsync(netUser => new AspNetUser()
+					{
+						EmailConfirmed = true
+					});
+
+				return Ok();
+			}
+		}
+
+
+		[ProducesResponseType(typeof(string), 200)]
+		[HttpPost(nameof(Login))]
+		[AllowAnonymous]
+		public async Task<IActionResult> Login([FromBody] LoginModel model)
+		{
+			var ident =
+				await GetIdentity(model.Email, model.Password);
+
+			if (!ident.success)
 			{
 				return BadRequest();
 			}
 
 			var encodedJwt =
-				await _jwtGenerator.Generate(name, role);
+				await _jwtGenerator.Generate(ident.name, ident.role);
 
 			return Ok(encodedJwt);
-        }
+		}
+
+		[HttpPost(nameof(BanUser))]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> BanUser(string email)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Email == email);
+
+				if (!found.Any())
+				{
+					return BadRequest();
+				}
+
+				if (found.Count() > 1)
+				{
+					throw new InvalidOperationException("More 1 user by email!!");
+				}
+
+				await contextProvider.GetTable<AspNetUser>()
+					.Where(t => t.Email == email)
+					.UpdateAsync(netUser => new AspNetUser()
+					{
+						IsBanned = true
+					});
+
+				return Ok();
+			}
+		}
 
 		[ProducesResponseType(typeof(RegistrationModel), 200)]
 		[HttpPost(nameof(Register))]
 		[AllowAnonymous]
 		public async Task<IActionResult> Register([FromBody] RegistrationModel model)
 		{
+			
+
+			AspNetUser user;
+
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
 				if (contextProvider.GetTable<AspNetUser>().Any(t => t.Email == model.Email))
@@ -75,7 +135,9 @@ namespace JwtWebApi.Api.Controllers
 					Email = model.Email,
 					EmailConfirmed = false,
 					UserName = model.UserName,
-					SecurityStamp = Guid.NewGuid().ToString()
+					SecurityStamp = Guid.NewGuid().ToString(),
+					IsBanned = false,
+					RegistrationDate = DateTimeOffset.Now
 				};
 
 			var hashedPassword =
@@ -84,10 +146,16 @@ namespace JwtWebApi.Api.Controllers
 			usr.PasswordHash =
 				hashedPassword;
 
-			AspNetUser res =
-				await _contextProviderFactory.Create().InsertNonEntityAsync(usr);
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				user =
+					await contextProvider.InsertNonEntityAsync(usr);
+			}
 
-			await _emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={res.Id}&signature={usr.SecurityStamp}", res.Email);
+			var role =
+				await SetDefaultRoleToUser(usr.Id);
+
+			await _emailService.SendMessage($"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={user.Id}&signature={usr.SecurityStamp}", user.Email);
 
 			return Ok(model);
 		}
@@ -100,7 +168,7 @@ namespace JwtWebApi.Api.Controllers
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
 				var usrs =
-					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email);
+					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email && !(t.IsBanned ?? false));
 
 				if (usrs.Count() > 1)
 				{
@@ -122,7 +190,7 @@ namespace JwtWebApi.Api.Controllers
 				}
 
 				var count =
-					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email)
+					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == email && !(t.IsBanned ?? false))
 						.UpdateAsync(u => new AspNetUser()
 						{
 							SecurityStamp =
@@ -134,59 +202,46 @@ namespace JwtWebApi.Api.Controllers
 					contextProvider.GetTable<AspNetUser>().First(t => t.Email == email);
 
 
-				await _emailService.SendMessage($"http://localhost:22111/Account/ConfirmEmail?user={updatedUsr.Id}&signature={updatedUsr.SecurityStamp}", updatedUsr.Email);
+				await _emailService.SendMessage($"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={updatedUsr.Id}&signature={updatedUsr.SecurityStamp}", updatedUsr.Email);
 
 				return Ok();
 			}
 
 		}
 
-		[HttpGet(nameof(ConfirmEmail))]
-		public async Task<IActionResult> ConfirmEmail(string user, string signature)
+
+		[ProducesResponseType(typeof(bool), 200)]
+		[HttpPost(nameof(ResetPassword))]
+		[AllowAnonymous]
+		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
 		{
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
-				var found =
-					contextProvider.GetTable<AspNetUser>()
-						.FirstOrDefault(t => t.Id == user && t.SecurityStamp == signature);
+				var usrs =
+					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false));
 
-				if (found == null)
+				if (usrs.Count() > 1)
 				{
-					return BadRequest();
+					throw new InvalidOperationException("Нарушена структура бд!!");
 				}
 
-				await contextProvider.GetTable<AspNetUser>()
-					.Where(t => t.Id == user && t.SecurityStamp == signature)
-					.UpdateAsync(netUser =>  new AspNetUser()
-					{
-						EmailConfirmed = true
-					});
-
-				return Ok();
-			}
-		}
-
-		private Task<bool> GetIdentity(string email, string password, out string name, out string role)
-		{
-			using (var provider = _contextProviderFactory.Create())
-			{
-				var user= 
-					provider.GetTable<AspNetUser>()
-					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false));
-
-				if (user == null)
+				if (!usrs.Any())
 				{
-					name = "";
-					role = "";
-					return Task.FromResult(false);
+					return BadRequest("Пользователя с такой почтой не существует");
 				}
 
-				switch (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password))
+				var usr =
+					usrs.Single();
+
+				if (!(usr.EmailConfirmed ?? false))
+				{
+					return Ok(false);
+				}
+
+				switch (_passwordHasher.VerifyHashedPassword(usr, usr.PasswordHash, model.OldPassword))
 				{
 					case PasswordVerificationResult.Failed:
-						name = "";
-						role = "";
-						return Task.FromResult(false);
+						return Ok(false);
 					case PasswordVerificationResult.Success:
 						break;
 					case PasswordVerificationResult.SuccessRehashNeeded:
@@ -195,14 +250,89 @@ namespace JwtWebApi.Api.Controllers
 						throw new ArgumentOutOfRangeException();
 				}
 
-				//var name = new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName);
-		
-				//var claimsIdentity = new ClaimsIdentity(new[] { name }, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-				//return claimsIdentity;
+				var hashedPassword =
+					_passwordHasher.HashPassword(usr, model.NewPassword);
 
-				name = user.UserName;
-				role = "user";
-				return Task.FromResult(true);
+				var res=
+					await contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false))
+						.UpdateAsync(netUser => new AspNetUser()
+						{
+							PasswordHash = hashedPassword
+						});
+
+				return Ok(res == 1);
+			}
+
+		}
+
+
+
+		private async Task<(bool success, string name, string role)> GetIdentity(string email, string password)
+		{
+			using (var provider = _contextProviderFactory.Create())
+			{
+				var user= 
+					provider.GetTable<AspNetUser>()
+					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false) && !(t.IsBanned ?? false));
+				
+				if (user == null)
+				{
+					return (false, "", "");
+				}
+
+				var userRole =
+					provider
+						.GetTable<AspNetUserRole>()
+						.FirstOrDefault(t => t.AspNetUserId == user.Id) ?? await SetDefaultRoleToUser(user.Id);
+
+				var role =
+					provider.GetTable<AspNetRole>()
+						.FirstOrDefault(t => t.Id == userRole.RoleId) ?? throw new InvalidOperationException("Нарушена целостность бд");
+
+				switch (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password))
+				{
+					case PasswordVerificationResult.Failed:
+						return (false, "", "");
+					case PasswordVerificationResult.Success:
+						break;
+					case PasswordVerificationResult.SuccessRehashNeeded:
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+
+				return (true, user.UserName, role.RoleName);
+			}
+		}
+
+		private async Task<AspNetUserRole> SetDefaultRoleToUser(string userId)
+		{
+			AspNetRole role;
+
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				role =
+					contextProvider
+						.GetTable<AspNetRole>()
+						.FirstOrDefault(t => t.RoleName == "user");
+
+				if (role == null)
+				{
+					throw new InvalidOperationException();
+				}
+
+				var userRole =
+					new AspNetUserRole()
+					{
+						AspNetUserId = userId,
+						RoleId = role.Id,
+					};
+
+
+				AspNetUserRole createdUserRole =
+					await contextProvider.InsertNonEntityAsync(userRole);
+
+				return createdUserRole;
 			}
 		}
 	}

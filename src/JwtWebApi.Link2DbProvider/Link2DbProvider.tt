@@ -82,7 +82,7 @@
 			}
 		}
 		
-		t.BaseClass = "SamGMU.DataProvider.IEntity";
+		t.BaseClass = "SamGMU.DataProvider.IEntity, JwtWebApi.DataProviders.Common.DataObjects.IDeletable";
 	}
 
 	GenerateModel();

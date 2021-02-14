@@ -12,7 +12,7 @@ namespace JwtWebApi.Api.Controllers
 {
 
 	[ApiController]
-	[Route("[controller]")]
+	[Route("api/[controller]")]
 	[Produces("application/json")]
 	public class GoogleAccountController : Controller
 	{

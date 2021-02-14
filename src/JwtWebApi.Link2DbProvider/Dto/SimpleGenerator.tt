@@ -43,7 +43,7 @@
 	NamespaceName = "JwtWebApi.Link2DbProvider";
 
 	this.GetSchemaOptions.IncludedSchemas = 
-		new []{"content", "aspnet"};
+		new []{"places", "aspnet"};
 
 	string serverPsqlName = "localhost";
 	string portPsqlName = "7777";
@@ -58,6 +58,43 @@
 	GenerateAssociations = false;
 	GenerateViews = true;
 	GenerateDatabaseName = false;
+
+
+	foreach (var t in Tables.Values
+							.Where(tl => !tl.TableName
+											.StartsWith("AspNet", StringComparison.OrdinalIgnoreCase)))
+	{
+	    if (t.TableName == "__MyMigrationsHistory")
+		{
+			continue;
+		}
+
+		foreach (var c in t.Columns.Values)
+		{
+			if (c.IsPrimaryKey)
+			{
+				c.MemberName = "Id";
+			}
+			else if (c.MemberName == "BirthData")
+			{
+				c.MemberName = "BirthDate";
+			}
+		}
+
+		var baseCl = "JwtWebApi.DataProviders.Common.DataObjects.IEntity";
+
+		if (t.Columns.Values.Any(t => t.MemberName == "IsDeleted"))
+		{
+			baseCl += ",JwtWebApi.DataProviders.Common.DataObjects.IDeletable";
+		}
+		
+		if (t.Columns.Values.Any(t => t.MemberName == "Name"))
+		{
+			baseCl += ",JwtWebApi.DataProviders.Common.DataObjects.INamed";
+		}
+
+		t.BaseClass = baseCl;
+	}
 
 	GenerateModel();
 #>

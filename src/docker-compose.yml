@@ -9,6 +9,8 @@ services:
       - ASPNETCORE_URLS=http://+:22111
     secrets:
       - TravelDbConnectionString
+      - JWTKey
+      - GoogleSecret
     networks:
       - backend
 networks:
@@ -17,5 +19,9 @@ networks:
       name: dev
 secrets:
    TravelDbConnectionString:
-      file: ./connection_string.txt
+      file: ./TravelDbConnectionString
+   JWTKey:
+      file: ./JWTKey
+   GoogleSecret:
+      file: ./GoogleSecret
       

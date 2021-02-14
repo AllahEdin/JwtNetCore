@@ -9,7 +9,10 @@ namespace JwtWebApi.MigrationProvider
 	{
 		private static readonly IMigrationDataUpdate[] DataUpdateServices =
 		{
-			new RolesMigrationDataUpdate()
+			new RolesMigrationDataUpdate(),
+			new CateringTypesMigrationDataUpdate(),
+			new CuisineTypesMigrationDataUpdate(),
+			new DenyTypesMigrationDataUpdate(),
 		};
 
 		/// <inheritdoc />

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.Api.Common\JwtWebApi.Api.Common.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Link2DbProvider\JwtWebApi.Link2DbProvider.csproj" />
+  </ItemGroup>
+
+</Project>

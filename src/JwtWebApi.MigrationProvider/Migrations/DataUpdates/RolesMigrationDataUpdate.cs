@@ -7,7 +7,7 @@ namespace JwtWebApi.MigrationProvider.Migrations.DataUpdates
 {
 	public class RolesMigrationDataUpdate : MigrationDataUpdate<AspNetRoles>
 	{
-		protected override Expression<Func<AspNetRoles, object>> Identificator => t => new {t.RoleName};
+		protected override Expression<Func<AspNetRoles, object>> Identificator => t => new { t.Id,t.RoleName };
 
 		protected override AspNetRoles[] GetEntities(DbContext context)
 		{
@@ -15,10 +15,12 @@ namespace JwtWebApi.MigrationProvider.Migrations.DataUpdates
 			{
 				new AspNetRoles()
 				{
+					Id = 1,
 					RoleName = "user",
 				},
 				new AspNetRoles()
 				{
+					Id = 2,
 					RoleName = "admin"
 				}
 			};

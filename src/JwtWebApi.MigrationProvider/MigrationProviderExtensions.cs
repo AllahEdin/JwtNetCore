@@ -19,7 +19,7 @@ namespace JwtWebApi.MigrationProvider
 				b => b.MigrationsAssembly(typeof(MigrationProviderExtensions)
 						.Assembly.GetName()
 						.Name)
-					.MigrationsHistoryTable("__MyMigrationsHistory", schema: "content"));
+					.MigrationsHistoryTable("__MyMigrationsHistory", schema: "migration"));
 
 			using (MigrationPostgreSqlContext myDbContext = new MigrationPostgreSqlContext(dbContextOptions.Options))
 			{
