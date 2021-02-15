@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -28,6 +29,44 @@ namespace JwtWebApi.Api.Common.Extensions
 					.ToArray()));
 
 			return false;
+		}
+
+		public static string GetUserId(this Controller controller)
+		{
+			var claim =
+				controller.User.Claims.Where(t => t.Type == "LOCAL AUTHORITY")
+					.ToArray();
+
+			if (claim.Count() > 1)
+			{
+				throw new InvalidOperationException();
+			}
+
+			if (!claim.Any())
+			{
+				return "";
+			}
+
+			return claim.First().Value;
+		}
+
+		public static string GetUserRole(this Controller controller)
+		{
+			var claim =
+				controller.User.Claims.Where(t => t.Type == ClaimsIdentity.DefaultRoleClaimType)
+					.ToArray();
+
+			if (claim.Count() > 1)
+			{
+				throw new InvalidOperationException();
+			}
+
+			if (!claim.Any())
+			{
+				return "";
+			}
+
+			return claim.First().Value;
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using JwtWebApi.Api.Common.Dto;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.DataProviders.Common.DataObjects;
@@ -60,7 +61,7 @@ namespace JwtWebApi.Api.Common.ApiController
 
 			var pages =
 				await Service.Get(page, pageSize);
-
+			
 			return Ok(pages);
 		}
 

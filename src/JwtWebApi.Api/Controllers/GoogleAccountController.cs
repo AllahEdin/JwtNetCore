@@ -115,7 +115,7 @@ namespace JwtWebApi.Api.Controllers
 					meta.displayName;
 
 				var token =
-					await _jwtGenerator.Generate(userName, "user");
+					await _jwtGenerator.Generate(userName, "user", "");
 
 				return token;
 			}

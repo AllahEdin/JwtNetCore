@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using JwtWebApi.Api.Common.Dto;
 using JwtWebApi.DataProviders.Common.DataObjects;
 using JwtWebApi.DataProviders.Common.Services;
 using Microsoft.EntityFrameworkCore;
@@ -49,18 +49,24 @@ namespace JwtWebApi.Api.Common.Services
 			}
 		}
 
-		public async Task<IEnumerable<T>> Get(int page, int pageSize)
+		public async Task<PagingResult<T>> Get(int page, int pageSize)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{
-				var res =
-					cp.GetTable<TDb>()
+				TDb[] res =
+					await cp.GetTable<TDb>()
 						.Skip((page - 1) * pageSize)
-						.Take(pageSize);
+						.Take(pageSize)
+						.ToArrayAsync();
 
-				return !res.Any()
-					? new T[0]
-					: DtoMapper.Map<T[]>(await res.ToArrayAsync());
+				return
+					new PagingResult<T>()
+					{
+						Total = cp.GetTable<TDb>().Count(),
+						Items = !res.Any()
+							? new T[0]
+							: DtoMapper.Map<T[]>(res),
+					};
 			}
 		}
 
