@@ -37,7 +37,43 @@ namespace JwtWebApi.Api.Controllers
 			_jwtGenerator = jwtGenerator;
 		}
 
-		[ProducesResponseType(typeof(PagingResult<AspNetUser>), 200)]
+		[HttpGet(nameof(GetSelfInfo))]
+		[Authorize]
+		public async Task<IActionResult> GetSelfInfo()
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					await contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Id == this.GetUserId() && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false))
+						.ToArrayAsync();
+
+				if (!found.Any())
+				{
+					return BadRequest("");
+				}
+
+				if (found.Length > 1)
+				{
+					return BadRequest("");
+				}
+
+				var usr = found.First();
+
+				return Ok(new UserReturnModel()
+				{
+					Id = usr.Id,
+					IsBanned = usr.IsBanned ?? false,
+					Email = usr.Email,
+					RegistrationDate = usr.RegistrationDate ?? DateTimeOffset.Now,
+					EmailConfirmed = usr.EmailConfirmed ?? false,
+					UserName = usr.UserName,
+					RoleName = this.GetUserRole(),
+				});
+			}
+		}
+
+		[ProducesResponseType(typeof(PagingResult<UserReturnModel>), 200)]
 		[HttpGet(nameof(GetPaging))]
 		[Authorize(Roles = "admin")]
 		public async Task<IActionResult> GetPaging([Range(1, int.MaxValue)]int page, [Range(1, int.MaxValue)] int pageSize)
@@ -49,10 +85,29 @@ namespace JwtWebApi.Api.Controllers
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize);
 
-				PagingResult<AspNetUser> users =
-					new PagingResult<AspNetUser>()
+				var res =
+				from user in found
+				join userRole in contextProvider.GetTable<AspNetUserRole>() on user.Id equals userRole.AspNetUserId
+					join role in contextProvider.GetTable<AspNetRole>() on userRole.RoleId equals role.Id
+					select new
 					{
-						Items = await found.ToArrayAsync(),
+						Usr = user, 
+						Role = role.RoleName
+					};
+
+				PagingResult <UserReturnModel> users =
+					new PagingResult<UserReturnModel>()
+					{
+						Items = (await res.ToArrayAsync()).Select(t => new UserReturnModel()
+						{
+							Id = t.Usr.Id,
+							Email = t.Usr.Email,
+							EmailConfirmed = t.Usr?.EmailConfirmed ?? false,
+							IsBanned = t.Usr?.IsBanned ?? false,
+							RegistrationDate = t.Usr.RegistrationDate ?? DateTimeOffset.Now,
+							UserName = t.Usr.UserName,
+							RoleName = t.Role,
+						}).ToArray(),
 						Total = contextProvider.GetTable<AspNetUser>().Count()
 					};
 
@@ -157,7 +212,7 @@ namespace JwtWebApi.Api.Controllers
 
 		[HttpPost(nameof(BanUser))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> BanUser(string email)
+		public async Task<IActionResult> BanUser(string email, bool isBanned)
 		{
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
@@ -175,11 +230,16 @@ namespace JwtWebApi.Api.Controllers
 					throw new InvalidOperationException("More 1 user by email!!");
 				}
 
+				if (found.First().Id == this.GetUserId())
+				{
+					return BadRequest();
+				}
+
 				await contextProvider.GetTable<AspNetUser>()
 					.Where(t => t.Email == email)
 					.UpdateAsync(netUser => new AspNetUser()
 					{
-						IsBanned = true
+						IsBanned = isBanned
 					});
 
 				return Ok();
