@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -11,20 +12,29 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 	{
 		private readonly IRestaurantCuisineTypesService _restaurantCuisineTypesService;
 		private readonly IRestaurantDenyTypesService _restaurantDenyTypesService;
-		private readonly ICuisineTypeService _cuisineTypeService;
-		private readonly IDenyTypeService _denyTypeService;
+
 
 
 		public RestaurantController(IRestaurantCuisineTypesService restaurantCuisineTypesService,
 			IRestaurantDenyTypesService restaurantDenyTypesService,
-			IRestaurantService service,
-			ICuisineTypeService cuisineTypeService,
-			IDenyTypeService denyTypeService ) : base(service)
+			IRestaurantService service) : base(service)
 		{
 			_restaurantCuisineTypesService = restaurantCuisineTypesService;
 			_restaurantDenyTypesService = restaurantDenyTypesService;
-			_cuisineTypeService = cuisineTypeService;
-			_denyTypeService = denyTypeService;
+		}
+
+		[HttpGet("WithLinks/GetPaging")]
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.GetPagingWithLinks(page, pageSize);
+
+			return Ok(pages);
 		}
 
 		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypesByIds))]
