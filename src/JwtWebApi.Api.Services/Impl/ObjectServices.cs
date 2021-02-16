@@ -12,8 +12,15 @@ namespace JwtWebApi.Api.Services.Impl
 {
 	internal class RestaurantsService : EntityProviderBase<IRestaurant, Restaurant>, IRestaurantService
 	{
-		public RestaurantsService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		private readonly IRestaurantCuisineTypesService _cuisineTypesService;
+		private readonly IRestaurantDenyTypesService _denyTypesService;
+
+		public RestaurantsService(IContextProviderFactory contextProviderFactory,
+			IRestaurantCuisineTypesService cuisineTypesService,
+			IRestaurantDenyTypesService denyTypesService) : base(contextProviderFactory)
 		{
+			_cuisineTypesService = cuisineTypesService;
+			_denyTypesService = denyTypesService;
 		}
 
 
@@ -55,6 +62,20 @@ namespace JwtWebApi.Api.Services.Impl
 
 			return model;
 		}
+
+		public override Task<bool> Delete(int id)
+		{
+			if (id <= 0)
+			{
+				throw new InvalidOperationException();
+			}
+
+			//TODO
+			throw new NotSupportedException();
+		}
+
+		protected override bool CanBeDeleted()
+			=> false;
 	}
 
 	internal class HotelService : EntityProviderBase<IHotel, Hotel>, IHotelService
@@ -103,6 +124,9 @@ namespace JwtWebApi.Api.Services.Impl
 
 			return model;
 		}
+
+		protected override bool CanBeDeleted()
+			=> false;
 	}
 
 	internal class AttractionService : EntityProviderBase<IAttraction, Attraction>, IAttractionService
@@ -149,5 +173,8 @@ namespace JwtWebApi.Api.Services.Impl
 
 			return model;
 		}
+
+		protected override bool CanBeDeleted()
+			=> false;
 	}
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using JwtWebApi.Api.Common.Dto;
 using JwtWebApi.DataProviders.Common.DataObjects;
+using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +17,6 @@ namespace JwtWebApi.Api.Common.Services
 	{
 		public IMapper DtoMapper { get; set; }
 		protected readonly IContextProviderFactory ContextProviderFactory;
-
 
 		protected EntityProviderBase(IContextProviderFactory contextProviderFactory)
 		{
@@ -54,10 +55,9 @@ namespace JwtWebApi.Api.Common.Services
 			using (var cp = ContextProviderFactory.Create())
 			{
 				TDb[] res =
-					await cp.GetTable<TDb>()
-						.Skip((page - 1) * pageSize)
-						.Take(pageSize)
-						.ToArrayAsync();
+					await EntityFrameworkQueryableExtensions.ToArrayAsync(cp.GetTable<TDb>()
+							.Skip((page - 1) * pageSize)
+							.Take(pageSize));
 
 				return
 					new PagingResult<T>()
@@ -95,9 +95,64 @@ namespace JwtWebApi.Api.Common.Services
 			}
 		}
 
-		public Task<bool> Delete(int id)
+		public virtual async Task<bool> Delete(int id)
 		{
-			throw new System.NotImplementedException();
+			if (CanBeDeleted())
+			{
+				using (var cp = ContextProviderFactory.Create())
+				{
+					var itemsToDelete =
+						cp.GetTable<TDb>()
+							.Where(t => t.Id == id);
+
+					if (!itemsToDelete.Any())
+					{
+						return false;
+					}
+
+					if (itemsToDelete.Count() > 1)
+					{
+						throw new InvalidOperationException("Нарушена целостность бд!!");
+					}
+
+					var res =
+						await itemsToDelete.DeleteAsync();
+
+					return (res == 1);
+				}
+			}
+
+			throw new NotSupportedException();
+		}
+
+		public virtual async Task<bool> Delete(Expression<Func<TDb, bool>> sort)
+		{
+			if (CanBeDeleted())
+			{
+				using (var cp = ContextProviderFactory.Create())
+				{
+					var itemsToDelete =
+						cp.GetTable<TDb>()
+							.Where(sort);
+
+					if (!itemsToDelete.Any())
+					{
+						return false;
+					}
+
+					if (itemsToDelete.Count() > 1)
+					{
+						throw new InvalidOperationException("Нарушена целостность бд!!");
+					}
+
+					var res =
+						await itemsToDelete.DeleteAsync();
+
+					return (res == 1);
+				}
+			}
+
+			throw new NotSupportedException();
 		}
 
 		protected abstract Task<T> Update(IContextProvider provider, T model);
@@ -109,5 +164,7 @@ namespace JwtWebApi.Api.Common.Services
 
 			return res;
 		}
+
+		protected abstract bool CanBeDeleted();
 	}
 }

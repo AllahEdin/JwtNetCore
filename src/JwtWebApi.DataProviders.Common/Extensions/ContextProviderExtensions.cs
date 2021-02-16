@@ -77,7 +77,7 @@ namespace JwtWebApi.DataProviders.Common.Extensions
         /// <summary>
         ///     Возвращает кол-во удаленных сущностей, согласно запросу <paramref name="query" />
         /// </summary>
-        public static async Task<int> DeleteAsync<T>(this IQueryable<T> query, int userId) where T : class, IEntity
+        public static async Task<int> DeleteAsync<T>(this IQueryable<T> query) where T : class, IEntity
         {
             return await query.DeleteAsync<T>(CancellationToken.None);
         }

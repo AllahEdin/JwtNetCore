@@ -31,5 +31,4 @@ namespace JwtWebApi.MigrationProvider.Migrations.DataUpdates
 			};
 		}
 	}
-	
 }
