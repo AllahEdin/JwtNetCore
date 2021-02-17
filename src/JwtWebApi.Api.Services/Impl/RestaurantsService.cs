@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
@@ -8,9 +9,6 @@ using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
-using LinqToDB;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -68,73 +66,96 @@ namespace JwtWebApi.Api.Services.Impl
 			return model;
 		}
 
-		public override Task<bool> Delete(int id)
+		public override async Task<bool> Delete(int id)
 		{
 			if (id <= 0)
 			{
 				throw new InvalidOperationException();
 			}
 
-			//TODO
-			throw new NotSupportedException();
+			IReadOnlyCollection<RestaurantCuisineType> toDelete =
+				new RestaurantCuisineType[0];
+
+			using (var cp = ContextProviderFactory.Create())
+			{
+				toDelete =
+					await cp.GetTable<RestaurantCuisineType>()
+						.Where(t => t.RestaurantId == id)
+						.ToArrayAsync();
+			}
+			
+			foreach (var restaurantCuisineTypes in toDelete)
+			{
+				await _cuisineTypesService.Delete(restaurantCuisineTypes.RestaurantId, restaurantCuisineTypes.CuisineTypeId);
+			}
+
+			IReadOnlyCollection<RestaurantDenyType> toDelete2 =
+				new RestaurantDenyType[0];
+
+			using (var cp = ContextProviderFactory.Create())
+			{
+				toDelete2 =
+					await cp.GetTable<RestaurantDenyType>()
+						.Where(t => t.RestaurantId == id)
+						.ToArrayAsync();
+			}
+
+			foreach (var restaurantDenyType in toDelete2)
+			{
+				await _denyTypesService.Delete(restaurantDenyType.RestaurantId, restaurantDenyType.DenyTypeId);
+			}
+
+			return true;
 		}
 
 		public async Task<PagingResult<IRestaurantWithLinks>> GetPagingWithLinks(int page, int pageSize)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{
-				var rests =
-					await cp.GetTable<Restaurant>()
+				var restsCui =
+					from r in cp.GetTable<Restaurant>()
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
-						.Join(cp.GetTable<RestaurantCuisineType>(),
-							restaurant => restaurant.Id,
-							type => type.RestaurantId,
-							(restaurant, type) => new {Rest = restaurant, CuisineType = type})
-						.Join(cp.GetTable<CateringType>(), arg => arg.CuisineType.Id , type => type.Id, (args1,
-							args2) => new {Rest = args1.Rest, CuisineType = args2})
-						.ToArrayAsync();
-
-				var restGr =
-					rests.GroupBy(k => k.Rest.Id, val => val);
+					join cu in cp.GetTable<RestaurantCuisineType>() on r.Id equals cu.RestaurantId into gr
+					from restCu in gr.DefaultIfEmpty()
+					join ct in cp.GetTable<CuisineType>() on restCu.CuisineTypeId equals ct.Id into gr2
+					from cuisineType in gr2.DefaultIfEmpty() 
+					select new { Rest = r, CuisineType = cuisineType };
 
 
-				//var cuisineIds =
-				//	await cp.GetTable<RestaurantCuisineType>()
-				//		.Where(t => restIds.Contains(t.RestaurantId))
-				//		.ToArrayAsync();
+				var restCuiGr =
+					restsCui.AsEnumerable()
+						.GroupBy(k => k.Rest.Id, val => val);
 
-				//var denyTypes =
-				//	await cp.GetTable<RestaurantDenyType>()
-				//		.Where(t => restIds.Contains(t.RestaurantId))
-				//		.ToArrayAsync();
-
-
-				//var result =
-				//	from r in cp.GetTable<Restaurant>()
-				//		.Skip((page - 1) * pageSize)
-				//		.Take(pageSize)
-				//	join cu in cp.GetTable<RestaurantCuisineType>() on r.Id equals cu.RestaurantId into gr
-				//	from aaaa in gr.DefaultIfEmpty()
-				//	join ct in cp.GetTable<CuisineType>() on aaaa.CuisineTypeId equals ct.Id
-				//	select new {Rest = r, CT = ct};
+				var restsDen =
+					from r in cp.GetTable<Restaurant>()
+						.Skip((page - 1) * pageSize)
+						.Take(pageSize)
+					join cu in cp.GetTable<RestaurantDenyType>() on r.Id equals cu.RestaurantId into gr
+					from restCu in gr.DefaultIfEmpty()
+					join ct in cp.GetTable<DenyType>() on restCu.DenyTypeId equals ct.Id into gr2
+					from cuisineType in gr2.DefaultIfEmpty()
+					select new { Rest = r, DenyType = cuisineType };
 
 				return new PagingResult<IRestaurantWithLinks>()
 				{
 					Total = cp.GetTable<Restaurant>().Count(),
-					Items = restGr.Select(t => new RestaurantWithLinks()
+					Items = restCuiGr.Select(t => new RestaurantWithLinks()
 					{
-						CuisineTypes = t.Select(s => new LocalCuisineType()
+						DenyTypes = restsDen.Where(w => w.Rest.Id == t.First().Rest.Id && w.DenyType != null)
+							.Select(s => new LocalDenyType()
+							{
+								Id = s.DenyType.Id,
+								Name = s.DenyType.Name,
+							}).Cast<IDenyType>().ToArray(),
+						CuisineTypes = t.Where(w => w.CuisineType != null).Select(s => new LocalCuisineType()
 						{
 							Id = s.CuisineType.Id,
 							Name = s.CuisineType.Name,
-						}).ToArray(),
+						}).Cast<ICuisineType>().ToArray(),
 						Restaurant = DtoMapper.Map<IRestaurant>(t.First().Rest),
 					}).ToArray()
 				};
-
-
-
 			}
 		}
 
