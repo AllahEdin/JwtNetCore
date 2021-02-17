@@ -13,6 +13,16 @@ namespace JwtWebApi.Api.Services.Dto
 	}
 
 
+	public interface IHotelWithLinks
+	{
+		public IHotel Hotel { get; set; }
+
+		public IEquipmentType[] EquipmentTypes { get; set; }
+
+		public IServiceType[] ServiceTypes { get; set; }
+	}
+
+
 	public interface IRestaurant : IEntity
 	{
 		public string Name { get; set; }

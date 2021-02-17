@@ -4,6 +4,7 @@ using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JwtWebApi.Api.Controllers.ObjectsControllers
@@ -38,6 +39,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypesByIds))]
+		[Authorize(Roles = "admin")]
 		public async Task<IActionResult> AddCuisineTypesByIds(int restaurantId, int[] cuisineTypeIds)
 		{
 			if (restaurantId <= 0)
@@ -64,6 +66,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpDelete("{restaurantId}/" + nameof(DeleteCuisineTypesByIds))]
+		[Authorize(Roles = "admin")]
 		public async Task<IActionResult> DeleteCuisineTypesByIds(int restaurantId, int[] cuisineTypeIds)
 		{
 			if (restaurantId <= 0)
@@ -85,6 +88,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpPost("{restaurantId}/" + nameof(AddDenyTypesByIds))]
+		[Authorize(Roles = "admin")]
 		public async Task<IActionResult> AddDenyTypesByIds(int restaurantId, int[] denyTypeIds)
 		{
 			if (restaurantId <= 0)
@@ -111,6 +115,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpDelete("{restaurantId}/" + nameof(DeleteDenyTypesByIds))]
+		[Authorize(Roles = "admin")]
 		public async Task<IActionResult> DeleteDenyTypesByIds(int restaurantId, int[] denyTypeIds)
 		{
 			if (restaurantId <= 0)
@@ -131,5 +136,20 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == denyTypeIds.Length);
 		}
 
+
+		[HttpDelete()]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> Delete(int restaurantId)
+		{
+			if (restaurantId <= 0)
+			{
+				return BadRequest();
+			}
+
+			var res =
+				await Service.Delete(restaurantId);
+
+			return Ok(res);
+		}
 	}
 }
