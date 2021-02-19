@@ -15,6 +15,9 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 		}
 
+		protected override bool CanBeDeleted()
+			=> false;
+
 		protected override async Task<T> Update(IContextProvider provider, T model)
 		{
 			var res =

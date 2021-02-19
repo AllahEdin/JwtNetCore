@@ -13,6 +13,10 @@ namespace JwtWebApi.MigrationProvider
 			new CateringTypesMigrationDataUpdate(),
 			new CuisineTypesMigrationDataUpdate(),
 			new DenyTypesMigrationDataUpdate(),
+			new CitiesMigrationDataUpdate(),
+			new EquipmentTypesMigrationDataUpdate(),
+			new HousingTypesMigrationDataUpdate(),
+			new ServiceTypesMigrationDataUpdate()
 		};
 
 		/// <inheritdoc />

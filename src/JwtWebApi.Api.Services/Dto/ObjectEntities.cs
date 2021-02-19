@@ -3,6 +3,26 @@ using JwtWebApi.DataProviders.Common.DataObjects;
 
 namespace JwtWebApi.Api.Services.Dto
 {
+	public interface IRestaurantWithLinks
+	{
+		public IRestaurant Restaurant { get; set; }
+
+		public ICuisineType[] CuisineTypes { get; set; }
+
+		public IDenyType[] DenyTypes { get; set; }
+	}
+
+
+	public interface IHotelWithLinks
+	{
+		public IHotel Hotel { get; set; }
+
+		public IEquipmentType[] EquipmentTypes { get; set; }
+
+		public IServiceType[] ServiceTypes { get; set; }
+	}
+
+
 	public interface IRestaurant : IEntity
 	{
 		public string Name { get; set; }

@@ -18,6 +18,12 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 			throw new NotSupportedException();
 		}
+
+		protected override bool CanBeDeleted()
+			=> true;
+
+		public Task<bool> Delete(int restaurantId, int cuisineTypeId)
+			=> base.Delete(rct => rct.RestaurantId == restaurantId && rct.CuisineTypeId == cuisineTypeId);
 	}
 
 	internal class RestaurantDentTypesService : EntityProviderBase<IRestaurantDenyTypes, RestaurantDenyType>, IRestaurantDenyTypesService
@@ -30,6 +36,12 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 			throw new NotSupportedException();
 		}
+
+		protected override bool CanBeDeleted()
+			=> true;
+
+		public Task<bool> Delete(int restaurantId, int denyTypeId)
+			=> base.Delete(rdt => rdt.RestaurantId == restaurantId && rdt.DenyTypeId == denyTypeId);
 	}
 
 
@@ -43,6 +55,12 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 			throw new NotImplementedException();
 		}
+
+		protected override bool CanBeDeleted()
+			=> true;
+
+		public Task<bool> Delete(int hotelId, int equipmentTypeId)
+			=> base.Delete(het => het.EquipmentTypeId == equipmentTypeId && het.HotelId == hotelId);
 	}
 
 	internal class HotelServiceTypesService : EntityProviderBase<IHotelServiceTypes, HotelServiceType>, IHotelServiceTypesService
@@ -55,5 +73,11 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 			throw new NotImplementedException();
 		}
+
+		protected override bool CanBeDeleted()
+			=> true;
+
+		public Task<bool> Delete(int hotelId, int serviceTypeId)
+			=> base.Delete(het => het.ServiceTypeId == serviceTypeId && het.HotelId == hotelId);
 	}
 }
