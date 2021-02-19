@@ -21,9 +21,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			_hotelServiceTypesService = hotelServiceTypesService;
 		}
 
-		[HttpPost("{hotelId}/" + nameof(AddCuisineTypesByIds))]
+		[HttpPost("{hotelId}/" + nameof(AddEquipmentTypesByIds))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddCuisineTypesByIds(int hotelId, int[] equipmentTypeIds)
+		public async Task<IActionResult> AddEquipmentTypesByIds(int hotelId, int[] equipmentTypeIds)
 		{
 			if (hotelId <= 0)
 			{
@@ -48,9 +48,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == equipmentTypeIds.Length);
 		}
 
-		[HttpDelete("{hotelId}/" + nameof(DeleteCuisineTypesByIds))]
+		[HttpDelete("{hotelId}/" + nameof(DeleteEquipmentTypesByIds))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteCuisineTypesByIds(int hotelId, int[] equipmentTypeIds)
+		public async Task<IActionResult> DeleteEquipmentTypesByIds(int hotelId, int[] equipmentTypeIds)
 		{
 			if (hotelId <= 0)
 			{
@@ -70,9 +70,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == equipmentTypeIds.Length);
 		}
 
-		[HttpPost("{hotelId}/" + nameof(AddDenyTypesByIds))]
+		[HttpPost("{hotelId}/" + nameof(AddServiceTypesByIds))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddDenyTypesByIds(int hotelId, int[] serviceTypeIds)
+		public async Task<IActionResult> AddServiceTypesByIds(int hotelId, int[] serviceTypeIds)
 		{
 			if (hotelId <= 0)
 			{
@@ -97,9 +97,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == serviceTypeIds.Length);
 		}
 
-		[HttpDelete("{hotelId}/" + nameof(DeleteDenyTypesByIds))]
+		[HttpDelete("{hotelId}/" + nameof(DeleteServiceTypesByIds))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteDenyTypesByIds(int hotelId, int[] serviceTypeIds)
+		public async Task<IActionResult> DeleteServiceTypesByIds(int hotelId, int[] serviceTypeIds)
 		{
 			if (hotelId <= 0)
 			{
