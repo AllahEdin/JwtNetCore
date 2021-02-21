@@ -12,7 +12,7 @@ namespace JwtWebApi.Api.Services.Services
 
 	public interface IHotelService : IEntityProvider<IHotel>
 	{
-
+		Task<PagingResult<IHotelWithLinks>> GetPagingWithLinks(int page, int pageSize);
 	}
 
 	public interface IAttractionService : IEntityProvider<IAttraction>
