@@ -105,6 +105,8 @@ namespace JwtWebApi.Api.Services.Impl
 				await _denyTypesService.Delete(restaurantDenyType.RestaurantId, restaurantDenyType.DenyTypeId);
 			}
 
+			await base.Delete(id);
+
 			return true;
 		}
 
@@ -160,6 +162,6 @@ namespace JwtWebApi.Api.Services.Impl
 		}
 
 		protected override bool CanBeDeleted()
-			=> false;
+			=> true;
 	}
 }

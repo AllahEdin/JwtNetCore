@@ -48,4 +48,14 @@ namespace JwtWebApi.Api.Models
 		public int Duration { get; set; }
 		public string Path { get; set; }
 	}
+
+	public class RouteModel : IRoute
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public bool Animals { get; set; }
+		public int Length { get; set; }
+		public int Time { get; set; }
+		public string Path { get; set; }
+	}
 }

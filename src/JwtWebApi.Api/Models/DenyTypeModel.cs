@@ -43,4 +43,34 @@ namespace JwtWebApi.Api.Models
 		public int Id { get; set; }
 		public string Name { get; set; }
 	}
+
+	public class AgeTypeModel : IAgeType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+	public class PeopleTypeModel : IPeopleType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+	public class SubjectNameModel : ISubjectName
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+	
+	public class SubjectModel : ISubject
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+	public class SubjectTypeModel : ISubjectType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
 }

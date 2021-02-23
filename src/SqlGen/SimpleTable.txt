@@ -1,0 +1,18 @@
+DROP TABLE IF EXISTS "@SCHEMA@"."@TableName@";
+CREATE TABLE "@SCHEMA@"."@TableName@" (
+  "Id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 2147483647
+START 1
+),
+  "Name" varchar(255) COLLATE "pg_catalog"."default"
+)
+;
+
+CREATE UNIQUE INDEX "IX_@TableName@_Name" ON "@SCHEMA@"."@TableName@" USING btree (
+  "Name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+
+
+ALTER TABLE "@SCHEMA@"."@TableName@" ADD CONSTRAINT "PK_@TableName@" PRIMARY KEY ("Id");

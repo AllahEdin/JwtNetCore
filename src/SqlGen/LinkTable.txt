@@ -1,0 +1,28 @@
+DROP TABLE IF EXISTS "@SCHEMA@"."@TableName@";
+CREATE TABLE "@SCHEMA@"."@TableName@" (
+  "Id" int4 NOT NULL GENERATED ALWAYS AS IDENTITY (
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 2147483647
+START 1
+),
+  "@ObjectId@" int4 NOT NULL,
+  "@SubjectId@" int4 NOT NULL
+)
+;
+
+
+CREATE INDEX "IX_@TableName@_@SubjectId@" ON "@SCHEMA@"."@TableName@" USING btree (
+  "@SubjectId@" "pg_catalog"."int4_ops" ASC NULLS LAST
+);
+CREATE UNIQUE INDEX "UIX_@TableName@_@ObjectId@_@SubjectId@" ON "@SCHEMA@"."@TableName@" USING btree (
+  "@ObjectId@" "pg_catalog"."int4_ops" ASC NULLS LAST,
+  "@SubjectId@" "pg_catalog"."int4_ops" ASC NULLS LAST
+);
+
+
+ALTER TABLE "@SCHEMA@"."@TableName@" ADD CONSTRAINT "PK_@TableName@" PRIMARY KEY ("Id");
+
+
+ALTER TABLE "@SCHEMA@"."@TableName@" ADD CONSTRAINT "FK_@TableName@_@ObjectId@" FOREIGN KEY ("@ObjectId@") REFERENCES "@SCHEMA@"."@ObjectTable@" ("Id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "@SCHEMA@"."@TableName@" ADD CONSTRAINT "FK_@TableName@_@SubjectId@" FOREIGN KEY ("@SubjectId@") REFERENCES "@SCHEMA@"."@SubjectTable@" ("Id") ON DELETE CASCADE ON UPDATE NO ACTION;

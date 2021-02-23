@@ -97,7 +97,6 @@ namespace JwtWebApi.Api.Common.Services
 
 		public virtual async Task<bool> Delete(int id)
 		{
-			if (CanBeDeleted())
 			{
 				using (var cp = ContextProviderFactory.Create())
 				{

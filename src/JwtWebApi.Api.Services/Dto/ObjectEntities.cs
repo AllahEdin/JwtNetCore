@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JwtWebApi.DataProviders.Common.DataObjects;
 
 namespace JwtWebApi.Api.Services.Dto
@@ -12,6 +13,27 @@ namespace JwtWebApi.Api.Services.Dto
 		public IDenyType[] DenyTypes { get; set; }
 	}
 
+	public interface IAttractionWithLinks
+	{
+		public IAttraction Attraction { get; set; }
+
+		public IEnumerable<int> RouteIds { get; set; }
+
+		public ISubject[] Subjects { get; set; }
+	}
+
+	public interface IRouteWithLinks
+	{
+		public IRoute Route { get; set; }
+
+		public IPeopleType[] PeopleTypes { get; set; }
+
+		public IAgeType[] AgeTypes { get; set; }
+
+		public ISubjectName[] SubjectNames { get; set; }
+
+		public ISubjectType[] SubjectTypes { get; set; }
+	}
 
 	public interface IHotelWithLinks
 	{
@@ -54,7 +76,6 @@ namespace JwtWebApi.Api.Services.Dto
 
 	public interface IAttraction : IEntity
 	{
-		public int Id { get; set; }
 		public string Name { get; set; }
 		public string Preview { get; set; }
 		public string Description { get; set; }
@@ -66,5 +87,14 @@ namespace JwtWebApi.Api.Services.Dto
 		public int Duration { get; set; }
 		public string Path { get; set; }
 
+	}
+
+	public interface IRoute : IEntity
+	{
+		 public string Name { get; set; } 
+		 public bool Animals { get; set; }
+		 public int Length { get; set; } 
+		 public int Time { get; set; } 
+		 public string Path { get; set; } 
 	}
 }

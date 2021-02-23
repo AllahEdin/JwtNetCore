@@ -386,7 +386,7 @@ namespace JwtWebApi.Api.Controllers
 					throw new InvalidOperationException("Не удалось обновить SecurityStamp");
 				}
 
-				await _emailService.SendMessage($"Ссылка_с_параметрами_на_восстановление_пароля?userId={usr.Id}&signature={stamp}", email);
+				await _emailService.SendMessage($"https://app-novgorod.herokuapp.com/recover?userId={usr.Id}&signature={stamp}", email);
 
 				return Ok();
 			}

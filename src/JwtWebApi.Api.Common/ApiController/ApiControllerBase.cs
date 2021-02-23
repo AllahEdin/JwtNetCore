@@ -136,5 +136,48 @@ namespace JwtWebApi.Api.Common.ApiController
 			bool isSuccess = await Service.Delete(id);
 			return Ok(isSuccess);
 		}
+
+
+		protected async Task<IActionResult> AddLink<TLinkService, TLink>(int objectId, int[] linkIds, TLinkService service, Func<int, int, TLink> createLink)
+			where TLinkService : IEntityProvider<TLink>
+		{
+			if (objectId <= 0)
+			{
+				return BadRequest();
+			}
+
+			int count = 0;
+
+			foreach (var linkId in linkIds)
+			{
+				var res =
+					await service.AddOrUpdate(createLink(objectId, linkId));
+
+				count += 1;
+			}
+
+			return Ok(count == linkIds.Length);
+		}
+
+		protected async Task<IActionResult> DeleteLink<TLinkService>(int objectId, int[] linkIds, TLinkService service)
+			where TLinkService : IEntityLinkDeleteService
+		{
+			if (objectId <= 0)
+			{
+				return BadRequest();
+			}
+
+			int count = 0;
+
+			foreach (var linkId in linkIds)
+			{
+				var res =
+					await service.Delete(objectId, linkId);
+
+				count += 1;
+			}
+
+			return Ok(count == linkIds.Length);
+		}
 	}
 }

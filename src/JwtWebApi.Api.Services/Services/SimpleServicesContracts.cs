@@ -37,4 +37,32 @@ namespace JwtWebApi.Api.Services.Services
 
 	}
 
+
+	public interface IAgeTypeService : IEntityProvider<IAgeType>
+	{
+
+	}
+
+	public interface IPeopleTypeService : IEntityProvider<IPeopleType>
+	{
+
+	}
+
+	public interface ISubjectNameService : IEntityProvider<ISubjectName>
+	{
+
+	}
+
+	public interface ISubjectService : IEntityProvider<ISubject>
+	{
+
+	}
+
+	public interface ISubjectTypeService : IEntityProvider<ISubjectType>
+	{
+
+	}
+
+
+
 }

@@ -34,7 +34,7 @@ namespace JwtWebApi.Api.Services.Impl
 
 			if (!hotels.Any())
 			{
-				throw new InvalidOperationException($"No restaurant with id = {model.Id}");
+				throw new InvalidOperationException($"No hotel with id = {model.Id}");
 			}
 
 			if (hotels.Count() > 1)
@@ -66,7 +66,7 @@ namespace JwtWebApi.Api.Services.Impl
 			return model;
 		}
 
-			public override async Task<bool> Delete(int id)
+		public override async Task<bool> Delete(int id)
 		{
 			if (id <= 0)
 			{
@@ -83,10 +83,11 @@ namespace JwtWebApi.Api.Services.Impl
 						.Where(t => t.HotelId == id)
 						.ToArrayAsync();
 			}
-			
+
 			foreach (var restaurantCuisineTypes in toDelete)
 			{
-				await _hotelEquipmentTypesService.Delete(restaurantCuisineTypes.HotelId, restaurantCuisineTypes.EquipmentTypeId);
+				await _hotelEquipmentTypesService.Delete(restaurantCuisineTypes.HotelId,
+					restaurantCuisineTypes.EquipmentTypeId);
 			}
 
 			IReadOnlyCollection<HotelServiceType> toDelete2 =
@@ -104,6 +105,8 @@ namespace JwtWebApi.Api.Services.Impl
 			{
 				await _hotelServiceTypesService.Delete(restaurantDenyType.HotelId, restaurantDenyType.ServiceTypeId);
 			}
+
+			await base.Delete(id);
 
 			return true;
 		}
@@ -161,6 +164,6 @@ namespace JwtWebApi.Api.Services.Impl
 		}
 
 		protected override bool CanBeDeleted()
-			=> false;
+			=> true;
 	}
 }

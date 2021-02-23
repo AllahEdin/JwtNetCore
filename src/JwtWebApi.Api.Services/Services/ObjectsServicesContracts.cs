@@ -17,6 +17,11 @@ namespace JwtWebApi.Api.Services.Services
 
 	public interface IAttractionService : IEntityProvider<IAttraction>
 	{
+		Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize);
+	}
 
+	public interface IRouteService : IEntityProvider<IRoute>
+	{
+		Task<PagingResult<IRouteWithLinks>> GetPagingWithLinks(int page, int pageSize);
 	}
 }

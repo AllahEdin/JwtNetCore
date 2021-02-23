@@ -30,4 +30,26 @@ namespace JwtWebApi.Api.Services.Dto
 	public interface IServiceType : IEntity, INamed
 	{
 	}
+
+
+
+	public interface IAgeType : IEntity, INamed
+	{
+	}
+
+	public interface IPeopleType : IEntity, INamed
+	{
+	}
+
+	public interface ISubjectName : IEntity, INamed
+	{
+	}
+
+	public interface ISubject : IEntity, INamed
+	{
+	}
+
+	public interface ISubjectType : IEntity, INamed
+	{
+	}
 }

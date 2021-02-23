@@ -26,10 +26,49 @@ namespace JwtWebApi.Api.Controllers.LinkControllers
 		}
 	}
 
-	public class HotelServiceTypesController : AuthorizeAdminApiControllerBase<IHotelServiceTypes, HotelServiceTypeModel, IHotelServiceTypesService>
+
+
+	public class AttractionSubjectsController : AuthorizeAdminApiControllerBase<IAttractionSubjects, AttractionSubjectsModel, IAttractionSubjectsService>
 	{
-		public HotelServiceTypesController(IHotelServiceTypesService service) : base(service)
+		public AttractionSubjectsController(IAttractionSubjectsService service) : base(service)
 		{
 		}
 	}
+
+	public class RouteAgeTypeController : AuthorizeAdminApiControllerBase<IRouteAgeType, RouteAgeTypeModel, IRouteAgeTypeService>
+	{
+		public RouteAgeTypeController(IRouteAgeTypeService service) : base(service)
+		{
+		}
+	}
+
+	public class RouteAttractionController : AuthorizeAdminApiControllerBase<IRouteAttraction, RouteAttractionModel, IRouteAttractionService>
+	{
+		public RouteAttractionController(IRouteAttractionService service) : base(service)
+		{
+		}
+	}
+
+	public class RoutePeopleTypeController : AuthorizeAdminApiControllerBase<IRoutePeopleType, RoutePeopleTypeModel, IRoutePeopleTypeService>
+	{
+		public RoutePeopleTypeController(IRoutePeopleTypeService service) : base(service)
+		{
+		}
+	}
+
+	public class RouteSubjectNameController : AuthorizeAdminApiControllerBase<IRouteSubjectName, RouteSubjectNameModel, IRouteSubjectNameService>
+	{
+		public RouteSubjectNameController(IRouteSubjectNameService service) : base(service)
+		{
+		}
+	}
+
+	public class RouteSubjectTypeController : AuthorizeAdminApiControllerBase<IRouteSubjectType, RouteSubjectTypeModel, IRouteSubjectTypeService>
+	{
+		public RouteSubjectTypeController(IRouteSubjectTypeService service) : base(service)
+		{
+		}
+	}
+
+	
 }
