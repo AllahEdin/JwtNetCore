@@ -175,8 +175,7 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
                 entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(255);
+	                .IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -325,8 +324,7 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
                 entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(255);
+                    .IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -444,8 +442,7 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
                 entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(255);
+                    .IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()

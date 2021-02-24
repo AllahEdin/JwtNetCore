@@ -11,13 +11,13 @@ namespace JwtWebApi.Api.Controllers
 	[Route("api/[controller]")]
 	public class FileStorageController : Controller
 	{
-		private const string FILESTORAGE_PATH = "FileStorage/";
+		private const string FILESTORAGE_PATH = "/usr/share/fs/";
 		private const string AUDIO_BASE = "audio/";
-		private const string PICTURES_BASE = "audio/";
+		private const string PICTURES_BASE = "pictures/";
 
 		[HttpPost]
 		[Authorize]
-		public async Task<IActionResult> GetStream(FileType type , string city, string path)
+		public async Task<IActionResult> GetStream(FileType type , string path)
 		{
 			var fullPath = FILESTORAGE_PATH;
 
