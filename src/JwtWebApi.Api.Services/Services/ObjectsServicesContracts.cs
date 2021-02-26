@@ -1,27 +1,21 @@
-﻿using System.Threading.Tasks;
-using JwtWebApi.Api.Common.Dto;
-using JwtWebApi.Api.Common.Services;
+﻿using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 
 namespace JwtWebApi.Api.Services.Services
 {
-	public interface IRestaurantService : IEntityProvider<IRestaurant>
+	public interface IRestaurantService : IEntityProvider<IRestaurant>, IPagingWithLinksProvider<IRestaurantWithLinks>
 	{
-		Task<PagingResult<IRestaurantWithLinks>> GetPagingWithLinks(int page, int pageSize);
 	}
 
-	public interface IHotelService : IEntityProvider<IHotel>
+	public interface IHotelService : IEntityProvider<IHotel>, IPagingWithLinksProvider<IHotelWithLinks>
 	{
-		Task<PagingResult<IHotelWithLinks>> GetPagingWithLinks(int page, int pageSize);
 	}
 
-	public interface IAttractionService : IEntityProvider<IAttraction>
+	public interface IAttractionService : IEntityProvider<IAttraction>, IPagingWithLinksProvider<IAttractionWithLinks>
 	{
-		Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize);
 	}
 
-	public interface IRouteService : IEntityProvider<IRoute>
+	public interface IRouteService : IEntityProvider<IRoute>, IPagingWithLinksProvider<IRouteWithLinks>
 	{
-		Task<PagingResult<IRouteWithLinks>> GetPagingWithLinks(int page, int pageSize);
 	}
 }

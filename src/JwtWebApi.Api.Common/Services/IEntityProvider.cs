@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Common.Services
 {
@@ -18,7 +19,7 @@ namespace JwtWebApi.Api.Common.Services
 		/// <summary>
 		///     Возвращает постраничный список элементов сущности <typeparamref name="T" />
 		/// </summary>
-		Task<PagingResult<T>> Get(int page, int pageSize);
+		Task<PagingResult<T>> Get(int page, int pageSize, ComplexFilterUnit filterUnit);
 
 		/// <summary>
 		///     Возвращает новый/обновленный элемент сущности <paramref name="model" />

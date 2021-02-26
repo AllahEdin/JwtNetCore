@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -11,6 +12,7 @@ using JwtWebApi.DataProviders.Common.DataObjects;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -77,13 +79,13 @@ namespace JwtWebApi.Api.Services.Impl
 		protected override bool CanBeDeleted()
 			=> true;
 
-		public async Task<PagingResult<IRouteWithLinks>> GetPagingWithLinks(int page, int pageSize)
+		public async Task<PagingResult<IRouteWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
 
 				IReadOnlyCollection<Route> routes=
-					await cp.GetTable<Route>()
+					await (filter == null ? cp.GetTable<Route>() : cp.GetTable<Route>().GetFilteredTable(filter, cp))
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();
@@ -207,5 +209,6 @@ namespace JwtWebApi.Api.Services.Impl
 		}
 
 
+		
 	}
 }

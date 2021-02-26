@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -68,17 +70,23 @@ namespace JwtWebApi.Api.Services.Impl
 		protected override bool CanBeDeleted()
 			=> true;
 
-		public async Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize)
+		public Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize) =>
+			GetPagingWithLinks(page, pageSize, null);
+
+		public async Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
 
-				IReadOnlyCollection<Attraction> attractions =
-					await cp.GetTable<Attraction>()
-						.Skip((page - 1) * pageSize)
+				var attractionsQ =
+					filter == null
+						? cp.GetTable<Attraction>()
+						: cp.GetTable<Attraction>().GetFilteredTable(filter, cp);
+
+				var attractions =
+					await attractionsQ.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();
-
 
 				var attrSubj =
 					cp.GetTable<AttractionSubject>()
@@ -157,5 +165,6 @@ namespace JwtWebApi.Api.Services.Impl
 
 			return true;
 		}
+
 	}
 }

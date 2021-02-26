@@ -4,6 +4,7 @@ using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,18 +24,13 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpGet("WithLinks/GetPaging")]
-		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
-		{
-			if (!this.IsValidModel(out IActionResult error))
-			{
-				return error;
-			}
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
+			=> base.GetPaging<IHotelWithLinks>(page, pageSize, null);
 
-			var pages =
-				await Service.GetPagingWithLinks(page, pageSize);
+		[HttpPost("WithLinks/GetPaging")]
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] ComplexFilterUnit filter)
+			=> base.GetPaging<IHotelWithLinks>(page, pageSize, filter);
 
-			return Ok(pages);
-		}
 
 		[HttpPost("{hotelId}/" + nameof(AddEquipmentTypesByIds))]
 		[Authorize(Roles = "admin")]

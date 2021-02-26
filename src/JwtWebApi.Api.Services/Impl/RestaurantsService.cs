@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -110,12 +112,12 @@ namespace JwtWebApi.Api.Services.Impl
 			return true;
 		}
 
-		public async Task<PagingResult<IRestaurantWithLinks>> GetPagingWithLinks(int page, int pageSize)
+		public async Task<PagingResult<IRestaurantWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{
 				var restsCui =
-					from r in cp.GetTable<Restaurant>()
+					from r in filter == null ? cp.GetTable<Restaurant>() : cp.GetTable<Restaurant>().GetFilteredTable(filter, cp)
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 					join cu in cp.GetTable<RestaurantCuisineType>() on r.Id equals cu.RestaurantId into gr

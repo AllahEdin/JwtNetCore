@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.DataProviders.Common.DataObjects;
+using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +18,7 @@ namespace JwtWebApi.Api.Common.ApiController
 		{
 		}
 
+
 		[HttpGet("{id}")]
 		[Authorize]
 		public Task<IActionResult> GetById(int id)
@@ -22,8 +26,14 @@ namespace JwtWebApi.Api.Common.ApiController
 
 		[HttpGet("")]
 		[Authorize]
-		public Task<IActionResult> GetPaging(int page, int pageSize)
+		public Task<IActionResult> GetPaging([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize)
 			=> base.Get(page, pageSize);
+		
+		[HttpPost(nameof(GetPagingFiltered))]
+		[Authorize]
+		public Task<IActionResult> GetPagingFiltered([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize, [FromBody] ComplexFilterUnit filterUnit)
+			=> base.GetFiltered(filterUnit, page, pageSize);
+
 
 		[HttpPost("")]
 		[Authorize(Roles = "admin")]

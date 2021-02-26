@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
-using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,19 +29,14 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			_routeSubjectTypeService = routeSubjectTypeService;
 		}
 
+
 		[HttpGet("WithLinks/GetPaging")]
-		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
-		{
-			if (!this.IsValidModel(out IActionResult error))
-			{
-				return error;
-			}
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
+			=> base.GetPaging<IRouteWithLinks>(page, pageSize, null);
 
-			var pages =
-				await Service.GetPagingWithLinks(page, pageSize);
-
-			return Ok(pages);
-		}
+		[HttpPost("WithLinks/GetPaging")]
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] ComplexFilterUnit filter)
+			=> base.GetPaging<IRouteWithLinks>(page, pageSize, filter);
 
 
 		#region PeopleType

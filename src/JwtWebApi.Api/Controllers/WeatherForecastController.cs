@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JWTWebApi.Services.Api;
+using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace JwtWebApi.Api.Controllers
 {
     [ApiController]
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -51,5 +54,6 @@ namespace JwtWebApi.Api.Controllers
 		        })
 		        .ToArray();
         }
+
     }
 }

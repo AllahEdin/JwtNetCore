@@ -8,6 +8,7 @@ using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.DataProviders.Common.DataObjects;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
+using JwtWebApi.Services.Services.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace JwtWebApi.Api.Common.Services
@@ -51,19 +52,25 @@ namespace JwtWebApi.Api.Common.Services
 			}
 		}
 
-		public async Task<PagingResult<T>> Get(int page, int pageSize)
+		public async Task<PagingResult<T>> Get(int page, int pageSize, ComplexFilterUnit filter)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{
+
+				IQueryable<TDb> table =
+					filter == null
+						? cp.GetTable<TDb>()
+						: cp.GetTable<TDb>().GetFilteredTable(filter, cp);
+
 				TDb[] res =
-					await EntityFrameworkQueryableExtensions.ToArrayAsync(cp.GetTable<TDb>()
-							.Skip((page - 1) * pageSize)
-							.Take(pageSize));
+					await EntityFrameworkQueryableExtensions.ToArrayAsync(table
+						.Skip((page - 1) * pageSize)
+						.Take(pageSize));
 
 				return
 					new PagingResult<T>()
 					{
-						Total = cp.GetTable<TDb>().Count(),
+						Total = table.Count(),
 						Items = !res.Any()
 							? new T[0]
 							: DtoMapper.Map<T[]>(res),
@@ -166,5 +173,7 @@ namespace JwtWebApi.Api.Common.Services
 		}
 
 		protected abstract bool CanBeDeleted();
+
+		
 	}
 }
