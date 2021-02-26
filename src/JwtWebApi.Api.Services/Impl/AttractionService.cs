@@ -78,42 +78,27 @@ namespace JwtWebApi.Api.Services.Impl
 			using (var cp = _contextProviderFactory.Create())
 			{
 
-				var attractionsQ =
-					filter == null
-						? cp.GetTable<Attraction>()
-						: cp.GetTable<Attraction>().GetFilteredTable(filter, cp);
-
-				var attractions =
-					await attractionsQ.Skip((page - 1) * pageSize)
-						.Take(pageSize)
-						.ToArrayAsync();
-
-				var attrSubj =
-					cp.GetTable<AttractionSubject>()
-						.Where(t => attractions.Select(s => s.Id).Contains(t.AttractionId));
-
-				var subjects =
-					attrSubj.Join(cp.GetTable<Subject>(), subject => subject.SubjectId, subject => subject.Id, (attrS, subject) => new { AttrId = attrS.AttractionId, Subj = subject});
-
+				var paging =
+					await Get(page, pageSize, filter);
 
 				var routes =
-					cp.GetTable<RouteAttraction>()
-						.Where(t => attractions.Select(s => s.Id).Contains(t.AttractionId));
+					await GetLink<RouteAttraction>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
 
-				
+				var subjects =
+					await GetLink<RouteAttraction>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
+
+
 				return new PagingResult<IAttractionWithLinks>()
 				{
-					Total = cp.GetTable<Attraction>().Count(),
-					Items = attractions.Select(t => new AttractionWithLinks()
+					Total = paging.Total,
+					Items = paging.Items.Select(t => new AttractionWithLinks()
 					{
-						Attraction = DtoMapper.Map<IAttraction>(t),
+						Attraction = t,
 						RouteIds = routes.Where(w => w.AttractionId == t.Id).Select(s => s.RouteId).ToArray(),
-						Subjects = subjects.Where(w => w.AttrId == t.Id).Select(s => new LocalSubject()
-						{
-							Name = s.Subj.Name,
-							Id = s.Subj.Id,
-						}).Cast<ISubject>().ToArray(),
-					}).ToArray(),
+						SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.Id).ToArray()
+					}).ToArray()
 				};
 
 			};

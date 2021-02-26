@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -131,6 +132,20 @@ namespace JwtWebApi.Api.Common.Services
 
 			throw new NotSupportedException();
 		}
+
+		public async Task<IReadOnlyCollection<TLink>> GetLink<TLink>(IReadOnlyCollection<T> source, Expression<Func<TLink, bool>> where)
+		where TLink : class,IEntity
+		{
+			using (var cp = ContextProviderFactory.Create())
+			{
+				var link =
+					cp.GetTable<TLink>()
+						.Where(where);
+
+				return await link.ToArrayAsync();
+			}
+		}
+
 
 		public virtual async Task<bool> Delete(Expression<Func<TDb, bool>> sort)
 		{

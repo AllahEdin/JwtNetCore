@@ -8,9 +8,9 @@ namespace JwtWebApi.Api.Services.Dto
 	{
 		public IRestaurant Restaurant { get; set; }
 
-		public ICuisineType[] CuisineTypes { get; set; }
+		public IEnumerable<int> CuisineTypeIds { get; set; }
 
-		public IDenyType[] DenyTypes { get; set; }
+		public IEnumerable<int> DenyTypeIds { get; set; }
 	}
 
 	public interface IAttractionWithLinks
@@ -19,29 +19,29 @@ namespace JwtWebApi.Api.Services.Dto
 
 		public IEnumerable<int> RouteIds { get; set; }
 
-		public ISubject[] Subjects { get; set; }
+		public IEnumerable<int> SubjectIds { get; set; }
 	}
 
 	public interface IRouteWithLinks
 	{
 		public IRoute Route { get; set; }
 
-		public IPeopleType[] PeopleTypes { get; set; }
+		public IEnumerable<int> PeopleTypeIds { get; set; }
 
-		public IAgeType[] AgeTypes { get; set; }
+		public IEnumerable<int> AgeTypeIds { get; set; }
 
-		public ISubjectName[] SubjectNames { get; set; }
+		public IEnumerable<int> SubjectNameIds { get; set; }
 
-		public ISubjectType[] SubjectTypes { get; set; }
+		public IEnumerable<int> SubjectTypeIds { get; set; }
 	}
 
 	public interface IHotelWithLinks
 	{
 		public IHotel Hotel { get; set; }
 
-		public IEquipmentType[] EquipmentTypes { get; set; }
+		public IEnumerable<int> EquipmentTypes { get; set; }
 
-		public IServiceType[] ServiceTypes { get; set; }
+		public IEnumerable<int> ServiceTypes { get; set; }
 	}
 
 

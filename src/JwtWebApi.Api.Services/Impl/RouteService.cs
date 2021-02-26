@@ -84,77 +84,37 @@ namespace JwtWebApi.Api.Services.Impl
 			using (var cp = _contextProviderFactory.Create())
 			{
 
-				IReadOnlyCollection<Route> routes=
-					await (filter == null ? cp.GetTable<Route>() : cp.GetTable<Route>().GetFilteredTable(filter, cp))
-						.Skip((page - 1) * pageSize)
-						.Take(pageSize)
-						.ToArrayAsync();
+				var paging =
+					await Get(page, pageSize, filter);
 
+				var at =
+					await GetLink<RouteAgeType>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.RouteId));
 
-				var routeAgeTypes =
-					cp.GetTable<RouteAgeType>()
-						.Where(t => routes.Select(s => s.Id).Contains(t.RouteId));
+				var pt =
+					await GetLink<RoutePeopleType>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.RouteId));
 
-				var ageTypes =
-					routeAgeTypes.Join(cp.GetTable<AgeType>(), routeAT=> routeAT.AgeTypeId, ageType=> ageType.Id,
-						(routeAT, ageType) => new {RouteId = routeAT.RouteId, Entity = ageType });
+				var sn =
+					await GetLink<RouteSubjectName>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.RouteId));
 
+				var st =
+					await GetLink<RouteSubjectType>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.RouteId));
 
-
-				var routePeopleTypes =
-					cp.GetTable<RoutePeopleType>()
-						.Where(t => routes.Select(s => s.Id).Contains(t.RouteId));
-
-				var peopleTypes =
-					routePeopleTypes.Join(cp.GetTable<PeopleType>(), link => link.RouteId, ent => ent.Id,
-						(link, ent) => new { RouteId = link.RouteId, Entity = ent });
-
-
-
-				var routeSubjectNames =
-					cp.GetTable<RouteSubjectName>()
-						.Where(t => routes.Select(s => s.Id).Contains(t.RouteId));
-
-				var subjectNames=
-					routeSubjectNames.Join(cp.GetTable<SubjectName>(), link => link.RouteId, ent => ent.Id,
-						(link, ent) => new { RouteId = link.RouteId, Entity = ent });
-
-
-				var routeSubjectTypes =
-					cp.GetTable<RouteSubjectType>()
-						.Where(t => routes.Select(s => s.Id).Contains(t.RouteId));
-
-				var subjectTypes =
-					routeSubjectTypes.Join(cp.GetTable<SubjectType>(), link => link.RouteId, ent => ent.Id,
-						(link, ent) => new { RouteId = link.RouteId, Entity = ent });
 
 				return new PagingResult<IRouteWithLinks>()
 				{
-					Total = cp.GetTable<Route>().Count(),
-					Items = routes.Select(t => new RouteWithLinks()
+					Total = paging.Total,
+					Items = paging.Items.Select(t => new RouteWithLinks()
 					{
-						AgeTypes = ageTypes.Where(w => w.RouteId == t.Id).Select(s => new LocalAgeType()
-						{
-							Name = s.Entity.Name,
-							Id = s.Entity.Id,
-						}).Cast<IAgeType>().ToArray(),
-						PeopleTypes = peopleTypes.Where(w => w.RouteId == t.Id).Select(s => new LocalPeopleType()
-						{
-							Name = s.Entity.Name,
-							Id = s.Entity.Id,
-						}).Cast<IPeopleType>().ToArray(),
-						Route = DtoMapper.Map<IRoute>(t),
-						SubjectNames = subjectNames.Where(w => w.RouteId == t.Id).Select(s => new LocalSubjectName()
-						{
-							Name = s.Entity.Name,
-							Id = s.Entity.Id,
-						}).Cast<ISubjectName>().ToArray(),
-						SubjectTypes = subjectTypes.Where(w => w.RouteId == t.Id).Select(s => new LocalServiceType()
-						{
-							Name = s.Entity.Name,
-							Id = s.Entity.Id,
-						}).Cast<ISubjectType>().ToArray(),
-					}).ToArray(),
+						AgeTypeIds = at.Where(w => w.RouteId ==t.Id).Select(s => s.AgeTypeId),
+						PeopleTypeIds = pt.Where(w => w.RouteId == t.Id).Select(s => s.PeopleTypeId),
+						Route = t,
+						SubjectNameIds = sn.Where(w => w.RouteId == t.Id).Select(s => s.SubjectNameId),
+						SubjectTypeIds = st.Where(w => w.RouteId == t.Id).Select(s => s.SubjectTypeId),
+					}).ToArray()
 				};
 
 			}

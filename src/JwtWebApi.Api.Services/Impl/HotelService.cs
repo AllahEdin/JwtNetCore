@@ -117,53 +117,30 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{
-				var restsCui =
-					from r in filter == null ? cp.GetTable<Hotel>() : cp.GetTable<Hotel>().GetFilteredTable(filter, cp)
-						.Skip((page - 1) * pageSize)
-						.Take(pageSize)
-					join het in cp.GetTable<HotelEquipmentType>() on r.Id equals het.HotelId into gr
-					from restCu in gr.DefaultIfEmpty()
-					join eq in cp.GetTable<EquipmentType>() on restCu.EquipmentTypeId equals eq.Id into gr2
-					from he in gr2.DefaultIfEmpty() 
-					select new { Hotel = r, HotelEquipment = he };
+				var paging =
+					await Get(page, pageSize, filter);
 
+				var services =
+					await GetLink<HotelServiceType>(paging.Items,
+						hst => paging.Items.Select(t => t.Id).Contains(hst.HotelId));
 
-				var restCuiGr =
-					restsCui.AsEnumerable()
-						.GroupBy(k => k.Hotel.Id, val => val);
-
-				var restsDen =
-					from r in cp.GetTable<Hotel>()
-						.Skip((page - 1) * pageSize)
-						.Take(pageSize)
-					join hst in cp.GetTable<HotelServiceType>() on r.Id equals hst.HotelId into gr
-					from restCu in gr.DefaultIfEmpty()
-					join st in cp.GetTable<ServiceType>() on restCu.ServiceTypeId equals st.Id into gr2
-					from stg in gr2.DefaultIfEmpty()
-					select new { Hotel = r, ServiceType = stg };
+				var equipments =
+					await GetLink<HotelEquipmentType>(paging.Items,
+						hst => paging.Items.Select(t => t.Id).Contains(hst.HotelId));
 
 				return new PagingResult<IHotelWithLinks>()
 				{
-					Total = cp.GetTable<Hotel>().Count(),
-					Items = restCuiGr.Select(t => new HotelWithLinks()
+					Total = paging.Total,
+					Items = paging.Items.Select(t => new HotelWithLinks()
 					{
-						ServiceTypes = restsDen.Where(w => w.Hotel.Id == t.First().Hotel.Id && w.ServiceType != null)
-							.Select(s => new LocalServiceType()
-							{
-								Id = s.ServiceType.Id,
-								Name = s.ServiceType.Name,
-							}).Cast<IServiceType>().ToArray(),
-						EquipmentTypes = t.Where(w => w.HotelEquipment != null)
-							.Select(s => new LocalEquipmentType()
-						{
-							Id = s.HotelEquipment.Id,
-							Name = s.HotelEquipment.Name,
-						}).Cast<IEquipmentType>().ToArray(),
-						Hotel = DtoMapper.Map<IHotel>(t.First().Hotel),
+						ServiceTypes = services.Where(w => w.HotelId == t.Id).Select(s => s.ServiceTypeId),
+						EquipmentTypes = equipments.Where(w => w.HotelId == t.Id).Select(s => s.EquipmentTypeId), 
+						Hotel = t,
 					}).ToArray()
 				};
 			}
 		}
+
 
 		protected override bool CanBeDeleted()
 			=> true;
