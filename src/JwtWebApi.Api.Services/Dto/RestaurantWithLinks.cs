@@ -1,19 +1,36 @@
-﻿namespace JwtWebApi.Api.Services.Dto
+﻿using System.Collections.Generic;
+
+namespace JwtWebApi.Api.Services.Dto
 {
 	internal class RestaurantWithLinks : IRestaurantWithLinks
 	{
 		public IRestaurant Restaurant { get; set; }
-		public ICuisineType[] CuisineTypes { get; set; }
-		public IDenyType[] DenyTypes { get; set; }
+		public IEnumerable<int> CuisineTypeIds { get; set; }
+		public IEnumerable<int> DenyTypeIds { get; set; }
 	}
 
 	internal class HotelWithLinks : IHotelWithLinks
 	{
 		public IHotel Hotel { get; set; }
-		public IEquipmentType[] EquipmentTypes { get; set; }
-		public IServiceType[] ServiceTypes { get; set; }
+		public IEnumerable<int> EquipmentTypes { get; set; }
+		public IEnumerable<int> ServiceTypes { get; set; }
 	}
 
+	internal class AttractionWithLinks : IAttractionWithLinks
+	{
+		public IAttraction Attraction { get; set; }
+		public IEnumerable<int> RouteIds { get; set; }
+		public IEnumerable<int> SubjectIds { get; set; }
+	}
+
+	internal class RouteWithLinks : IRouteWithLinks
+	{
+		public IRoute Route { get; set; }
+		public IEnumerable<int> PeopleTypeIds { get; set; }
+		public IEnumerable<int> AgeTypeIds { get; set; }
+		public IEnumerable<int> SubjectNameIds { get; set; }
+		public IEnumerable<int> SubjectTypeIds { get; set; }
+	}
 
 	internal class LocalCuisineType : ICuisineType
 	{
@@ -34,6 +51,38 @@
 	}
 
 	internal class LocalServiceType : IServiceType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+
+	internal class LocalSubject : ISubject
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+
+	internal class LocalAgeType : IAgeType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+	internal class LocalPeopleType : IPeopleType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+	internal class LocalSubjectName : ISubjectName
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+	internal class LocalSubjectType : ISubjectType
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }

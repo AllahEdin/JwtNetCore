@@ -4,23 +4,47 @@ using JwtWebApi.Api.Services.Dto;
 
 namespace JwtWebApi.Api.Services.Services
 {
-	public interface IRestaurantCuisineTypesService : IEntityProvider<IRestaurantCuisineTypes>
+	public interface IRestaurantCuisineTypesService : IEntityProvider<IRestaurantCuisineTypes>, IEntityLinkDeleteService
 	{
-		Task<bool> Delete(int restaurantId, int cuisineTypeId);
 	}
 
-	public interface IRestaurantDenyTypesService : IEntityProvider<IRestaurantDenyTypes>
+	public interface IRestaurantDenyTypesService : IEntityProvider<IRestaurantDenyTypes>, IEntityLinkDeleteService
 	{
-		Task<bool> Delete(int restaurantId, int denyTypeId);
 	}
 
-	public interface IHotelEquipmentTypesService : IEntityProvider<IHotelEquipmentTypes>
+	public interface IHotelEquipmentTypesService : IEntityProvider<IHotelEquipmentTypes>, IEntityLinkDeleteService
 	{
-		Task<bool> Delete(int hotelId, int equipmentTypeId);
 	}
 
-	public interface IHotelServiceTypesService : IEntityProvider<IHotelServiceTypes>
+	public interface IHotelServiceTypesService : IEntityProvider<IHotelServiceTypes>, IEntityLinkDeleteService
 	{
-		Task<bool> Delete(int hotelId, int serviceTypeId);
 	}
+
+
+
+	public interface IAttractionSubjectsService : IEntityProvider<IAttractionSubjects>, IEntityLinkDeleteService
+	{
+	}
+
+	public interface IRouteAgeTypeService : IEntityProvider<IRouteAgeType>, IEntityLinkDeleteService
+	{
+	}
+
+	public interface IRouteAttractionService : IEntityProvider<IRouteAttraction>, IEntityLinkDeleteService
+	{
+	}
+
+	public interface IRoutePeopleTypeService : IEntityProvider<IRoutePeopleType>, IEntityLinkDeleteService
+	{
+	}
+
+	public interface IRouteSubjectNameService : IEntityProvider<IRouteSubjectName>, IEntityLinkDeleteService
+	{
+	}
+
+	public interface IRouteSubjectTypeService : IEntityProvider<IRouteSubjectType>, IEntityLinkDeleteService
+	{
+	}
+
+	
 }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using JwtWebApi.Api.Common.Dto;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.DataProviders.Common.DataObjects;
+using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JwtWebApi.Api.Common.ApiController
@@ -25,6 +25,24 @@ namespace JwtWebApi.Api.Common.ApiController
 		protected ApiControllerBase(TService service)
 		{
 			Service = service;
+		}
+
+		protected async Task<IActionResult> GetPaging<TEntityWithLinks>(int page, int pageSize, ComplexFilterUnit filter)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			if (Service is IPagingWithLinksProvider<TEntityWithLinks> pagingWithLinks)
+			{
+				var pages =
+					await pagingWithLinks.GetPagingWithLinks(page, pageSize, filter);
+
+				return Ok(pages);
+			}
+
+			throw new NotSupportedException();
 		}
 
 		/// <summary>
@@ -60,8 +78,25 @@ namespace JwtWebApi.Api.Common.ApiController
 			}
 
 			var pages =
-				await Service.Get(page, pageSize);
+				await Service.Get(page, pageSize, null);
 			
+			return Ok(pages);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="model">Создаваемый объект. Обязательное для заполнения</param>
+		protected async Task<IActionResult> GetFiltered([Required] [FromBody] ComplexFilterUnit filter, int page, int pageSize)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.Get(page, pageSize, filter);
+
 			return Ok(pages);
 		}
 
@@ -135,6 +170,49 @@ namespace JwtWebApi.Api.Common.ApiController
 
 			bool isSuccess = await Service.Delete(id);
 			return Ok(isSuccess);
+		}
+
+
+		protected async Task<IActionResult> AddLink<TLinkService, TLink>(int objectId, int[] linkIds, TLinkService service, Func<int, int, TLink> createLink)
+			where TLinkService : IEntityProvider<TLink>
+		{
+			if (objectId <= 0)
+			{
+				return BadRequest();
+			}
+
+			int count = 0;
+
+			foreach (var linkId in linkIds)
+			{
+				var res =
+					await service.AddOrUpdate(createLink(objectId, linkId));
+
+				count += 1;
+			}
+
+			return Ok(count == linkIds.Length);
+		}
+
+		protected async Task<IActionResult> DeleteLink<TLinkService>(int objectId, int[] linkIds, TLinkService service)
+			where TLinkService : IEntityLinkDeleteService
+		{
+			if (objectId <= 0)
+			{
+				return BadRequest();
+			}
+
+			int count = 0;
+
+			foreach (var linkId in linkIds)
+			{
+				var res =
+					await service.Delete(objectId, linkId);
+
+				count += 1;
+			}
+
+			return Ok(count == linkIds.Length);
 		}
 	}
 }

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.DataProviders.Common.DataObjects;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
+using JwtWebApi.Services.Services.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace JwtWebApi.Api.Common.Services
@@ -50,19 +53,25 @@ namespace JwtWebApi.Api.Common.Services
 			}
 		}
 
-		public async Task<PagingResult<T>> Get(int page, int pageSize)
+		public async Task<PagingResult<T>> Get(int page, int pageSize, ComplexFilterUnit filter)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{
+
+				IQueryable<TDb> table =
+					filter == null
+						? cp.GetTable<TDb>()
+						: cp.GetTable<TDb>().GetFilteredTable(filter, cp);
+
 				TDb[] res =
-					await EntityFrameworkQueryableExtensions.ToArrayAsync(cp.GetTable<TDb>()
-							.Skip((page - 1) * pageSize)
-							.Take(pageSize));
+					await EntityFrameworkQueryableExtensions.ToArrayAsync(table
+						.Skip((page - 1) * pageSize)
+						.Take(pageSize));
 
 				return
 					new PagingResult<T>()
 					{
-						Total = cp.GetTable<TDb>().Count(),
+						Total = table.Count(),
 						Items = !res.Any()
 							? new T[0]
 							: DtoMapper.Map<T[]>(res),
@@ -97,7 +106,6 @@ namespace JwtWebApi.Api.Common.Services
 
 		public virtual async Task<bool> Delete(int id)
 		{
-			if (CanBeDeleted())
 			{
 				using (var cp = ContextProviderFactory.Create())
 				{
@@ -124,6 +132,20 @@ namespace JwtWebApi.Api.Common.Services
 
 			throw new NotSupportedException();
 		}
+
+		public async Task<IReadOnlyCollection<TLink>> GetLink<TLink>(IReadOnlyCollection<T> source, Expression<Func<TLink, bool>> where)
+		where TLink : class,IEntity
+		{
+			using (var cp = ContextProviderFactory.Create())
+			{
+				var link =
+					cp.GetTable<TLink>()
+						.Where(where);
+
+				return await link.ToArrayAsync();
+			}
+		}
+
 
 		public virtual async Task<bool> Delete(Expression<Func<TDb, bool>> sort)
 		{
@@ -166,5 +188,7 @@ namespace JwtWebApi.Api.Common.Services
 		}
 
 		protected abstract bool CanBeDeleted();
+
+		
 	}
 }

@@ -38,6 +38,28 @@ namespace JwtWebApi.Api.Services
 				.As<IHousingTypeService>()
 				.SingleInstance();
 
+			builder.RegisterType<AgeTypeService>()
+				.As<IAgeTypeService>()
+				.SingleInstance();
+
+			builder.RegisterType<PeopleTypeService>()
+				.As<IPeopleTypeService>()
+				.SingleInstance();
+
+			builder.RegisterType<SubjectNameService>()
+				.As<ISubjectNameService>()
+				.SingleInstance();
+
+			builder.RegisterType<SubjectService>()
+				.As<ISubjectService>()
+				.SingleInstance();
+
+			builder.RegisterType<SubjectTypeService>()
+				.As<ISubjectTypeService>()
+				.SingleInstance();
+
+
+
 
 			builder.RegisterType<RestaurantCuisineTypesService>()
 				.As<IRestaurantCuisineTypesService>()
@@ -55,6 +77,32 @@ namespace JwtWebApi.Api.Services
 				.As<IHotelServiceTypesService>()
 				.SingleInstance();
 
+			builder.RegisterType<AttractionSubjectsService>()
+				.As<IAttractionSubjectsService>()
+				.SingleInstance();
+
+			builder.RegisterType<RouteAgeTypeService>()
+				.As<IRouteAgeTypeService>()
+				.SingleInstance();
+
+			builder.RegisterType<RouteAttractionService>()
+				.As<IRouteAttractionService>()
+				.SingleInstance();
+
+			builder.RegisterType<RoutePeopleTypeService>()
+				.As<IRoutePeopleTypeService>()
+				.SingleInstance();
+
+			builder.RegisterType<RouteSubjectNameService>()
+				.As<IRouteSubjectNameService>()
+				.SingleInstance();
+
+			builder.RegisterType<RouteSubjectTypeService>()
+				.As<IRouteSubjectTypeService>()
+				.SingleInstance();
+
+
+
 
 			builder.RegisterType<RestaurantsService>()
 				.As<IRestaurantService>()
@@ -66,6 +114,10 @@ namespace JwtWebApi.Api.Services
 
 			builder.RegisterType<AttractionService>()
 				.As<IAttractionService>()
+				.SingleInstance();
+
+			builder.RegisterType<RouteService>()
+				.As<IRouteService>()
 				.SingleInstance();
 		}
 	}

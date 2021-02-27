@@ -53,4 +53,43 @@ namespace JwtWebApi.Api.Controllers.SimpleDataControllers
 		{
 		}
 	}
+
+
+
+
+	public class AgeTypeController : AuthorizeAdminApiControllerBase<IAgeType, AgeTypeModel, IAgeTypeService>
+	{
+		public AgeTypeController(IAgeTypeService service) : base(service)
+		{
+		}
+	}
+
+	public class PeopleTypeController : AuthorizeAdminApiControllerBase<IPeopleType, PeopleTypeModel, IPeopleTypeService>
+	{
+		public PeopleTypeController(IPeopleTypeService service) : base(service)
+		{
+		}
+	}
+
+	public class SubjectNameController : AuthorizeAdminApiControllerBase<ISubjectName, SubjectNameModel, ISubjectNameService>
+	{
+		public SubjectNameController(ISubjectNameService service) : base(service)
+		{
+		}
+	}
+
+	public class SubjectController : AuthorizeAdminApiControllerBase<ISubject, SubjectModel, ISubjectService>
+	{
+		public SubjectController(ISubjectService service) : base(service)
+		{
+		}
+	}
+
+
+	public class SubjectTypeController : AuthorizeAdminApiControllerBase<ISubjectType, SubjectTypeModel, ISubjectTypeService>
+	{
+		public SubjectTypeController(ISubjectTypeService service) : base(service)
+		{
+		}
+	}
 }

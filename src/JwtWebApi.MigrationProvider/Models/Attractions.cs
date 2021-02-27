@@ -7,6 +7,12 @@ namespace JwtWebApi.MigrationProvider.Models
 {
     public partial class Attractions
     {
+        public Attractions()
+        {
+            AttractionSubjects = new HashSet<AttractionSubjects>();
+            RouteAttractions = new HashSet<RouteAttractions>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public string Preview { get; set; }
@@ -20,5 +26,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Path { get; set; }
 
         public virtual Cities City { get; set; }
+        public virtual ICollection<AttractionSubjects> AttractionSubjects { get; set; }
+        public virtual ICollection<RouteAttractions> RouteAttractions { get; set; }
     }
 }

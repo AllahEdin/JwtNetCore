@@ -20,6 +20,25 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.2");
 
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AgeTypes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Name" }, "IX_AgeTypes_Name")
+                        .IsUnique();
+
+                    b.ToTable("AgeTypes", "places");
+                });
+
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AspNetRoles", b =>
                 {
                     b.Property<int>("Id")
@@ -98,6 +117,29 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.ToTable("AspNetUsers", "aspnet");
                 });
 
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AttractionSubjects", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<int>("AttractionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "SubjectId" }, "IX_AttractionSubjects_SubjectId");
+
+                    b.HasIndex(new[] { "AttractionId", "SubjectId" }, "UIX_AttractionSubjects_AttractionId_SubjectId")
+                        .IsUnique();
+
+                    b.ToTable("AttractionSubjects", "places");
+                });
+
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Attractions", b =>
                 {
                     b.Property<int>("Id")
@@ -118,8 +160,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Duration")
                         .HasColumnType("integer");
@@ -320,8 +361,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("HousingTypeId")
                         .HasColumnType("integer");
@@ -377,6 +417,25 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsUnique();
 
                     b.ToTable("HousingTypes", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.PeopleTypes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Name" }, "IX_PeopleTypes_Name")
+                        .IsUnique();
+
+                    b.ToTable("PeopleTypes", "places");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RestaurantCuisineTypes", b =>
@@ -437,7 +496,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<DateTime>("BuildDate")
+                    b.Property<DateTimeOffset>("BuildDate")
                         .HasColumnType("timestamp(6) with time zone");
 
                     b.Property<int>("CateringTypeId")
@@ -448,8 +507,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Latitude")
                         .IsRequired()
@@ -485,6 +543,152 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.ToTable("Restaurants", "places");
                 });
 
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteAgeTypes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<int>("AgeTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "AgeTypeId" }, "IX_RouteAgeTypes_AgeTypeId");
+
+                    b.HasIndex(new[] { "RouteId", "AgeTypeId" }, "UIX_RouteAgeTypes_RouteId_AgeTypeId")
+                        .IsUnique();
+
+                    b.ToTable("RouteAgeTypes", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteAttractions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<int>("AttractionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "AttractionId" }, "IX_RouteAttractions_AttractionId");
+
+                    b.HasIndex(new[] { "RouteId", "AttractionId" }, "UIX_RouteAttractions_RouteId_AttractionId")
+                        .IsUnique();
+
+                    b.ToTable("RouteAttractions", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RoutePeopleTypes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<int>("PeopleTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "PeopleTypeId" }, "IX_RoutePeopleTypes_PeopleTypeId");
+
+                    b.HasIndex(new[] { "RouteId", "PeopleTypeId" }, "UIX_RoutePeopleTypes_RouteId_PeopleTypeId")
+                        .IsUnique();
+
+                    b.ToTable("RoutePeopleTypes", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteSubjectNames", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubjectNameId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "SubjectNameId" }, "IX_RouteSubjectNames_SubjectNameId");
+
+                    b.HasIndex(new[] { "RouteId", "SubjectNameId" }, "UIX_RouteSubjectNames_RouteId_SubjectNameId")
+                        .IsUnique();
+
+                    b.ToTable("RouteSubjectNames", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteSubjectTypes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubjectTypeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "SubjectTypeId" }, "IX_RouteSubjectTypes_SubjectTypeId");
+
+                    b.HasIndex(new[] { "RouteId", "SubjectTypeId" }, "UIX_RouteSubjectTypes_RouteId_SubjectTypeId")
+                        .IsUnique();
+
+                    b.ToTable("RouteSubjectTypes", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Routes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<bool>("Animals")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("Time")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Routes", "places");
+                });
+
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.ServiceTypes", b =>
                 {
                     b.Property<int>("Id")
@@ -502,6 +706,63 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsUnique();
 
                     b.ToTable("ServiceTypes", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.SubjectNames", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Name" }, "IX_SubjectNames_Name")
+                        .IsUnique();
+
+                    b.ToTable("SubjectNames", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.SubjectTypes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Name" }, "IX_SubjectTypes_Name")
+                        .IsUnique();
+
+                    b.ToTable("SubjectTypes", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Subjects", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityAlwaysColumn();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Name" }, "IX_Subjects_Name")
+                        .IsUnique();
+
+                    b.ToTable("Subjects", "places");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AspNetUserRoles", b =>
@@ -523,6 +784,27 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Navigation("AspNetUser");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AttractionSubjects", b =>
+                {
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Attractions", "Attraction")
+                        .WithMany("AttractionSubjects")
+                        .HasForeignKey("AttractionId")
+                        .HasConstraintName("FK_AttractionSubjects_AttractionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Subjects", "Subject")
+                        .WithMany("AttractionSubjects")
+                        .HasForeignKey("SubjectId")
+                        .HasConstraintName("FK_AttractionSubjects_SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attraction");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Attractions", b =>
@@ -663,6 +945,123 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Navigation("City");
                 });
 
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteAgeTypes", b =>
+                {
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.AgeTypes", "AgeType")
+                        .WithMany("RouteAgeTypes")
+                        .HasForeignKey("AgeTypeId")
+                        .HasConstraintName("FK_RouteAgeTypes_AgeTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Routes", "Route")
+                        .WithMany("RouteAgeTypes")
+                        .HasForeignKey("RouteId")
+                        .HasConstraintName("FK_RouteAgeTypes_RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AgeType");
+
+                    b.Navigation("Route");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteAttractions", b =>
+                {
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Attractions", "Attraction")
+                        .WithMany("RouteAttractions")
+                        .HasForeignKey("AttractionId")
+                        .HasConstraintName("FK_RouteAttractions_AttractionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Routes", "Route")
+                        .WithMany("RouteAttractions")
+                        .HasForeignKey("RouteId")
+                        .HasConstraintName("FK_RouteAttractions_RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attraction");
+
+                    b.Navigation("Route");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RoutePeopleTypes", b =>
+                {
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.PeopleTypes", "PeopleType")
+                        .WithMany("RoutePeopleTypes")
+                        .HasForeignKey("PeopleTypeId")
+                        .HasConstraintName("FK_RoutePeopleTypes_PeopleTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Routes", "Route")
+                        .WithMany("RoutePeopleTypes")
+                        .HasForeignKey("RouteId")
+                        .HasConstraintName("FK_RoutePeopleTypes_RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PeopleType");
+
+                    b.Navigation("Route");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteSubjectNames", b =>
+                {
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Routes", "Route")
+                        .WithMany("RouteSubjectNames")
+                        .HasForeignKey("RouteId")
+                        .HasConstraintName("FK_RouteSubjectNames_RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.SubjectNames", "SubjectName")
+                        .WithMany("RouteSubjectNames")
+                        .HasForeignKey("SubjectNameId")
+                        .HasConstraintName("FK_RouteSubjectNames_SubjectNameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Route");
+
+                    b.Navigation("SubjectName");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteSubjectTypes", b =>
+                {
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Routes", "Route")
+                        .WithMany("RouteSubjectTypes")
+                        .HasForeignKey("RouteId")
+                        .HasConstraintName("FK_RouteSubjectTypes_RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.SubjectTypes", "SubjectType")
+                        .WithMany("RouteSubjectTypes")
+                        .HasForeignKey("SubjectTypeId")
+                        .HasConstraintName("FK_RouteSubjectTypes_SubjectTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Route");
+
+                    b.Navigation("SubjectType");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AgeTypes", b =>
+                {
+                    b.Navigation("RouteAgeTypes");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Attractions", b =>
+                {
+                    b.Navigation("AttractionSubjects");
+
+                    b.Navigation("RouteAttractions");
+                });
+
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.CateringTypes", b =>
                 {
                     b.Navigation("Restaurants");
@@ -704,6 +1103,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Navigation("Hotels");
                 });
 
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.PeopleTypes", b =>
+                {
+                    b.Navigation("RoutePeopleTypes");
+                });
+
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Restaurants", b =>
                 {
                     b.Navigation("RestaurantCuisineTypes");
@@ -711,9 +1115,37 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Navigation("RestaurantDenyTypes");
                 });
 
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Routes", b =>
+                {
+                    b.Navigation("RouteAgeTypes");
+
+                    b.Navigation("RouteAttractions");
+
+                    b.Navigation("RoutePeopleTypes");
+
+                    b.Navigation("RouteSubjectNames");
+
+                    b.Navigation("RouteSubjectTypes");
+                });
+
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.ServiceTypes", b =>
                 {
                     b.Navigation("HotelServiceTypes");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.SubjectNames", b =>
+                {
+                    b.Navigation("RouteSubjectNames");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.SubjectTypes", b =>
+                {
+                    b.Navigation("RouteSubjectTypes");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Subjects", b =>
+                {
+                    b.Navigation("AttractionSubjects");
                 });
 #pragma warning restore 612, 618
         }

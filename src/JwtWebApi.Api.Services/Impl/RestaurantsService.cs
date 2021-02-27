@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -105,61 +107,41 @@ namespace JwtWebApi.Api.Services.Impl
 				await _denyTypesService.Delete(restaurantDenyType.RestaurantId, restaurantDenyType.DenyTypeId);
 			}
 
+			await base.Delete(id);
+
 			return true;
 		}
 
-		public async Task<PagingResult<IRestaurantWithLinks>> GetPagingWithLinks(int page, int pageSize)
+
+		public async Task<PagingResult<IRestaurantWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{
-				var restsCui =
-					from r in cp.GetTable<Restaurant>()
-						.Skip((page - 1) * pageSize)
-						.Take(pageSize)
-					join cu in cp.GetTable<RestaurantCuisineType>() on r.Id equals cu.RestaurantId into gr
-					from restCu in gr.DefaultIfEmpty()
-					join ct in cp.GetTable<CuisineType>() on restCu.CuisineTypeId equals ct.Id into gr2
-					from cuisineType in gr2.DefaultIfEmpty() 
-					select new { Rest = r, CuisineType = cuisineType };
+				var paging =
+					await Get(page, pageSize, filter);
 
+				var ct =
+					await GetLink<RestaurantCuisineType>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.RestaurantId));
 
-				var restCuiGr =
-					restsCui.AsEnumerable()
-						.GroupBy(k => k.Rest.Id, val => val);
-
-				var restsDen =
-					from r in cp.GetTable<Restaurant>()
-						.Skip((page - 1) * pageSize)
-						.Take(pageSize)
-					join cu in cp.GetTable<RestaurantDenyType>() on r.Id equals cu.RestaurantId into gr
-					from restCu in gr.DefaultIfEmpty()
-					join ct in cp.GetTable<DenyType>() on restCu.DenyTypeId equals ct.Id into gr2
-					from cuisineType in gr2.DefaultIfEmpty()
-					select new { Rest = r, DenyType = cuisineType };
+				var dt =
+					await GetLink<RestaurantDenyType>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.RestaurantId));
 
 				return new PagingResult<IRestaurantWithLinks>()
 				{
-					Total = cp.GetTable<Restaurant>().Count(),
-					Items = restCuiGr.Select(t => new RestaurantWithLinks()
+					Total = paging.Total,
+					Items = paging.Items.Select(t => new RestaurantWithLinks()
 					{
-						DenyTypes = restsDen.Where(w => w.Rest.Id == t.First().Rest.Id && w.DenyType != null)
-							.Select(s => new LocalDenyType()
-							{
-								Id = s.DenyType.Id,
-								Name = s.DenyType.Name,
-							}).Cast<IDenyType>().ToArray(),
-						CuisineTypes = t.Where(w => w.CuisineType != null).Select(s => new LocalCuisineType()
-						{
-							Id = s.CuisineType.Id,
-							Name = s.CuisineType.Name,
-						}).Cast<ICuisineType>().ToArray(),
-						Restaurant = DtoMapper.Map<IRestaurant>(t.First().Rest),
+						CuisineTypeIds = ct.Where(w => w.RestaurantId == t.Id).Select(s => s.CuisineTypeId),
+						DenyTypeIds = dt.Where(w => w.RestaurantId == t.Id).Select(s => s.DenyTypeId),
+						Restaurant = t,
 					}).ToArray()
 				};
 			}
 		}
 
 		protected override bool CanBeDeleted()
-			=> false;
+			=> true;
 	}
 }

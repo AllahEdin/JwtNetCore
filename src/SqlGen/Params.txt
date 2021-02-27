@@ -1,0 +1,6 @@
+SCHEMA=places
+TableName=RoutePeopleTypes
+ObjectId=RouteId
+SubjectId=PeopleTypeId
+ObjectTable=Routes
+SubjectTable=PeopleTypes

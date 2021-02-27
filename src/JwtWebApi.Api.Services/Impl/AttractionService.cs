@@ -1,31 +1,43 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Services.Impl
 {
 	internal class AttractionService : EntityProviderBase<IAttraction, Attraction>, IAttractionService
 	{
-		public AttractionService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
-		{
-		}
+		private readonly IContextProviderFactory _contextProviderFactory;
+		private readonly IAttractionSubjectsService _attractionSubjectsService;
+		private readonly IRouteAttractionService _routeAttractionService;
 
+		public AttractionService(IContextProviderFactory contextProviderFactory, 
+			IAttractionSubjectsService attractionSubjectsService, 
+			IRouteAttractionService routeAttractionService) : base(contextProviderFactory)
+		{
+			_contextProviderFactory = contextProviderFactory;
+			_attractionSubjectsService = attractionSubjectsService;
+			_routeAttractionService = routeAttractionService;
+		}
 
 		protected override async Task<IAttraction> Update(IContextProvider provider, IAttraction model)
 		{
 			var attractions =
-				provider.GetTable<Hotel>()
+				provider.GetTable<Attraction>()
 					.Where(t => t.Id == model.Id);
 
 			if (!attractions.Any())
 			{
-				throw new InvalidOperationException($"No restaurant with id = {model.Id}");
+				throw new InvalidOperationException($"No attraction with id = {model.Id}");
 			}
 
 			if (attractions.Count() > 1)
@@ -56,6 +68,88 @@ namespace JwtWebApi.Api.Services.Impl
 		}
 
 		protected override bool CanBeDeleted()
-			=> false;
+			=> true;
+
+		public Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize) =>
+			GetPagingWithLinks(page, pageSize, null);
+
+		public async Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
+		{
+			using (var cp = _contextProviderFactory.Create())
+			{
+
+				var paging =
+					await Get(page, pageSize, filter);
+
+				var routes =
+					await GetLink<RouteAttraction>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
+
+				var subjects =
+					await GetLink<RouteAttraction>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
+
+
+				return new PagingResult<IAttractionWithLinks>()
+				{
+					Total = paging.Total,
+					Items = paging.Items.Select(t => new AttractionWithLinks()
+					{
+						Attraction = t,
+						RouteIds = routes.Where(w => w.AttractionId == t.Id).Select(s => s.RouteId).ToArray(),
+						SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.Id).ToArray()
+					}).ToArray()
+				};
+
+			};
+			
+
+		}
+
+		public override async Task<bool> Delete(int id)
+		{
+			if (id <= 0)
+			{
+				throw new InvalidOperationException();
+			}
+
+			IReadOnlyCollection<AttractionSubject> toDelete =
+				new AttractionSubject[0];
+
+			using (var cp = ContextProviderFactory.Create())
+			{
+				toDelete =
+					await cp.GetTable<AttractionSubject>()
+						.Where(t => t.AttractionId == id)
+						.ToArrayAsync();
+			}
+
+			foreach (var attractionSubject in toDelete)
+			{
+				await _attractionSubjectsService.Delete(attractionSubject.AttractionId,
+					attractionSubject.SubjectId);
+			}
+
+			IReadOnlyCollection<RouteAttraction> toDelete2 =
+				new RouteAttraction[0];
+
+			using (var cp = ContextProviderFactory.Create())
+			{
+				toDelete2 =
+					await cp.GetTable<RouteAttraction>()
+						.Where(t => t.AttractionId == id)
+						.ToArrayAsync();
+			}
+
+			foreach (var routeAttraction in toDelete2)
+			{
+				await _routeAttractionService.Delete(routeAttraction.AttractionId, routeAttraction.RouteId);
+			}
+
+			await base.Delete(id);
+
+			return true;
+		}
+
 	}
 }

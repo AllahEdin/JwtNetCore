@@ -59,6 +59,7 @@ bld/
 *.vspx
 *.sap
 /src/DcpIS/.tools/
+/src/dev
 *.dbmdl
 *.jfm
 *.zip

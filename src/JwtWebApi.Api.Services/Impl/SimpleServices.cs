@@ -54,4 +54,40 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 		}
 	}
+
+
+	internal class AgeTypeService : NameTypeServiceBase<IAgeType, AgeType>, IAgeTypeService
+	{
+		public AgeTypeService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+	}
+
+	internal class PeopleTypeService : NameTypeServiceBase<IPeopleType, PeopleType>, IPeopleTypeService
+	{
+		public PeopleTypeService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+	}
+
+	internal class SubjectNameService : NameTypeServiceBase<ISubjectName, SubjectName>, ISubjectNameService
+	{
+		public SubjectNameService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+	}
+
+	internal class SubjectService : NameTypeServiceBase<ISubject, Subject>, ISubjectService
+	{
+		public SubjectService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+	}
+
+	internal class SubjectTypeService : NameTypeServiceBase<ISubjectType, SubjectType>, ISubjectTypeService
+	{
+		public SubjectTypeService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+	}
 }

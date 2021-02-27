@@ -17,9 +17,11 @@ namespace JwtWebApi.MigrationProvider.Models
         {
         }
 
+        public virtual DbSet<AgeTypes> AgeTypes { get; set; }
         public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
         public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
+        public virtual DbSet<AttractionSubjects> AttractionSubjects { get; set; }
         public virtual DbSet<Attractions> Attractions { get; set; }
         public virtual DbSet<CateringTypes> CateringTypes { get; set; }
         public virtual DbSet<Cities> Cities { get; set; }
@@ -30,10 +32,20 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<HotelServiceTypes> HotelServiceTypes { get; set; }
         public virtual DbSet<Hotels> Hotels { get; set; }
         public virtual DbSet<HousingTypes> HousingTypes { get; set; }
+        public virtual DbSet<PeopleTypes> PeopleTypes { get; set; }
         public virtual DbSet<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual DbSet<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }
         public virtual DbSet<Restaurants> Restaurants { get; set; }
+        public virtual DbSet<RouteAgeTypes> RouteAgeTypes { get; set; }
+        public virtual DbSet<RouteAttractions> RouteAttractions { get; set; }
+        public virtual DbSet<RoutePeopleTypes> RoutePeopleTypes { get; set; }
+        public virtual DbSet<RouteSubjectNames> RouteSubjectNames { get; set; }
+        public virtual DbSet<RouteSubjectTypes> RouteSubjectTypes { get; set; }
+        public virtual DbSet<Routes> Routes { get; set; }
         public virtual DbSet<ServiceTypes> ServiceTypes { get; set; }
+        public virtual DbSet<SubjectNames> SubjectNames { get; set; }
+        public virtual DbSet<SubjectTypes> SubjectTypes { get; set; }
+        public virtual DbSet<Subjects> Subjects { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -47,6 +59,18 @@ namespace JwtWebApi.MigrationProvider.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "en_US.utf8");
+
+            modelBuilder.Entity<AgeTypes>(entity =>
+            {
+                entity.ToTable("AgeTypes", "places");
+
+                entity.HasIndex(e => e.Name, "IX_AgeTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
 
             modelBuilder.Entity<AspNetRoles>(entity =>
             {
@@ -114,6 +138,28 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
             });
 
+            modelBuilder.Entity<AttractionSubjects>(entity =>
+            {
+                entity.ToTable("AttractionSubjects", "places");
+
+                entity.HasIndex(e => e.SubjectId, "IX_AttractionSubjects_SubjectId");
+
+                entity.HasIndex(e => new { e.AttractionId, e.SubjectId }, "UIX_AttractionSubjects_AttractionId_SubjectId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.Attraction)
+                    .WithMany(p => p.AttractionSubjects)
+                    .HasForeignKey(d => d.AttractionId)
+                    .HasConstraintName("FK_AttractionSubjects_AttractionId");
+
+                entity.HasOne(d => d.Subject)
+                    .WithMany(p => p.AttractionSubjects)
+                    .HasForeignKey(d => d.SubjectId)
+                    .HasConstraintName("FK_AttractionSubjects_SubjectId");
+            });
+
             modelBuilder.Entity<Attractions>(entity =>
             {
                 entity.ToTable("Attractions", "places");
@@ -129,8 +175,7 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
                 entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(255);
+	                .IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -279,8 +324,7 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
                 entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(255);
+                    .IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -318,6 +362,18 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.ToTable("HousingTypes", "places");
 
                 entity.HasIndex(e => e.Name, "IX_HousingTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<PeopleTypes>(entity =>
+            {
+                entity.ToTable("PeopleTypes", "places");
+
+                entity.HasIndex(e => e.Name, "IX_PeopleTypes_Name")
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
@@ -386,8 +442,7 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
                 entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(255);
+                    .IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -420,11 +475,172 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasConstraintName("FK_Restaurants_CityId");
             });
 
+            modelBuilder.Entity<RouteAgeTypes>(entity =>
+            {
+                entity.ToTable("RouteAgeTypes", "places");
+
+                entity.HasIndex(e => e.AgeTypeId, "IX_RouteAgeTypes_AgeTypeId");
+
+                entity.HasIndex(e => new { e.RouteId, e.AgeTypeId }, "UIX_RouteAgeTypes_RouteId_AgeTypeId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.AgeType)
+                    .WithMany(p => p.RouteAgeTypes)
+                    .HasForeignKey(d => d.AgeTypeId)
+                    .HasConstraintName("FK_RouteAgeTypes_AgeTypeId");
+
+                entity.HasOne(d => d.Route)
+                    .WithMany(p => p.RouteAgeTypes)
+                    .HasForeignKey(d => d.RouteId)
+                    .HasConstraintName("FK_RouteAgeTypes_RouteId");
+            });
+
+            modelBuilder.Entity<RouteAttractions>(entity =>
+            {
+                entity.ToTable("RouteAttractions", "places");
+
+                entity.HasIndex(e => e.AttractionId, "IX_RouteAttractions_AttractionId");
+
+                entity.HasIndex(e => new { e.RouteId, e.AttractionId }, "UIX_RouteAttractions_RouteId_AttractionId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.Attraction)
+                    .WithMany(p => p.RouteAttractions)
+                    .HasForeignKey(d => d.AttractionId)
+                    .HasConstraintName("FK_RouteAttractions_AttractionId");
+
+                entity.HasOne(d => d.Route)
+                    .WithMany(p => p.RouteAttractions)
+                    .HasForeignKey(d => d.RouteId)
+                    .HasConstraintName("FK_RouteAttractions_RouteId");
+            });
+
+            modelBuilder.Entity<RoutePeopleTypes>(entity =>
+            {
+                entity.ToTable("RoutePeopleTypes", "places");
+
+                entity.HasIndex(e => e.PeopleTypeId, "IX_RoutePeopleTypes_PeopleTypeId");
+
+                entity.HasIndex(e => new { e.RouteId, e.PeopleTypeId }, "UIX_RoutePeopleTypes_RouteId_PeopleTypeId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.PeopleType)
+                    .WithMany(p => p.RoutePeopleTypes)
+                    .HasForeignKey(d => d.PeopleTypeId)
+                    .HasConstraintName("FK_RoutePeopleTypes_PeopleTypeId");
+
+                entity.HasOne(d => d.Route)
+                    .WithMany(p => p.RoutePeopleTypes)
+                    .HasForeignKey(d => d.RouteId)
+                    .HasConstraintName("FK_RoutePeopleTypes_RouteId");
+            });
+
+            modelBuilder.Entity<RouteSubjectNames>(entity =>
+            {
+                entity.ToTable("RouteSubjectNames", "places");
+
+                entity.HasIndex(e => e.SubjectNameId, "IX_RouteSubjectNames_SubjectNameId");
+
+                entity.HasIndex(e => new { e.RouteId, e.SubjectNameId }, "UIX_RouteSubjectNames_RouteId_SubjectNameId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.Route)
+                    .WithMany(p => p.RouteSubjectNames)
+                    .HasForeignKey(d => d.RouteId)
+                    .HasConstraintName("FK_RouteSubjectNames_RouteId");
+
+                entity.HasOne(d => d.SubjectName)
+                    .WithMany(p => p.RouteSubjectNames)
+                    .HasForeignKey(d => d.SubjectNameId)
+                    .HasConstraintName("FK_RouteSubjectNames_SubjectNameId");
+            });
+
+            modelBuilder.Entity<RouteSubjectTypes>(entity =>
+            {
+                entity.ToTable("RouteSubjectTypes", "places");
+
+                entity.HasIndex(e => e.SubjectTypeId, "IX_RouteSubjectTypes_SubjectTypeId");
+
+                entity.HasIndex(e => new { e.RouteId, e.SubjectTypeId }, "UIX_RouteSubjectTypes_RouteId_SubjectTypeId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.Route)
+                    .WithMany(p => p.RouteSubjectTypes)
+                    .HasForeignKey(d => d.RouteId)
+                    .HasConstraintName("FK_RouteSubjectTypes_RouteId");
+
+                entity.HasOne(d => d.SubjectType)
+                    .WithMany(p => p.RouteSubjectTypes)
+                    .HasForeignKey(d => d.SubjectTypeId)
+                    .HasConstraintName("FK_RouteSubjectTypes_SubjectTypeId");
+            });
+
+            modelBuilder.Entity<Routes>(entity =>
+            {
+                entity.ToTable("Routes", "places");
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Path)
+                    .IsRequired()
+                    .HasMaxLength(255);
+            });
+
             modelBuilder.Entity<ServiceTypes>(entity =>
             {
                 entity.ToTable("ServiceTypes", "places");
 
                 entity.HasIndex(e => e.Name, "IX_ServiceTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<SubjectNames>(entity =>
+            {
+                entity.ToTable("SubjectNames", "places");
+
+                entity.HasIndex(e => e.Name, "IX_SubjectNames_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<SubjectTypes>(entity =>
+            {
+                entity.ToTable("SubjectTypes", "places");
+
+                entity.HasIndex(e => e.Name, "IX_SubjectTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<Subjects>(entity =>
+            {
+                entity.ToTable("Subjects", "places");
+
+                entity.HasIndex(e => e.Name, "IX_Subjects_Name")
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();

@@ -5,7 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Impl\**" />
+    <EmbeddedResource Remove="Impl\**" />
+    <None Remove="Impl\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.Services\JwtWebApi.Services.csproj" />
   </ItemGroup>
 
 </Project>

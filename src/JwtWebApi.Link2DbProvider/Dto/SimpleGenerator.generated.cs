@@ -23,10 +23,12 @@ namespace JwtWebApi.Link2DbProvider
 	/// </summary>
 	public partial class DbTest1DB : LinqToDB.Data.DataConnection
 	{
+		public ITable<AgeType>               AgeTypes               { get { return this.GetTable<AgeType>(); } }
 		public ITable<AspNetRole>            AspNetRoles            { get { return this.GetTable<AspNetRole>(); } }
 		public ITable<AspNetUser>            AspNetUsers            { get { return this.GetTable<AspNetUser>(); } }
 		public ITable<AspNetUserRole>        AspNetUserRoles        { get { return this.GetTable<AspNetUserRole>(); } }
 		public ITable<Attraction>            Attractions            { get { return this.GetTable<Attraction>(); } }
+		public ITable<AttractionSubject>     AttractionSubjects     { get { return this.GetTable<AttractionSubject>(); } }
 		public ITable<CateringType>          CateringTypes          { get { return this.GetTable<CateringType>(); } }
 		public ITable<City>                  Cities                 { get { return this.GetTable<City>(); } }
 		public ITable<CuisineType>           CuisineTypes           { get { return this.GetTable<CuisineType>(); } }
@@ -36,10 +38,20 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<HotelEquipmentType>    HotelEquipmentTypes    { get { return this.GetTable<HotelEquipmentType>(); } }
 		public ITable<HotelServiceType>      HotelServiceTypes      { get { return this.GetTable<HotelServiceType>(); } }
 		public ITable<HousingType>           HousingTypes           { get { return this.GetTable<HousingType>(); } }
+		public ITable<PeopleType>            PeopleTypes            { get { return this.GetTable<PeopleType>(); } }
 		public ITable<Restaurant>            Restaurants            { get { return this.GetTable<Restaurant>(); } }
 		public ITable<RestaurantCuisineType> RestaurantCuisineTypes { get { return this.GetTable<RestaurantCuisineType>(); } }
 		public ITable<RestaurantDenyType>    RestaurantDenyTypes    { get { return this.GetTable<RestaurantDenyType>(); } }
+		public ITable<Route>                 Routes                 { get { return this.GetTable<Route>(); } }
+		public ITable<RouteAgeType>          RouteAgeTypes          { get { return this.GetTable<RouteAgeType>(); } }
+		public ITable<RouteAttraction>       RouteAttractions       { get { return this.GetTable<RouteAttraction>(); } }
+		public ITable<RoutePeopleType>       RoutePeopleTypes       { get { return this.GetTable<RoutePeopleType>(); } }
+		public ITable<RouteSubjectName>      RouteSubjectNames      { get { return this.GetTable<RouteSubjectName>(); } }
+		public ITable<RouteSubjectType>      RouteSubjectTypes      { get { return this.GetTable<RouteSubjectType>(); } }
 		public ITable<ServiceType>           ServiceTypes           { get { return this.GetTable<ServiceType>(); } }
+		public ITable<Subject>               Subjects               { get { return this.GetTable<Subject>(); } }
+		public ITable<SubjectName>           SubjectNames           { get { return this.GetTable<SubjectName>(); } }
+		public ITable<SubjectType>           SubjectTypes           { get { return this.GetTable<SubjectType>(); } }
 
 		partial void InitMappingSchema()
 		{
@@ -67,6 +79,13 @@ namespace JwtWebApi.Link2DbProvider
 
 		partial void InitDataContext  ();
 		partial void InitMappingSchema();
+	}
+
+	[Table(Schema="places", Name="AgeTypes")]
+	public partial class AgeType : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     Nullable] public string Name { get; set; } // character varying(255)
 	}
 
 	[Table(Schema="aspnet", Name="AspNetRoles")]
@@ -110,6 +129,14 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string         Longitude   { get; set; } // character varying(255)
 		[Column,     NotNull ] public int            Duration    { get; set; } // integer
 		[Column,     NotNull ] public string         Path        { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="AttractionSubjects")]
+	public partial class AttractionSubject : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id           { get; set; } // integer
+		[Column,     NotNull ] public int AttractionId { get; set; } // integer
+		[Column,     NotNull ] public int SubjectId    { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="CateringTypes")]
@@ -187,6 +214,13 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     Nullable] public string Name { get; set; } // character varying(255)
 	}
 
+	[Table(Schema="places", Name="PeopleTypes")]
+	public partial class PeopleType : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     Nullable] public string Name { get; set; } // character varying(255)
+	}
+
 	[Table(Schema="places", Name="Restaurants")]
 	public partial class Restaurant : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
 	{
@@ -219,8 +253,80 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public int DenyTypeId   { get; set; } // integer
 	}
 
+	[Table(Schema="places", Name="Routes")]
+	public partial class Route : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	{
+		[PrimaryKey, Identity] public int    Id      { get; set; } // integer
+		[Column,     NotNull ] public string Name    { get; set; } // character varying(255)
+		[Column,     NotNull ] public bool   Animals { get; set; } // boolean
+		[Column,     NotNull ] public int    Length  { get; set; } // integer
+		[Column,     NotNull ] public int    Time    { get; set; } // integer
+		[Column,     NotNull ] public string Path    { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="RouteAgeTypes")]
+	public partial class RouteAgeType : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id        { get; set; } // integer
+		[Column,     NotNull ] public int RouteId   { get; set; } // integer
+		[Column,     NotNull ] public int AgeTypeId { get; set; } // integer
+	}
+
+	[Table(Schema="places", Name="RouteAttractions")]
+	public partial class RouteAttraction : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id           { get; set; } // integer
+		[Column,     NotNull ] public int RouteId      { get; set; } // integer
+		[Column,     NotNull ] public int AttractionId { get; set; } // integer
+	}
+
+	[Table(Schema="places", Name="RoutePeopleTypes")]
+	public partial class RoutePeopleType : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id           { get; set; } // integer
+		[Column,     NotNull ] public int RouteId      { get; set; } // integer
+		[Column,     NotNull ] public int PeopleTypeId { get; set; } // integer
+	}
+
+	[Table(Schema="places", Name="RouteSubjectNames")]
+	public partial class RouteSubjectName : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id            { get; set; } // integer
+		[Column,     NotNull ] public int RouteId       { get; set; } // integer
+		[Column,     NotNull ] public int SubjectNameId { get; set; } // integer
+	}
+
+	[Table(Schema="places", Name="RouteSubjectTypes")]
+	public partial class RouteSubjectType : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id            { get; set; } // integer
+		[Column,     NotNull ] public int RouteId       { get; set; } // integer
+		[Column,     NotNull ] public int SubjectTypeId { get; set; } // integer
+	}
+
 	[Table(Schema="places", Name="ServiceTypes")]
 	public partial class ServiceType : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     Nullable] public string Name { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="Subjects")]
+	public partial class Subject : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     Nullable] public string Name { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="SubjectNames")]
+	public partial class SubjectName : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     Nullable] public string Name { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="SubjectTypes")]
+	public partial class SubjectType : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
 	{
 		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
 		[Column,     Nullable] public string Name { get; set; } // character varying(255)

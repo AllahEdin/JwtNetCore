@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JwtWebApi.DataProviders.Common.DataObjects;
 
 namespace JwtWebApi.Api.Services.Dto
@@ -7,19 +8,40 @@ namespace JwtWebApi.Api.Services.Dto
 	{
 		public IRestaurant Restaurant { get; set; }
 
-		public ICuisineType[] CuisineTypes { get; set; }
+		public IEnumerable<int> CuisineTypeIds { get; set; }
 
-		public IDenyType[] DenyTypes { get; set; }
+		public IEnumerable<int> DenyTypeIds { get; set; }
 	}
 
+	public interface IAttractionWithLinks
+	{
+		public IAttraction Attraction { get; set; }
+
+		public IEnumerable<int> RouteIds { get; set; }
+
+		public IEnumerable<int> SubjectIds { get; set; }
+	}
+
+	public interface IRouteWithLinks
+	{
+		public IRoute Route { get; set; }
+
+		public IEnumerable<int> PeopleTypeIds { get; set; }
+
+		public IEnumerable<int> AgeTypeIds { get; set; }
+
+		public IEnumerable<int> SubjectNameIds { get; set; }
+
+		public IEnumerable<int> SubjectTypeIds { get; set; }
+	}
 
 	public interface IHotelWithLinks
 	{
 		public IHotel Hotel { get; set; }
 
-		public IEquipmentType[] EquipmentTypes { get; set; }
+		public IEnumerable<int> EquipmentTypes { get; set; }
 
-		public IServiceType[] ServiceTypes { get; set; }
+		public IEnumerable<int> ServiceTypes { get; set; }
 	}
 
 
@@ -54,7 +76,6 @@ namespace JwtWebApi.Api.Services.Dto
 
 	public interface IAttraction : IEntity
 	{
-		public int Id { get; set; }
 		public string Name { get; set; }
 		public string Preview { get; set; }
 		public string Description { get; set; }
@@ -66,5 +87,14 @@ namespace JwtWebApi.Api.Services.Dto
 		public int Duration { get; set; }
 		public string Path { get; set; }
 
+	}
+
+	public interface IRoute : IEntity
+	{
+		 public string Name { get; set; } 
+		 public bool Animals { get; set; }
+		 public int Length { get; set; } 
+		 public int Time { get; set; } 
+		 public string Path { get; set; } 
 	}
 }
