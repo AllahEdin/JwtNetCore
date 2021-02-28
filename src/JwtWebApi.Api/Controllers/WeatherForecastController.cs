@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using JWTWebApi.Services.Api;
 using JwtWebApi.Services.Services.Expressions;
@@ -53,6 +54,18 @@ namespace JwtWebApi.Api.Controllers
 			        Summary = Summaries[rng.Next(Summaries.Length)]
 		        })
 		        .ToArray();
+        }
+
+        [HttpPost()]
+        public async Task<IActionResult> Test([FromBody] SearchModel search)
+        {
+	       var searchInt =
+               new Search<object>(search.Filter);
+
+           IExpression exp =
+	           searchInt.CreateExpression(Expression.Parameter(typeof(string), "x"));
+
+           return Ok(exp.GetExpression().ToString());
         }
 
     }

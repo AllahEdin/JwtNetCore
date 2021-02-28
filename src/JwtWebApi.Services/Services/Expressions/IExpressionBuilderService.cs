@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.Serialization;
 
 namespace JwtWebApi.Services.Services.Expressions
 {
@@ -109,10 +111,15 @@ namespace JwtWebApi.Services.Services.Expressions
 	{
 		public enum OperatorType
 		{
+			[EnumMember(Value = "And")]
 			And,
+			[EnumMember(Value = "Or")]
 			Or,
+			[EnumMember(Value = "GraterThan")]
 			GraterThan,
+			[EnumMember(Value = "Equals")]
 			Equals,
+			[EnumMember(Value = "Contains")]
 			Contains
 		}
 
