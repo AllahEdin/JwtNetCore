@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using JwtWebApi.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace JwtWebApi.Api.Controllers
 {
@@ -21,78 +22,27 @@ namespace JwtWebApi.Api.Controllers
 		private readonly ConcurrentDictionary<string, string> _hashFiles =
 			new ConcurrentDictionary<string, string>();
 
+	
 		[HttpGet]
 		[Authorize]
 		public async Task<IActionResult> GetFileInfos(FileType type, string path)
 		{
-			var fullPath = FILESTORAGE_PATH;
 
-			switch (type)
-			{
-				case FileType.None:
-					return BadRequest();
-				case FileType.Audio:
-					fullPath += $"{AUDIO_BASE}{path}";
-					break;
-				case FileType.Picture:
-					fullPath += $"{PICTURES_BASE}{path}";
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(type), type, null);
-			}
+			var fullPath =
+				GetPath(type, path);
 
-			var list =
-				new List<CustomFileInfo>();
+			var res =
+				GetFileInfos(fullPath,"");
 
-			foreach (string file in Directory.GetFiles(fullPath))
-			{
-				using (var md5 = MD5.Create())
-				{
-					var hash =
-
-						_hashFiles.GetOrAdd(file, s =>
-						{
-							using (var stream = System.IO.File.OpenRead(file))
-							{
-								var hash =
-									md5.ComputeHash(stream);
-
-								return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-								;
-							}
-						});
-
-
-					list.Add(new CustomFileInfo()
-					{
-						FileName = Path.GetFileName(file),
-						Hash = hash,
-					});
-				}
-			}
-
-			return Ok(list.ToArray());
+			return Ok(res);
 		}
+		
 
 		[HttpPost]
 		[Authorize]
 		public async Task<IActionResult> GetStream(FileType type , string path, string fileName)
 		{
-			var fullPath = FILESTORAGE_PATH;
-
-			switch (type)
-			{
-				case FileType.None:
-					return BadRequest();
-				case FileType.Audio:
-					fullPath += $"{AUDIO_BASE}{path}";
-					break;
-				case FileType.Picture:
-					fullPath += $"{PICTURES_BASE}{path}";
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(type), type, null);
-			}
+			var fullPath = GetPath(type, path);
 
 			fullPath =
 				Path.Combine(fullPath, fileName);
@@ -140,21 +90,7 @@ namespace JwtWebApi.Api.Controllers
 		[Authorize(Roles = "admin")]
 		public async Task<IActionResult> Upload(FileType type, string path,string fileName)
 		{
-			var fullPath = FILESTORAGE_PATH;
-
-			switch (type)
-			{
-				case FileType.None:
-					return BadRequest();
-				case FileType.Audio:
-					fullPath += $"{AUDIO_BASE}{path}";
-					break;
-				case FileType.Picture:
-					fullPath += $"{PICTURES_BASE}{path}";
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(type), type, null);
-			}
+			var fullPath = GetPath(type, path);
 
 			if (!Directory.Exists(fullPath))
 			{
@@ -180,6 +116,14 @@ namespace JwtWebApi.Api.Controllers
 			var pathWithFile =
 				Path.Combine(fullPath, fileName);
 
+			var dir =
+				Path.GetDirectoryName(pathWithFile);
+
+			if (!Directory.Exists(dir))
+			{
+				Directory.CreateDirectory(dir);
+			}
+
 			if (System.IO.File.Exists(pathWithFile))
 			{
 				System.IO.File.Delete(pathWithFile);
@@ -193,12 +137,85 @@ namespace JwtWebApi.Api.Controllers
 			return Ok(pathWithFile);
 		}
 
-		//[HttpDelete()]
-		//[Authorize(Roles = "admin")]
-		//public async Task<IActionResult> Delete(FileType type, string path, string fileName)
-		//{
+		[HttpDelete()]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> Delete(FileType type, string path, string fileName)
+		{
+			var fullPath = GetPath(type, path);
 
-		//}
+			fullPath =
+				Path.Combine(fullPath, fileName);
+
+			if (!System.IO.File.Exists(fullPath))
+			{
+				return BadRequest();
+			}
+
+			System.IO.File.Delete(fullPath);
+
+			return Ok();
+		}
+
+		private string GetPath(FileType type, string path)
+		{
+			var fullPath = FILESTORAGE_PATH;
+
+			switch (type)
+			{
+				case FileType.None:
+					throw new InvalidOperationException();
+				case FileType.Audio:
+					fullPath += $"{AUDIO_BASE}{path}";
+					break;
+				case FileType.Picture:
+					fullPath += $"{PICTURES_BASE}{path}";
+					break;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(type), type, null);
+			}
+
+			return fullPath;
+		}
+
+
+		private ICollection<CustomFileInfo> GetFileInfos(string dirPath, string additionalFolders)
+		{
+			var list =
+				new List<CustomFileInfo>();
+
+			foreach (string file in Directory.GetFiles(dirPath))
+			{
+				using (var md5 = MD5.Create())
+				{
+					var hash =
+
+						_hashFiles.GetOrAdd(file, s =>
+						{
+							using (var stream = System.IO.File.OpenRead(file))
+							{
+								var hash =
+									md5.ComputeHash(stream);
+
+								return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+							}
+						});
+
+
+					list.Add(new CustomFileInfo()
+					{
+						FileName = $"{additionalFolders}{Path.GetFileName(file)}",
+						Hash = hash,
+					});
+				}
+			}
+
+			foreach (var directory in Directory.GetDirectories(dirPath))
+			{
+				list.AddRange(GetFileInfos(directory, $"{additionalFolders}{Path.GetFileName(directory)}/"));
+			}
+
+			return list;
+		}
 
 	}
 }
