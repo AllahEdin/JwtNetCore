@@ -20,6 +20,8 @@ namespace JwtWebApi.Api.Services.Dto
 		public IEnumerable<int> RouteIds { get; set; }
 
 		public IEnumerable<int> SubjectIds { get; set; }
+
+		public IEnumerable<int> PlaceTypeIds { get; set; }
 	}
 
 	public interface IRouteWithLinks
@@ -33,6 +35,8 @@ namespace JwtWebApi.Api.Services.Dto
 		public IEnumerable<int> SubjectNameIds { get; set; }
 
 		public IEnumerable<int> SubjectTypeIds { get; set; }
+
+		public IEnumerable<int> Attractions { get; set; }
 	}
 
 	public interface IHotelWithLinks

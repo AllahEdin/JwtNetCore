@@ -26,6 +26,10 @@ namespace JwtWebApi.Api.Services.Services
 	{
 	}
 
+	public interface IAttractionPlaceTypeService : IEntityProvider<IAttractionPlaceType>, IEntityLinkDeleteService
+	{
+	}
+
 	public interface IRouteAgeTypeService : IEntityProvider<IRouteAgeType>, IEntityLinkDeleteService
 	{
 	}

@@ -90,4 +90,11 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 		}
 	}
+
+	internal class PlaceTypeService : NameTypeServiceBase<IPlaceType, PlaceType>, IPlaceTypeService
+	{
+		public PlaceTypeService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+	}
 }

@@ -73,7 +73,7 @@ namespace JwtWebApi.Api.Services.Impl
 		public Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize) =>
 			GetPagingWithLinks(page, pageSize, null);
 
-		public async Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
+		public async Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize, SearchModel filter)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -89,6 +89,10 @@ namespace JwtWebApi.Api.Services.Impl
 					await GetLink<AttractionSubject>(paging.Items,
 						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
 
+				var pt =
+					await GetLink<AttractionPlaceType>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
+
 
 				return new PagingResult<IAttractionWithLinks>()
 				{
@@ -97,7 +101,8 @@ namespace JwtWebApi.Api.Services.Impl
 					{
 						Attraction = t,
 						RouteIds = routes.Where(w => w.AttractionId == t.Id).Select(s => s.RouteId).ToArray(),
-						SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.Id).ToArray()
+						SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.SubjectId).ToArray(),
+						PlaceTypeIds = pt.Where(w => w.AttractionId == t.Id).Select(s => s.PlaceTypeId).ToArray(),
 					}).ToArray()
 				};
 
@@ -144,6 +149,22 @@ namespace JwtWebApi.Api.Services.Impl
 			foreach (var routeAttraction in toDelete2)
 			{
 				await _routeAttractionService.Delete(routeAttraction.AttractionId, routeAttraction.RouteId);
+			}
+
+			IReadOnlyCollection<AttractionPlaceType> toDelete3 =
+				new AttractionPlaceType[0];
+
+			using (var cp = ContextProviderFactory.Create())
+			{
+				toDelete3 =
+					await cp.GetTable<AttractionPlaceType>()
+						.Where(t => t.AttractionId == id)
+						.ToArrayAsync();
+			}
+
+			foreach (var attractionPlaceType in toDelete3)
+			{
+				await _routeAttractionService.Delete(attractionPlaceType.AttractionId, attractionPlaceType.PlaceTypeId);
 			}
 
 			await base.Delete(id);

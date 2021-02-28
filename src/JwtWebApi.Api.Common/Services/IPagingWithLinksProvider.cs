@@ -6,6 +6,6 @@ namespace JwtWebApi.Api.Common.Services
 {
 	public interface IPagingWithLinksProvider<T>
 	{
-		Task<PagingResult<T>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter);
+		Task<PagingResult<T>> GetPagingWithLinks(int page, int pageSize, SearchModel filter);
 	}
 }

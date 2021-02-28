@@ -58,6 +58,10 @@ namespace JwtWebApi.Api.Services
 				.As<ISubjectTypeService>()
 				.SingleInstance();
 
+			builder.RegisterType<PlaceTypeService>()
+				.As<IPlaceTypeService>()
+				.SingleInstance();
+
 
 
 
@@ -101,6 +105,9 @@ namespace JwtWebApi.Api.Services
 				.As<IRouteSubjectTypeService>()
 				.SingleInstance();
 
+			builder.RegisterType<AttractionPlaceTypeService>()
+				.As<IAttractionPlaceTypeService>()
+				.SingleInstance();
 
 
 

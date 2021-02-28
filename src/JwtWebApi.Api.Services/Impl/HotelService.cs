@@ -113,7 +113,7 @@ namespace JwtWebApi.Api.Services.Impl
 			return true;
 		}
 
-		public async Task<PagingResult<IHotelWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
+		public async Task<PagingResult<IHotelWithLinks>> GetPagingWithLinks(int page, int pageSize, SearchModel filter)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{

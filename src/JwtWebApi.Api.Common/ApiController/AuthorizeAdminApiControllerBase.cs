@@ -31,7 +31,7 @@ namespace JwtWebApi.Api.Common.ApiController
 		
 		[HttpPost(nameof(GetPagingFiltered))]
 		[Authorize]
-		public Task<IActionResult> GetPagingFiltered([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize, [FromBody] ComplexFilterUnit filterUnit)
+		public Task<IActionResult> GetPagingFiltered([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize, [FromBody] SearchModel filterUnit)
 			=> base.GetFiltered(filterUnit, page, pageSize);
 
 

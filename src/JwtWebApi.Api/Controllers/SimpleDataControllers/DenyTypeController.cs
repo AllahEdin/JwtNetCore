@@ -54,7 +54,12 @@ namespace JwtWebApi.Api.Controllers.SimpleDataControllers
 		}
 	}
 
-
+	public class PlaceTypeController : AuthorizeAdminApiControllerBase<IPlaceType, PlaceTypeModel, IPlaceTypeService>
+	{
+		public PlaceTypeController(IPlaceTypeService service) : base(service)
+		{
+		}
+	}
 
 
 	public class AgeTypeController : AuthorizeAdminApiControllerBase<IAgeType, AgeTypeModel, IAgeTypeService>

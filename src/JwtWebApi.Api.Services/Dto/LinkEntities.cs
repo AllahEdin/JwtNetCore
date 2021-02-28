@@ -72,4 +72,11 @@ namespace JwtWebApi.Api.Services.Dto
 		public int SubjectTypeId { get; set; } 
 	}
 
+	public interface IAttractionPlaceType : IEntity
+	{
+		int Id { get; set; } 
+		int AttractionId { get; set; } 
+		int PlaceTypeId { get; set; } 
+	}
+
 }

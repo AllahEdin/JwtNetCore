@@ -192,5 +192,13 @@ namespace JwtWebApi.Api.Controllers
 
 			return Ok(pathWithFile);
 		}
+
+		//[HttpDelete()]
+		//[Authorize(Roles = "admin")]
+		//public async Task<IActionResult> Delete(FileType type, string path, string fileName)
+		//{
+
+		//}
+
 	}
 }

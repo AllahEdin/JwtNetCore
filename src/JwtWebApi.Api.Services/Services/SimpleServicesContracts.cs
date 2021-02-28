@@ -63,6 +63,9 @@ namespace JwtWebApi.Api.Services.Services
 
 	}
 
+	public interface IPlaceTypeService : IEntityProvider<IPlaceType>
+	{
 
+	}
 
 }

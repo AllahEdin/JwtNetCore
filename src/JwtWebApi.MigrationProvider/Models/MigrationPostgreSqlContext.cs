@@ -21,6 +21,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
         public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
+        public virtual DbSet<AttractionPlaceTypes> AttractionPlaceTypes { get; set; }
         public virtual DbSet<AttractionSubjects> AttractionSubjects { get; set; }
         public virtual DbSet<Attractions> Attractions { get; set; }
         public virtual DbSet<CateringTypes> CateringTypes { get; set; }
@@ -33,6 +34,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<Hotels> Hotels { get; set; }
         public virtual DbSet<HousingTypes> HousingTypes { get; set; }
         public virtual DbSet<PeopleTypes> PeopleTypes { get; set; }
+        public virtual DbSet<PlaceTypes> PlaceTypes { get; set; }
         public virtual DbSet<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual DbSet<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }
         public virtual DbSet<Restaurants> Restaurants { get; set; }
@@ -138,6 +140,28 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
             });
 
+            modelBuilder.Entity<AttractionPlaceTypes>(entity =>
+            {
+                entity.ToTable("AttractionPlaceTypes", "places");
+
+                entity.HasIndex(e => e.PlaceTypeId, "IX_AttractionPlaceTypes_PlaceTypeId");
+
+                entity.HasIndex(e => new { e.AttractionId, e.PlaceTypeId }, "UIX_AttractionPlaceTypes_AttractionId_PlaceTypeId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.Attraction)
+                    .WithMany(p => p.AttractionPlaceTypes)
+                    .HasForeignKey(d => d.AttractionId)
+                    .HasConstraintName("FK_AttractionPlaceTypes_AttractionId");
+
+                entity.HasOne(d => d.PlaceType)
+                    .WithMany(p => p.AttractionPlaceTypes)
+                    .HasForeignKey(d => d.PlaceTypeId)
+                    .HasConstraintName("FK_AttractionPlaceTypes_PlaceTypeId");
+            });
+
             modelBuilder.Entity<AttractionSubjects>(entity =>
             {
                 entity.ToTable("AttractionSubjects", "places");
@@ -174,8 +198,7 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
-                entity.Property(e => e.Description)
-	                .IsRequired();
+                entity.Property(e => e.Description).IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -323,8 +346,7 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
-                entity.Property(e => e.Description)
-                    .IsRequired();
+                entity.Property(e => e.Description).IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -374,6 +396,18 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.ToTable("PeopleTypes", "places");
 
                 entity.HasIndex(e => e.Name, "IX_PeopleTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<PlaceTypes>(entity =>
+            {
+                entity.ToTable("PlaceTypes", "places");
+
+                entity.HasIndex(e => e.Name, "IX_PlaceTypes_Name")
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
@@ -441,8 +475,7 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
-                entity.Property(e => e.Description)
-                    .IsRequired();
+                entity.Property(e => e.Description).IsRequired();
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()

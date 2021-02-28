@@ -30,7 +30,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, null);
 
 		[HttpPost("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] ComplexFilterUnit filter)
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, filter);
 
 

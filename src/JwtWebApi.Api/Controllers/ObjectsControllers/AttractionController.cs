@@ -14,12 +14,14 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 	{
 		private readonly IAttractionSubjectsService _attractionSubjectsService;
 		private readonly IRouteAttractionService _routeAttractionService;
+		private readonly IAttractionPlaceTypeService _attractionPlaceTypeService;
 
 		public AttractionController(IAttractionService service, IAttractionSubjectsService attractionSubjectsService,
-			IRouteAttractionService routeAttractionService) : base(service)
+			IRouteAttractionService routeAttractionService, IAttractionPlaceTypeService attractionPlaceTypeService) : base(service)
 		{
 			_attractionSubjectsService = attractionSubjectsService;
 			_routeAttractionService = routeAttractionService;
+			_attractionPlaceTypeService = attractionPlaceTypeService;
 		}
 
 		[HttpGet("WithLinks/GetPaging")]
@@ -27,7 +29,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			=> base.GetPaging<IAttractionWithLinks>(page, pageSize, null);
 
 		[HttpPost("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] ComplexFilterUnit filter)
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IAttractionWithLinks>(page, pageSize, filter);
 
 
@@ -70,6 +72,28 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		public Task<IActionResult> DeleteRouteById(int attractionId, int[] routeIds)
 			=> DeleteLink(attractionId, routeIds,
 				_routeAttractionService);
+
+
+
+
+		[Authorize(Roles = "admin")]
+		[HttpPost("{attractionId}/" + nameof(AddPlaceTypeById))]
+		public Task<IActionResult> AddPlaceTypeById(int attractionId, int[] placeTypeIds)
+			=> AddLink<IAttractionPlaceTypeService, IAttractionPlaceType>(attractionId, placeTypeIds,
+				_attractionPlaceTypeService, (objId, linkId) =>
+					new AttractionPlaceTypeModel()
+					{
+						Id = 0,
+						PlaceTypeId = linkId,
+						AttractionId = objId,
+					});
+
+
+		[Authorize(Roles = "admin")]
+		[HttpDelete("{attractionId}/" + nameof(DeletePlaceTypeById))]
+		public Task<IActionResult> DeletePlaceTypeById(int attractionId, int[] placeTypeIds)
+			=> DeleteLink(attractionId, placeTypeIds,
+				_attractionPlaceTypeService);
 
 
 		[HttpDelete()]

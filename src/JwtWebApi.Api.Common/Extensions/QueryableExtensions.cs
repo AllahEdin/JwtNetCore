@@ -11,21 +11,20 @@ namespace JwtWebApi.Api.Common.Extensions
 {
 	public static class QueryableExtensions
 	{
-		public static IQueryable<TDb> OrderBy<TDb>(this IQueryable<TDb> source, string propertyName)
-
+		public static IQueryable<TDb> OrderBy<TDb>(this IQueryable<TDb> source, OrderModel model)
 		{
-
 			var x = Expression.Parameter(source.ElementType, "x");
 
-			var selector = Expression.Lambda(Expression.PropertyOrField(x, propertyName), x);
+			var selector = Expression.Lambda(Expression.PropertyOrField(x, model.PropertyName), x);
 
-			return source.Provider.CreateQuery<TDb>(
+			return
+				source.Provider.CreateQuery<TDb>(
+					Expression.Call(typeof(Queryable), model.IsDes ? "OrderByDescending" : "OrderBy",
+							new Type[] {source.ElementType, selector.Body.Type},
 
-				Expression.Call(typeof(Queryable), "OrderBy", new Type[] { source.ElementType, selector.Body.Type },
+							source.Expression, selector
 
-					source.Expression, selector
-
-				));
+						));
 
 		}
 
@@ -72,12 +71,22 @@ namespace JwtWebApi.Api.Common.Extensions
 				));
 		}
 
-		public static IQueryable<TDb> GetFilteredTable<TDb>(this IQueryable<TDb> source, ComplexFilterUnit filter, IContextProvider cp)
+		public static IQueryable<TDb> GetFilteredTable<TDb>(this IQueryable<TDb> source, SearchModel filter, IContextProvider cp)
 			where TDb : class, IEntity
 		{
-			return
-				source
-					.Where(filter);
+			var where =
+				filter?.Filter != null
+					? source
+						.Where(filter.Filter)
+					: source;
+
+			var order =
+				filter?.Order != null
+					? where
+						.OrderBy(filter.Order)
+					: where;
+
+			return order;
 		}
 	}
 }

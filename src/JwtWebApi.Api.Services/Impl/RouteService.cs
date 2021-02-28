@@ -79,7 +79,7 @@ namespace JwtWebApi.Api.Services.Impl
 		protected override bool CanBeDeleted()
 			=> true;
 
-		public async Task<PagingResult<IRouteWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
+		public async Task<PagingResult<IRouteWithLinks>> GetPagingWithLinks(int page, int pageSize, SearchModel filter)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -103,6 +103,9 @@ namespace JwtWebApi.Api.Services.Impl
 					await GetLink<RouteSubjectType>(paging.Items,
 						opt => paging.Items.Select(t => t.Id).Contains(opt.RouteId));
 
+				var ra =
+					await GetLink<RouteAttraction>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.RouteId));
 
 				return new PagingResult<IRouteWithLinks>()
 				{
@@ -114,6 +117,7 @@ namespace JwtWebApi.Api.Services.Impl
 						Route = t,
 						SubjectNameIds = sn.Where(w => w.RouteId == t.Id).Select(s => s.SubjectNameId),
 						SubjectTypeIds = st.Where(w => w.RouteId == t.Id).Select(s => s.SubjectTypeId),
+						Attractions = ra.Where(w => w.RouteId == t.Id).Select(s => s.AttractionId),
 					}).ToArray()
 				};
 
