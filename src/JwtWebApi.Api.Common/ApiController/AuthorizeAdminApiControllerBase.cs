@@ -45,5 +45,10 @@ namespace JwtWebApi.Api.Common.ApiController
 		public Task<IActionResult> Put([FromBody] TModel model)
 			=> base.Update(model);
 
+		[HttpDelete(nameof(DeleteById))]
+		[Authorize(Roles = "admin")]
+		public Task<IActionResult> DeleteById(int id)
+			=> base.Delete(id);
+
 	}
 }

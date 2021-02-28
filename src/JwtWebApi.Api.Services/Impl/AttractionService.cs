@@ -86,7 +86,7 @@ namespace JwtWebApi.Api.Services.Impl
 						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
 
 				var subjects =
-					await GetLink<RouteAttraction>(paging.Items,
+					await GetLink<AttractionSubject>(paging.Items,
 						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
 
 
