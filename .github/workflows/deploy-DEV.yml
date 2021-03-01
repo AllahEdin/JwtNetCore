@@ -8,7 +8,7 @@ jobs:
   build:
 
     name: Deploy Docker Image - DEV
-    runs-on: self-hosted
+    runs-on: [self-hosted, dev]
   
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
  
@@ -19,4 +19,7 @@ jobs:
    
       - name: Rmi Images
         run: docker rmi cheekibreeki228/test_repos:dev --force
+        
+      - name: Build Images
+        run: docker build -t cheekibreeki228/test_repos:dev .
 
