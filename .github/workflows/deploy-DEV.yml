@@ -21,5 +21,5 @@ jobs:
         run: docker rmi cheekibreeki228/test_repos:dev --force
         
       - name: Build Images
-        run: docker build -t cheekibreeki228/test_repos:dev .
+        run: cd src/; docker build -t cheekibreeki228/test_repos:dev .
 
