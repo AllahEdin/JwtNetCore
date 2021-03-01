@@ -1,0 +1,21 @@
+on:
+  push:
+    branches-ignore: [master]
+  pull_request:
+    branches-ignore: []
+
+jobs:
+  build:
+
+    name: Deploy Docker Image - DEV
+    runs-on: self-hosted
+  
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+ 
+    steps:
+    
+      - name: Checkout Code
+        uses: actions/checkout@v2.3.4
+   
+      - name: Get current date
+        run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${GITHUB_ENV}
