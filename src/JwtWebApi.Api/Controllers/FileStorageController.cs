@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +21,8 @@ namespace JwtWebApi.Api.Controllers
 		private const string FILESTORAGE_PATH = "/usr/share/fs/";
 		private const string AUDIO_BASE = "audio/";
 		private const string PICTURES_BASE = "pictures/";
+
+		private const int BUFFER_SIZE = 1024 * 1024;
 
 		private readonly ConcurrentDictionary<string, string> _hashFiles =
 			new ConcurrentDictionary<string, string>();
@@ -110,8 +115,29 @@ namespace JwtWebApi.Api.Controllers
 			byte[] array =
 				new byte[Convert.ToInt32(Request.ContentLength)];
 
-			var res =
-				await Request.Body.ReadAsync(array);
+			byte[] buffer = ArrayPool<byte>.Shared.Rent(BUFFER_SIZE);
+
+			int index = 0;
+
+			while (true)
+			{
+				var bytesRemaining = await Request.Body.ReadAsync(buffer, offset: 0, buffer.Length);
+				if (bytesRemaining == 0)
+				{
+					break;
+				}
+
+				if (bytesRemaining < BUFFER_SIZE)
+				{
+					buffer.Take(bytesRemaining).ToArray().CopyTo(array, index);
+				}
+				else
+				{
+					buffer.CopyTo(array, index);
+				}
+
+				index += bytesRemaining;
+			}
 
 			var pathWithFile =
 				Path.Combine(fullPath, fileName);
