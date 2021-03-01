@@ -12,7 +12,7 @@ services:
       - JWTKey
       - GoogleSecret
     volumes:
-      - usr/app/dev/fs:/usr/share/fs
+      - /usr/app/dev/fs:/usr/share/fs
     networks:
       - backend
 networks:
