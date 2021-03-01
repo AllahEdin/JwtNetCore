@@ -22,4 +22,13 @@ jobs:
         
       - name: Build Images
         run: cd src/; docker build -t cheekibreeki228/test_repos:dev .
+        
+      - name: Deploy Image
+        run: docker push cheekibreeki228/test_repos:dev
+  
+      - name: Stop Service
+        run: docker-compose down --rmi all
+        
+      - name: Start Service
+        run: docker-compose up -d
 
