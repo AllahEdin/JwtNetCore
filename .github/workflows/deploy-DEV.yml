@@ -24,7 +24,7 @@ jobs:
         run: cd src/; docker build -t cheekibreeki228/test_repos:dev .
         
       - name: Deploy Image
-        run: docker push cheekibreeki228/test_repos:dev
+        run:  cat /usr/app/dev/dockerhub_password | docker login --username cheekibreeki228 --password-stdin; docker push cheekibreeki228/test_repos:dev
   
       - name: Stop Service
         run: docker-compose down --rmi all
