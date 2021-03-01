@@ -21,9 +21,9 @@ networks:
       name: dev
 secrets:
    TravelDbConnectionString:
-      file: usr/app/dev/TravelDbConnectionString
+      file: /usr/app/dev/TravelDbConnectionString
    JWTKey:
-      file: usr/app/dev/JWTKey
+      file: /usr/app/dev/JWTKey
    GoogleSecret:
-      file: usr/app/dev/GoogleSecret
+      file: /usr/app/dev/GoogleSecret
       
