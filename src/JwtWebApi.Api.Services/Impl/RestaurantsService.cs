@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
-using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -54,6 +53,7 @@ namespace JwtWebApi.Api.Services.Impl
 					.UpdateAsync(t => new Restaurant()
 					{
 						CityId = model.CityId > 0 ? model.CityId : rest.CityId,
+						DistrictId = model.DistrictId > 0 ? model.DistrictId : rest.DistrictId,
 						BuildDate = model.BuildDate > default(DateTimeOffset) ? model.BuildDate : rest.BuildDate,
 						Address = string.IsNullOrEmpty(model.Address) ? rest.Address : model.Address,
 						CateringTypeId = model.CateringTypeId > 0 ? model.CateringTypeId : rest.CateringTypeId,

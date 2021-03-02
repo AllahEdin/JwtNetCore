@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
-using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -54,6 +53,7 @@ namespace JwtWebApi.Api.Services.Impl
 					.UpdateAsync(t => new Attraction()
 					{
 						CityId = model.CityId > 0 ? model.CityId : attraction.CityId,
+						DistrictId = model.DistrictId > 0 ? model.DistrictId : attraction.DistrictId,
 						BuildDate = model.BuildDate > default(DateTimeOffset) ? model.BuildDate : attraction.BuildDate,
 						Address = string.IsNullOrEmpty(model.Address) ? attraction.Address : model.Address,
 						Name = string.IsNullOrEmpty(model.Name) ? attraction.Name : model.Name,

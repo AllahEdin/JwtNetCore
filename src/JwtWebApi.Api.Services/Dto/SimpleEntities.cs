@@ -56,4 +56,8 @@ namespace JwtWebApi.Api.Services.Dto
 	public interface IPlaceType : IEntity, INamed
 	{
 	}
+
+	public interface IDistrict : IEntity, INamed
+	{
+	}
 }

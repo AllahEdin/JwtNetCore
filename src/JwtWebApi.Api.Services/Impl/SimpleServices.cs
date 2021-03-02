@@ -97,4 +97,11 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 		}
 	}
+
+	internal class DistrictService : NameTypeServiceBase<IDistrict, District>, IDistrictService
+	{
+		public DistrictService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+	}
 }

@@ -97,4 +97,11 @@ namespace JwtWebApi.Api.Controllers.SimpleDataControllers
 		{
 		}
 	}
+
+	public class DistrictController : AuthorizeAdminApiControllerBase<IDistrict, DistrictModel, IDistrictService>
+	{
+		public DistrictController(IDistrictService service) : base(service)
+		{
+		}
+	}
 }

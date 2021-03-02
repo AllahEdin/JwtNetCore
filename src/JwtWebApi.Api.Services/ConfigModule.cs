@@ -62,6 +62,9 @@ namespace JwtWebApi.Api.Services
 				.As<IPlaceTypeService>()
 				.SingleInstance();
 
+			builder.RegisterType<DistrictService>()
+				.As<IDistrictService>()
+				.SingleInstance();
 
 
 

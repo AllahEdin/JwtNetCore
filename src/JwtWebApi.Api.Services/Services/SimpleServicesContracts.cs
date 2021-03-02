@@ -68,4 +68,9 @@ namespace JwtWebApi.Api.Services.Services
 
 	}
 
+	public interface IDistrictService : IEntityProvider<IDistrict>
+	{
+
+	}
+
 }

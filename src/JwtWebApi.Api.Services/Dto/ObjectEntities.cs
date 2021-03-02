@@ -61,6 +61,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public string Longitude { get; set; }
 		public int CateringTypeId { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 	}
 
 	public interface IHotel : IEntity
@@ -76,6 +77,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public int HousingTypeId { get; set; }
 		public int ClassType { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 	}
 
 	public interface IAttraction : IEntity
@@ -90,6 +92,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public string Longitude { get; set; }
 		public int Duration { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 
 	}
 
