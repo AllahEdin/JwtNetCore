@@ -227,6 +227,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.Attractions)
                     .HasForeignKey(d => d.CityId)
                     .HasConstraintName("FK_Attractions_CityId");
+
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.Attractions)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_Attractions_DistrictId");
             });
 
             modelBuilder.Entity<CateringTypes>(entity =>
@@ -390,6 +395,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasForeignKey(d => d.CityId)
                     .HasConstraintName("FK_Hotels_CityId");
 
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.Hotels)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_Hotels_DistrictId");
+
                 entity.HasOne(d => d.HousingType)
                     .WithMany(p => p.Hotels)
                     .HasForeignKey(d => d.HousingTypeId)
@@ -525,6 +535,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.Restaurants)
                     .HasForeignKey(d => d.CityId)
                     .HasConstraintName("FK_Restaurants_CityId");
+
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.Restaurants)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_Restaurants_DistrictId");
             });
 
             modelBuilder.Entity<RouteAgeTypes>(entity =>
@@ -552,6 +567,8 @@ namespace JwtWebApi.MigrationProvider.Models
             modelBuilder.Entity<RouteAttractions>(entity =>
             {
                 entity.ToTable("RouteAttractions", "places");
+
+                entity.HasIndex(e => e.RouteId, "IX_RouteAttractions_RouteId");
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
