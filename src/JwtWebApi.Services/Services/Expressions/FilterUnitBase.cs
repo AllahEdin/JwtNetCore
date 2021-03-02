@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using System.Reflection;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -8,8 +8,13 @@ namespace JwtWebApi.Services.Services.Expressions
 {
 	public enum FilterUnitType
 	{
+		[EnumMember(Value = "Parameter")]
 		Parameter = 1,
+
+		[EnumMember(Value = "Const")]
 		Const = 2,
+
+		[EnumMember(Value = "Complex")]
 		Complex = 3
 	}
 
@@ -78,14 +83,6 @@ namespace JwtWebApi.Services.Services.Expressions
 		{
 			if (unit is ParameterFilterUnit parameter)
 			{
-				//	PropertyInfo prp =
-				//		typeof(TDb).GetProperty(parameter.PropertyName);
-
-				//	if (prp == null)
-				//	{
-				//		throw new InvalidOperationException();
-				//	}
-
 				return new PropertyExpression(parameterExpression, parameter.PropertyName);
 			}
 			else

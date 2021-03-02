@@ -72,4 +72,11 @@ namespace JwtWebApi.Api.Models
 		public int RouteId { get; set; }
 		public int SubjectTypeId { get; set; }
 	}
+
+	public class AttractionPlaceTypeModel : IAttractionPlaceType
+	{
+		public int Id { get; set; }
+		public int AttractionId { get; set; }
+		public int PlaceTypeId { get; set; }
+	}
 }

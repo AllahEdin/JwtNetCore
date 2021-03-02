@@ -20,6 +20,8 @@ namespace JwtWebApi.Api.Services.Dto
 		public IEnumerable<int> RouteIds { get; set; }
 
 		public IEnumerable<int> SubjectIds { get; set; }
+
+		public IEnumerable<int> PlaceTypeIds { get; set; }
 	}
 
 	public interface IRouteWithLinks
@@ -33,6 +35,8 @@ namespace JwtWebApi.Api.Services.Dto
 		public IEnumerable<int> SubjectNameIds { get; set; }
 
 		public IEnumerable<int> SubjectTypeIds { get; set; }
+
+		public IEnumerable<int> Attractions { get; set; }
 	}
 
 	public interface IHotelWithLinks
@@ -57,6 +61,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public string Longitude { get; set; }
 		public int CateringTypeId { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 	}
 
 	public interface IHotel : IEntity
@@ -72,6 +77,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public int HousingTypeId { get; set; }
 		public int ClassType { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 	}
 
 	public interface IAttraction : IEntity
@@ -86,6 +92,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public string Longitude { get; set; }
 		public int Duration { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 
 	}
 

@@ -16,6 +16,7 @@ namespace JwtWebApi.Api.Models
 		public string Longitude { get; set; }
 		public int CateringTypeId { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 	}
 
 	public class HotelModel : IHotel
@@ -32,6 +33,7 @@ namespace JwtWebApi.Api.Models
 		public int HousingTypeId { get; set; }
 		public int ClassType { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 	}
 
 	public class AttractionModel : IAttraction
@@ -47,6 +49,7 @@ namespace JwtWebApi.Api.Models
 		public string Longitude { get; set; }
 		public int Duration { get; set; }
 		public string Path { get; set; }
+		public int DistrictId { get; set; }
 	}
 
 	public class RouteModel : IRoute

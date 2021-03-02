@@ -3,15 +3,17 @@ using System;
 using JwtWebApi.MigrationProvider.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace JwtWebApi.MigrationProvider.Migrations
 {
     [DbContext(typeof(MigrationPostgreSqlContext))]
-    partial class MigrationPostgreSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20210228103142_postgresqlMigration_Table_PlaceTypes")]
+    partial class postgresqlMigration_Table_PlaceTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -185,11 +187,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("DistrictId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValueSql("1");
-
                     b.Property<int>("Duration")
                         .HasColumnType("integer");
 
@@ -219,8 +216,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DistrictId");
 
                     b.HasIndex(new[] { "CityId" }, "IX_Attractions_CityId");
 
@@ -301,25 +296,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsUnique();
 
                     b.ToTable("DenyTypes", "places");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Districts", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityAlwaysColumn();
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex(new[] { "Name" }, "IX_Districts_Name")
-                        .IsUnique();
-
-                    b.ToTable("Districts", "places");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.EquipmentTypes", b =>
@@ -412,11 +388,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("DistrictId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValueSql("1");
-
                     b.Property<int>("HousingTypeId")
                         .HasColumnType("integer");
 
@@ -446,8 +417,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DistrictId");
 
                     b.HasIndex(new[] { "CityId" }, "IX_Hotels_CityId");
 
@@ -584,11 +553,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("DistrictId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValueSql("1");
-
                     b.Property<string>("Latitude")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -615,8 +579,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DistrictId");
 
                     b.HasIndex(new[] { "CateringTypeId" }, "IX_Restaurants_CateringTypeId");
 
@@ -663,9 +625,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AttractionId");
+                    b.HasIndex(new[] { "AttractionId" }, "IX_RouteAttractions_AttractionId");
 
-                    b.HasIndex(new[] { "RouteId" }, "IX_RouteAttractions_RouteId");
+                    b.HasIndex(new[] { "RouteId", "AttractionId" }, "UIX_RouteAttractions_RouteId_AttractionId")
+                        .IsUnique();
 
                     b.ToTable("RouteAttractions", "places");
                 });
@@ -918,16 +881,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Districts", "District")
-                        .WithMany("Attractions")
-                        .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK_Attractions_DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("City");
-
-                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.HotelEquipmentTypes", b =>
@@ -981,13 +935,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Districts", "District")
-                        .WithMany("Hotels")
-                        .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK_Hotels_DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("JwtWebApi.MigrationProvider.Models.HousingTypes", "HousingType")
                         .WithMany("Hotels")
                         .HasForeignKey("HousingTypeId")
@@ -996,8 +943,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsRequired();
 
                     b.Navigation("City");
-
-                    b.Navigation("District");
 
                     b.Navigation("HousingType");
                 });
@@ -1060,18 +1005,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Districts", "District")
-                        .WithMany("Restaurants")
-                        .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK_Restaurants_DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("CateringType");
 
                     b.Navigation("City");
-
-                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteAgeTypes", b =>
@@ -1215,15 +1151,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.DenyTypes", b =>
                 {
                     b.Navigation("RestaurantDenyTypes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Districts", b =>
-                {
-                    b.Navigation("Attractions");
-
-                    b.Navigation("Hotels");
-
-                    b.Navigation("Restaurants");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.EquipmentTypes", b =>

@@ -19,7 +19,7 @@ namespace JwtWebApi.Api.Common.Services
 		/// <summary>
 		///     Возвращает постраничный список элементов сущности <typeparamref name="T" />
 		/// </summary>
-		Task<PagingResult<T>> Get(int page, int pageSize, ComplexFilterUnit filterUnit);
+		Task<PagingResult<T>> Get(int page, int pageSize, SearchModel filterUnit);
 
 		/// <summary>
 		///     Возвращает новый/обновленный элемент сущности <paramref name="model" />

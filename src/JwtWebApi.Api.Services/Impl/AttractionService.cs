@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
-using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -54,6 +53,7 @@ namespace JwtWebApi.Api.Services.Impl
 					.UpdateAsync(t => new Attraction()
 					{
 						CityId = model.CityId > 0 ? model.CityId : attraction.CityId,
+						DistrictId = model.DistrictId > 0 ? model.DistrictId : attraction.DistrictId,
 						BuildDate = model.BuildDate > default(DateTimeOffset) ? model.BuildDate : attraction.BuildDate,
 						Address = string.IsNullOrEmpty(model.Address) ? attraction.Address : model.Address,
 						Name = string.IsNullOrEmpty(model.Name) ? attraction.Name : model.Name,
@@ -73,7 +73,7 @@ namespace JwtWebApi.Api.Services.Impl
 		public Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize) =>
 			GetPagingWithLinks(page, pageSize, null);
 
-		public async Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
+		public async Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinks(int page, int pageSize, SearchModel filter)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -86,7 +86,11 @@ namespace JwtWebApi.Api.Services.Impl
 						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
 
 				var subjects =
-					await GetLink<RouteAttraction>(paging.Items,
+					await GetLink<AttractionSubject>(paging.Items,
+						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
+
+				var pt =
+					await GetLink<AttractionPlaceType>(paging.Items,
 						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
 
 
@@ -97,7 +101,8 @@ namespace JwtWebApi.Api.Services.Impl
 					{
 						Attraction = t,
 						RouteIds = routes.Where(w => w.AttractionId == t.Id).Select(s => s.RouteId).ToArray(),
-						SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.Id).ToArray()
+						SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.SubjectId).ToArray(),
+						PlaceTypeIds = pt.Where(w => w.AttractionId == t.Id).Select(s => s.PlaceTypeId).ToArray(),
 					}).ToArray()
 				};
 
@@ -144,6 +149,22 @@ namespace JwtWebApi.Api.Services.Impl
 			foreach (var routeAttraction in toDelete2)
 			{
 				await _routeAttractionService.Delete(routeAttraction.AttractionId, routeAttraction.RouteId);
+			}
+
+			IReadOnlyCollection<AttractionPlaceType> toDelete3 =
+				new AttractionPlaceType[0];
+
+			using (var cp = ContextProviderFactory.Create())
+			{
+				toDelete3 =
+					await cp.GetTable<AttractionPlaceType>()
+						.Where(t => t.AttractionId == id)
+						.ToArrayAsync();
+			}
+
+			foreach (var attractionPlaceType in toDelete3)
+			{
+				await _routeAttractionService.Delete(attractionPlaceType.AttractionId, attractionPlaceType.PlaceTypeId);
 			}
 
 			await base.Delete(id);

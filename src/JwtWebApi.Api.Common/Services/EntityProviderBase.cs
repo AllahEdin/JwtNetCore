@@ -53,15 +53,13 @@ namespace JwtWebApi.Api.Common.Services
 			}
 		}
 
-		public async Task<PagingResult<T>> Get(int page, int pageSize, ComplexFilterUnit filter)
+		public async Task<PagingResult<T>> Get(int page, int pageSize, SearchModel filter)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{
 
 				IQueryable<TDb> table =
-					filter == null
-						? cp.GetTable<TDb>()
-						: cp.GetTable<TDb>().GetFilteredTable(filter, cp);
+					cp.GetTable<TDb>().GetFilteredTable(filter, cp);
 
 				TDb[] res =
 					await EntityFrameworkQueryableExtensions.ToArrayAsync(table

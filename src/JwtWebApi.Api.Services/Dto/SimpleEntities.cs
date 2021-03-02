@@ -52,4 +52,12 @@ namespace JwtWebApi.Api.Services.Dto
 	public interface ISubjectType : IEntity, INamed
 	{
 	}
+
+	public interface IPlaceType : IEntity, INamed
+	{
+	}
+
+	public interface IDistrict : IEntity, INamed
+	{
+	}
 }

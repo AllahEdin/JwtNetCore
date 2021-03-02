@@ -15,18 +15,20 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		private readonly IRouteAgeTypeService _routeAgeTypeService;
 		private readonly IRouteSubjectNameService _routeSubjectNameService;
 		private readonly IRouteSubjectTypeService _routeSubjectTypeService;
-
+		private readonly IRouteAttractionService _routeAttractionService;
 
 		public RouteController(IRouteService service, 
 			IRoutePeopleTypeService routePeopleTypeService, 
 			IRouteAgeTypeService routeAgeTypeService, 
 			IRouteSubjectNameService routeSubjectNameService, 
-			IRouteSubjectTypeService routeSubjectTypeService) : base(service)
+			IRouteSubjectTypeService routeSubjectTypeService, 
+			IRouteAttractionService routeAttractionService) : base(service)
 		{
 			_routePeopleTypeService = routePeopleTypeService;
 			_routeAgeTypeService = routeAgeTypeService;
 			_routeSubjectNameService = routeSubjectNameService;
 			_routeSubjectTypeService = routeSubjectTypeService;
+			_routeAttractionService = routeAttractionService;
 		}
 
 
@@ -35,7 +37,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			=> base.GetPaging<IRouteWithLinks>(page, pageSize, null);
 
 		[HttpPost("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] ComplexFilterUnit filter)
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IRouteWithLinks>(page, pageSize, filter);
 
 
@@ -136,6 +138,29 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 		#endregion
 
+
+		#region Attrcations
+
+		[Authorize(Roles = "admin")]
+		[HttpPost("{routeId}/" + nameof(AddAttractionById))]
+		public Task<IActionResult> AddAttractionById(int routeId, int[] attractionIds)
+			=> AddLink<IRouteAttractionService, IRouteAttraction>(routeId, attractionIds,
+				_routeAttractionService, (objId, linkId) =>
+					new RouteAttractionModel()
+					{
+						Id = 0,
+						RouteId = objId,
+						AttractionId = linkId,
+					});
+
+
+		[Authorize(Roles = "admin")]
+		[HttpDelete("{routeId}/" + nameof(DeleteAttractionById))]
+		public Task<IActionResult> DeleteAttractionById(int routeId, int[] attractionIds)
+			=> DeleteLink(routeId, attractionIds,
+				_routeAttractionService);
+
+		#endregion
 
 		[HttpDelete()]
 		[Authorize(Roles = "admin")]

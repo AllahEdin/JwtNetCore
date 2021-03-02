@@ -24,9 +24,11 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Longitude { get; set; }
         public int CateringTypeId { get; set; }
         public string Path { get; set; }
+        public int DistrictId { get; set; }
 
         public virtual CateringTypes CateringType { get; set; }
         public virtual Cities City { get; set; }
+        public virtual Districts District { get; set; }
         public virtual ICollection<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual ICollection<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }
     }

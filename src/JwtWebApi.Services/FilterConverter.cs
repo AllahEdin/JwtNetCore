@@ -29,13 +29,13 @@ namespace JwtWebApi.Services
 		{
 			JObject jo = JObject.Load(reader);
 
-			switch (jo["Type"].Value<int>())
+			switch ((jo["Type"] ?? jo["type"]) .Value<string>())
 			{
-				case 1:
+				case "Parameter":
 					return JsonConvert.DeserializeObject<ParameterFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
-				case 2:
+				case "Const":
 					return JsonConvert.DeserializeObject<ConstFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
-				case 3:
+				case "Complex":
 					return JsonConvert.DeserializeObject<ComplexFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
 				default:
 					throw new InvalidOperationException();

@@ -31,7 +31,7 @@ namespace JwtWebApi.Api.Common.ApiController
 		
 		[HttpPost(nameof(GetPagingFiltered))]
 		[Authorize]
-		public Task<IActionResult> GetPagingFiltered([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize, [FromBody] ComplexFilterUnit filterUnit)
+		public Task<IActionResult> GetPagingFiltered([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize, [FromBody] SearchModel filterUnit)
 			=> base.GetFiltered(filterUnit, page, pageSize);
 
 
@@ -44,6 +44,11 @@ namespace JwtWebApi.Api.Common.ApiController
 		[Authorize(Roles = "admin")]
 		public Task<IActionResult> Put([FromBody] TModel model)
 			=> base.Update(model);
+
+		[HttpDelete(nameof(DeleteById))]
+		[Authorize(Roles = "admin")]
+		public Task<IActionResult> DeleteById(int id)
+			=> base.Delete(id);
 
 	}
 }

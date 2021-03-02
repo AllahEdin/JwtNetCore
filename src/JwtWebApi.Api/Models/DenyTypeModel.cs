@@ -73,4 +73,16 @@ namespace JwtWebApi.Api.Models
 		public int Id { get; set; }
 		public string Name { get; set; }
 	}
+
+	public class PlaceTypeModel : IPlaceType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
+
+	public class DistrictModel : IDistrict
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+	}
 }

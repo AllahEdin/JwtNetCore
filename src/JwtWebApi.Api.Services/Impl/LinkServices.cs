@@ -100,6 +100,25 @@ namespace JwtWebApi.Api.Services.Impl
 			=> base.Delete(het => het.AttractionId == attractionId && het.SubjectId == subjectId);
 	}
 
+	internal class AttractionPlaceTypeService  : EntityProviderBase<IAttractionPlaceType, AttractionPlaceType>, IAttractionPlaceTypeService
+	{
+		public AttractionPlaceTypeService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+
+		protected override Task<IAttractionPlaceType> Update(IContextProvider provider, IAttractionPlaceType model)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override bool CanBeDeleted()
+			=> true;
+
+
+		public Task<bool> Delete(int attractionId, int placeTypeId)
+			=> base.Delete(het => het.AttractionId == attractionId && het.PlaceTypeId == placeTypeId);
+	}
+
 	internal class RouteAgeTypeService : EntityProviderBase<IRouteAgeType, RouteAgeType>, IRouteAgeTypeService
 	{
 		public RouteAgeTypeService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)

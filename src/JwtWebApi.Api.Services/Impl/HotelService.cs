@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
-using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -53,6 +52,7 @@ namespace JwtWebApi.Api.Services.Impl
 					.UpdateAsync(t => new Hotel()
 					{
 						CityId = model.CityId > 0 ? model.CityId : hotel.CityId,
+						DistrictId = model.DistrictId > 0 ? model.DistrictId : hotel.DistrictId,
 						BuildDate = model.BuildDate > default(DateTimeOffset) ? model.BuildDate : hotel.BuildDate,
 						Address = string.IsNullOrEmpty(model.Address) ? hotel.Address : model.Address,
 						Name = string.IsNullOrEmpty(model.Name) ? hotel.Name : model.Name,
@@ -113,7 +113,7 @@ namespace JwtWebApi.Api.Services.Impl
 			return true;
 		}
 
-		public async Task<PagingResult<IHotelWithLinks>> GetPagingWithLinks(int page, int pageSize, ComplexFilterUnit filter)
+		public async Task<PagingResult<IHotelWithLinks>> GetPagingWithLinks(int page, int pageSize, SearchModel filter)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{

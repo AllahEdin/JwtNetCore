@@ -27,7 +27,7 @@ namespace JwtWebApi.Api.Common.ApiController
 			Service = service;
 		}
 
-		protected async Task<IActionResult> GetPaging<TEntityWithLinks>(int page, int pageSize, ComplexFilterUnit filter)
+		protected async Task<IActionResult> GetPaging<TEntityWithLinks>(int page, int pageSize, SearchModel filter)
 		{
 			if (!this.IsValidModel(out IActionResult error))
 			{
@@ -87,7 +87,7 @@ namespace JwtWebApi.Api.Common.ApiController
 		/// 
 		/// </summary>
 		/// <param name="model">Создаваемый объект. Обязательное для заполнения</param>
-		protected async Task<IActionResult> GetFiltered([Required] [FromBody] ComplexFilterUnit filter, int page, int pageSize)
+		protected async Task<IActionResult> GetFiltered([Required] [FromBody] SearchModel filter, int page, int pageSize)
 		{
 			if (!this.IsValidModel(out IActionResult error))
 			{

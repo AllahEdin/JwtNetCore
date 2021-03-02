@@ -12,7 +12,7 @@ services:
       - JWTKey
       - GoogleSecret
     volumes:
-      - ./fs:/usr/share/fs
+      - /usr/app/dev/fs:/usr/share/fs
     networks:
       - backend
 networks:
@@ -21,9 +21,9 @@ networks:
       name: dev
 secrets:
    TravelDbConnectionString:
-      file: ./dev/TravelDbConnectionString
+      file: /usr/app/dev/TravelDbConnectionString
    JWTKey:
-      file: ./dev/JWTKey
+      file: /usr/app/dev/JWTKey
    GoogleSecret:
-      file: ./dev/GoogleSecret
+      file: /usr/app/dev/GoogleSecret
       

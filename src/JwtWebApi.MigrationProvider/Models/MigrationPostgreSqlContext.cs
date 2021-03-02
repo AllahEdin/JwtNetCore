@@ -21,18 +21,21 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
         public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
+        public virtual DbSet<AttractionPlaceTypes> AttractionPlaceTypes { get; set; }
         public virtual DbSet<AttractionSubjects> AttractionSubjects { get; set; }
         public virtual DbSet<Attractions> Attractions { get; set; }
         public virtual DbSet<CateringTypes> CateringTypes { get; set; }
         public virtual DbSet<Cities> Cities { get; set; }
         public virtual DbSet<CuisineTypes> CuisineTypes { get; set; }
         public virtual DbSet<DenyTypes> DenyTypes { get; set; }
+        public virtual DbSet<Districts> Districts { get; set; }
         public virtual DbSet<EquipmentTypes> EquipmentTypes { get; set; }
         public virtual DbSet<HotelEquipmentTypes> HotelEquipmentTypes { get; set; }
         public virtual DbSet<HotelServiceTypes> HotelServiceTypes { get; set; }
         public virtual DbSet<Hotels> Hotels { get; set; }
         public virtual DbSet<HousingTypes> HousingTypes { get; set; }
         public virtual DbSet<PeopleTypes> PeopleTypes { get; set; }
+        public virtual DbSet<PlaceTypes> PlaceTypes { get; set; }
         public virtual DbSet<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual DbSet<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }
         public virtual DbSet<Restaurants> Restaurants { get; set; }
@@ -138,6 +141,28 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
             });
 
+            modelBuilder.Entity<AttractionPlaceTypes>(entity =>
+            {
+                entity.ToTable("AttractionPlaceTypes", "places");
+
+                entity.HasIndex(e => e.PlaceTypeId, "IX_AttractionPlaceTypes_PlaceTypeId");
+
+                entity.HasIndex(e => new { e.AttractionId, e.PlaceTypeId }, "UIX_AttractionPlaceTypes_AttractionId_PlaceTypeId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.Attraction)
+                    .WithMany(p => p.AttractionPlaceTypes)
+                    .HasForeignKey(d => d.AttractionId)
+                    .HasConstraintName("FK_AttractionPlaceTypes_AttractionId");
+
+                entity.HasOne(d => d.PlaceType)
+                    .WithMany(p => p.AttractionPlaceTypes)
+                    .HasForeignKey(d => d.PlaceTypeId)
+                    .HasConstraintName("FK_AttractionPlaceTypes_PlaceTypeId");
+            });
+
             modelBuilder.Entity<AttractionSubjects>(entity =>
             {
                 entity.ToTable("AttractionSubjects", "places");
@@ -174,8 +199,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
-                entity.Property(e => e.Description)
-	                .IsRequired();
+                entity.Property(e => e.Description).IsRequired();
+
+                entity.Property(e => e.DistrictId).HasDefaultValueSql("1");
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -201,6 +227,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.Attractions)
                     .HasForeignKey(d => d.CityId)
                     .HasConstraintName("FK_Attractions_CityId");
+
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.Attractions)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_Attractions_DistrictId");
             });
 
             modelBuilder.Entity<CateringTypes>(entity =>
@@ -244,6 +275,18 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.ToTable("DenyTypes", "places");
 
                 entity.HasIndex(e => e.Name, "IX_DenyTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<Districts>(entity =>
+            {
+                entity.ToTable("Districts", "places");
+
+                entity.HasIndex(e => e.Name, "IX_Districts_Name")
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
@@ -323,8 +366,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
-                entity.Property(e => e.Description)
-                    .IsRequired();
+                entity.Property(e => e.Description).IsRequired();
+
+                entity.Property(e => e.DistrictId).HasDefaultValueSql("1");
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -351,6 +395,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasForeignKey(d => d.CityId)
                     .HasConstraintName("FK_Hotels_CityId");
 
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.Hotels)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_Hotels_DistrictId");
+
                 entity.HasOne(d => d.HousingType)
                     .WithMany(p => p.Hotels)
                     .HasForeignKey(d => d.HousingTypeId)
@@ -374,6 +423,18 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.ToTable("PeopleTypes", "places");
 
                 entity.HasIndex(e => e.Name, "IX_PeopleTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<PlaceTypes>(entity =>
+            {
+                entity.ToTable("PlaceTypes", "places");
+
+                entity.HasIndex(e => e.Name, "IX_PlaceTypes_Name")
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
@@ -441,8 +502,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
-                entity.Property(e => e.Description)
-                    .IsRequired();
+                entity.Property(e => e.Description).IsRequired();
+
+                entity.Property(e => e.DistrictId).HasDefaultValueSql("1");
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -473,6 +535,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.Restaurants)
                     .HasForeignKey(d => d.CityId)
                     .HasConstraintName("FK_Restaurants_CityId");
+
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.Restaurants)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_Restaurants_DistrictId");
             });
 
             modelBuilder.Entity<RouteAgeTypes>(entity =>
@@ -501,10 +568,7 @@ namespace JwtWebApi.MigrationProvider.Models
             {
                 entity.ToTable("RouteAttractions", "places");
 
-                entity.HasIndex(e => e.AttractionId, "IX_RouteAttractions_AttractionId");
-
-                entity.HasIndex(e => new { e.RouteId, e.AttractionId }, "UIX_RouteAttractions_RouteId_AttractionId")
-                    .IsUnique();
+                entity.HasIndex(e => e.RouteId, "IX_RouteAttractions_RouteId");
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
