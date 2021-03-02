@@ -28,6 +28,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<Cities> Cities { get; set; }
         public virtual DbSet<CuisineTypes> CuisineTypes { get; set; }
         public virtual DbSet<DenyTypes> DenyTypes { get; set; }
+        public virtual DbSet<Districts> Districts { get; set; }
         public virtual DbSet<EquipmentTypes> EquipmentTypes { get; set; }
         public virtual DbSet<HotelEquipmentTypes> HotelEquipmentTypes { get; set; }
         public virtual DbSet<HotelServiceTypes> HotelServiceTypes { get; set; }
@@ -200,6 +201,8 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Description).IsRequired();
 
+                entity.Property(e => e.DistrictId).HasDefaultValueSql("1");
+
                 entity.Property(e => e.Latitude)
                     .IsRequired()
                     .HasMaxLength(255);
@@ -267,6 +270,18 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.ToTable("DenyTypes", "places");
 
                 entity.HasIndex(e => e.Name, "IX_DenyTypes_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<Districts>(entity =>
+            {
+                entity.ToTable("Districts", "places");
+
+                entity.HasIndex(e => e.Name, "IX_Districts_Name")
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
@@ -347,6 +362,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.BuildDate).HasColumnType("timestamp(6) with time zone");
 
                 entity.Property(e => e.Description).IsRequired();
+
+                entity.Property(e => e.DistrictId).HasDefaultValueSql("1");
 
                 entity.Property(e => e.Latitude)
                     .IsRequired()
@@ -477,6 +494,8 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Description).IsRequired();
 
+                entity.Property(e => e.DistrictId).HasDefaultValueSql("1");
+
                 entity.Property(e => e.Latitude)
                     .IsRequired()
                     .HasMaxLength(255);
@@ -533,11 +552,6 @@ namespace JwtWebApi.MigrationProvider.Models
             modelBuilder.Entity<RouteAttractions>(entity =>
             {
                 entity.ToTable("RouteAttractions", "places");
-
-                entity.HasIndex(e => e.AttractionId, "IX_RouteAttractions_AttractionId");
-
-                entity.HasIndex(e => new { e.RouteId, e.AttractionId }, "UIX_RouteAttractions_RouteId_AttractionId")
-                    .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 

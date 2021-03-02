@@ -16,7 +16,8 @@ namespace JwtWebApi.MigrationProvider
 			new CitiesMigrationDataUpdate(),
 			new EquipmentTypesMigrationDataUpdate(),
 			new HousingTypesMigrationDataUpdate(),
-			new ServiceTypesMigrationDataUpdate()
+			new ServiceTypesMigrationDataUpdate(),
+			new DistrictsMigrationDataUpdate()
 		};
 
 		/// <inheritdoc />

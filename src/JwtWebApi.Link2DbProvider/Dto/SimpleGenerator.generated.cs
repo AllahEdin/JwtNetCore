@@ -34,6 +34,7 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<City>                  Cities                 { get { return this.GetTable<City>(); } }
 		public ITable<CuisineType>           CuisineTypes           { get { return this.GetTable<CuisineType>(); } }
 		public ITable<DenyType>              DenyTypes              { get { return this.GetTable<DenyType>(); } }
+		public ITable<District>              Districts              { get { return this.GetTable<District>(); } }
 		public ITable<EquipmentType>         EquipmentTypes         { get { return this.GetTable<EquipmentType>(); } }
 		public ITable<Hotel>                 Hotels                 { get { return this.GetTable<Hotel>(); } }
 		public ITable<HotelEquipmentType>    HotelEquipmentTypes    { get { return this.GetTable<HotelEquipmentType>(); } }
@@ -131,6 +132,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string         Longitude   { get; set; } // character varying(255)
 		[Column,     NotNull ] public int            Duration    { get; set; } // integer
 		[Column,     NotNull ] public string         Path        { get; set; } // character varying(255)
+		[Column,     NotNull ] public int            DistrictId  { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="AttractionPlaceTypes")]
@@ -177,6 +179,13 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     Nullable] public string Name { get; set; } // character varying(255)
 	}
 
+	[Table(Schema="places", Name="Districts")]
+	public partial class District : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     Nullable] public string Name { get; set; } // character varying(255)
+	}
+
 	[Table(Schema="places", Name="EquipmentTypes")]
 	public partial class EquipmentType : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
 	{
@@ -199,6 +208,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public int            HousingTypeId { get; set; } // integer
 		[Column,     NotNull ] public int            ClassType     { get; set; } // integer
 		[Column,     NotNull ] public string         Path          { get; set; } // character varying(255)
+		[Column,     NotNull ] public int            DistrictId    { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="HotelEquipmentTypes")]
@@ -252,6 +262,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string         Longitude      { get; set; } // character varying(255)
 		[Column,     NotNull ] public int            CateringTypeId { get; set; } // integer
 		[Column,     NotNull ] public string         Path           { get; set; } // character varying(255)
+		[Column,     NotNull ] public int            DistrictId     { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="RestaurantCuisineTypes")]

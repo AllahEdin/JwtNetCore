@@ -25,6 +25,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public int HousingTypeId { get; set; }
         public int ClassType { get; set; }
         public string Path { get; set; }
+        public int DistrictId { get; set; }
 
         public virtual Cities City { get; set; }
         public virtual HousingTypes HousingType { get; set; }
