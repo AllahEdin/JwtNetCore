@@ -34,7 +34,13 @@ namespace JwtWebApi.Services
 				case "Parameter":
 					return JsonConvert.DeserializeObject<ParameterFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
 				case "Const":
-					return JsonConvert.DeserializeObject<ConstFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
+					var deserialized =
+						JsonConvert.DeserializeObject<ConstFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
+					deserialized.Value =
+						(Int32.TryParse((jo["Value"] ?? jo["value"]).ToString(), out var val))
+							? val
+							: deserialized.Value;
+					return deserialized;
 				case "Complex":
 					return JsonConvert.DeserializeObject<ComplexFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
 				default:
