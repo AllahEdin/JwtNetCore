@@ -287,17 +287,16 @@ namespace JwtWebApi.MigrationProvider.Models
             {
                 entity.ToTable("DIstrictCities", "places");
 
-                entity.HasIndex(e => e.DistrictId, "UIX_DistrictCities_DistrictId")
-                    .IsUnique();
+                entity.HasIndex(e => e.DistrictId, "UIX_DistrictCities_DistrictId");
 
-                entity.HasIndex(e => e.CityId, "UIX_DistrictCities_CityId")
-	                .IsUnique();
+                entity.HasIndex(e => new {e.DistrictId, e.CityId}, "UIX_DistrictCities_DistrictId_CityId")
+                    .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
                 entity.HasOne(d => d.City)
-                    .WithMany(p => p.DistrictCities)
-                    .HasForeignKey(d => d.CityId)
+                    .WithOne(p => p.DistrictCities)
+                    .HasForeignKey<DistrictCities>(d => d.CityId)
                     .HasConstraintName("FK_DIstrictCities_CityId");
 
                 entity.HasOne(d => d.District)
