@@ -28,6 +28,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<Cities> Cities { get; set; }
         public virtual DbSet<CuisineTypes> CuisineTypes { get; set; }
         public virtual DbSet<DenyTypes> DenyTypes { get; set; }
+        public virtual DbSet<DistrictCities> DistrictCities { get; set; }
         public virtual DbSet<Districts> Districts { get; set; }
         public virtual DbSet<EquipmentTypes> EquipmentTypes { get; set; }
         public virtual DbSet<HotelEquipmentTypes> HotelEquipmentTypes { get; set; }
@@ -280,6 +281,29 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
                 entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<DistrictCities>(entity =>
+            {
+                entity.ToTable("DIstrictCities", "places");
+
+                entity.HasIndex(e => e.DistrictId, "UIX_DistrictCities_DistrictId")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.CityId, "UIX_DistrictCities_CityId")
+	                .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.City)
+                    .WithMany(p => p.DistrictCities)
+                    .HasForeignKey(d => d.CityId)
+                    .HasConstraintName("FK_DIstrictCities_CityId");
+
+                entity.HasOne(d => d.District)
+                    .WithOne(p => p.DistrictCities)
+                    .HasForeignKey<DistrictCities>(d => d.DistrictId)
+                    .HasConstraintName("FK_DIstrictCities_DistrictId");
             });
 
             modelBuilder.Entity<Districts>(entity =>

@@ -35,6 +35,7 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<CuisineType>           CuisineTypes           { get { return this.GetTable<CuisineType>(); } }
 		public ITable<DenyType>              DenyTypes              { get { return this.GetTable<DenyType>(); } }
 		public ITable<District>              Districts              { get { return this.GetTable<District>(); } }
+		public ITable<DIstrictCity>          DIstrictCities         { get { return this.GetTable<DIstrictCity>(); } }
 		public ITable<EquipmentType>         EquipmentTypes         { get { return this.GetTable<EquipmentType>(); } }
 		public ITable<Hotel>                 Hotels                 { get { return this.GetTable<Hotel>(); } }
 		public ITable<HotelEquipmentType>    HotelEquipmentTypes    { get { return this.GetTable<HotelEquipmentType>(); } }
@@ -184,6 +185,14 @@ namespace JwtWebApi.Link2DbProvider
 	{
 		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
 		[Column,     Nullable] public string Name { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="DIstrictCities")]
+	public partial class DIstrictCity : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id         { get; set; } // integer
+		[Column,     NotNull ] public int DistrictId { get; set; } // integer
+		[Column,     NotNull ] public int CityId     { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="EquipmentTypes")]

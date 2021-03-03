@@ -17,6 +17,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
+        public virtual DistrictCities DistrictCities { get; set; }
         public virtual ICollection<Attractions> Attractions { get; set; }
         public virtual ICollection<Hotels> Hotels { get; set; }
         public virtual ICollection<Restaurants> Restaurants { get; set; }

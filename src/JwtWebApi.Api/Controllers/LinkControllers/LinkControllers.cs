@@ -70,5 +70,10 @@ namespace JwtWebApi.Api.Controllers.LinkControllers
 		}
 	}
 
-	
+	public class DistrictCityController : AuthorizeAdminApiControllerBase<IDistrictCity, DistrictCityModel, IDistrictCityService>
+	{
+		public DistrictCityController(IDistrictCityService service) : base(service)
+		{
+		}
+	}
 }

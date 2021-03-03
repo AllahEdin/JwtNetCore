@@ -79,4 +79,11 @@ namespace JwtWebApi.Api.Services.Dto
 		int PlaceTypeId { get; set; } 
 	}
 
+	public interface IDistrictCity : IEntity
+	{
+		public int Id { get; set; }
+		public int DistrictId { get; set; }
+		public int CityId { get; set; }
+	}
+
 }
