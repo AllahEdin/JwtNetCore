@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.DataProviders.Common.DataObjects;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
 using JwtWebApi.Services.Services.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -78,38 +82,83 @@ namespace JwtWebApi.Api.Services.Impl
 			using (var cp = _contextProviderFactory.Create())
 			{
 
-				var paging =
+				PagingResult<IAttraction> paging =
 					await Get(page, pageSize, filter);
 
-				var routes =
-					await GetLink<RouteAttraction>(paging.Items,
-						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
-
-				var subjects =
-					await GetLink<AttractionSubject>(paging.Items,
-						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
-
-				var pt =
-					await GetLink<AttractionPlaceType>(paging.Items,
-						opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
-
-
-				return new PagingResult<IAttractionWithLinks>()
-				{
-					Total = paging.Total,
-					Items = paging.Items.Select(t => new AttractionWithLinks()
-					{
-						Attraction = t,
-						RouteIds = routes.Where(w => w.AttractionId == t.Id).Select(s => s.RouteId).ToArray(),
-						SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.SubjectId).ToArray(),
-						PlaceTypeIds = pt.Where(w => w.AttractionId == t.Id).Select(s => s.PlaceTypeId).ToArray(),
-					}).ToArray()
-				};
-
+				return await GetPagingWithLinksInternal(paging);
 			};
-			
-
 		}
+
+		public async Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page, int pageSize, string name, int? cityId, int? districtId, int[] subjectIds, int[] placeTypeIds)
+		{
+			using (var cp = _contextProviderFactory.Create())
+			{
+				var attrs =
+					cp.GetTable<Attraction>();
+
+				if (cityId != null)
+				{
+					attrs =
+						attrs.Where(w => w.CityId == cityId);
+				}
+
+				if (!string.IsNullOrEmpty(name))
+				{
+					attrs =
+						attrs.Where(w => w.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+				}
+
+				if (districtId != null)
+				{
+					attrs =
+						attrs.Where(w => w.DistrictId == districtId);
+				}
+
+				if (subjectIds?.Any() ?? false)
+				{
+					var attrSubjIds =
+						cp.GetTable<AttractionSubject>()
+							.ToArray()
+							.GroupBy(atts => atts.AttractionId)
+							.Where(w => subjectIds.All(a => w.Select(s => s.SubjectId).Contains(a)) ).Select(s => s.Key);
+
+					attrs =
+						attrs.Where(w => attrSubjIds.Contains(w.Id));
+				}
+
+				if (placeTypeIds?.Any() ?? false)
+				{
+					var attrSubjIds =
+						cp.GetTable<AttractionPlaceType>()
+							.ToArray()
+							.GroupBy(atts => atts.AttractionId)
+							.Where(w => placeTypeIds.All(a => w.Select(s => s.PlaceTypeId).Contains(a))).Select(s => s.Key);
+
+					attrs =
+						attrs.Where(w => attrSubjIds.Contains(w.Id));
+				}
+
+				IReadOnlyCollection<Attraction> attractions =
+					await attrs.Skip((page - 1) * pageSize)
+						.Take(pageSize)
+						.ToArrayAsync();
+
+				var paging =
+					new PagingResult<IAttraction>()
+					{
+						Total = attrs.Count(),
+						Items = !attractions.Any()
+							? new IAttraction[0]
+							: DtoMapper.Map<IAttraction[]>(attractions),
+					};
+				
+				var res =
+					await GetPagingWithLinksInternal(paging);
+
+				return res;
+			}
+		}
+		
 
 		public override async Task<bool> Delete(int id)
 		{
@@ -172,5 +221,33 @@ namespace JwtWebApi.Api.Services.Impl
 			return true;
 		}
 
+
+		private async Task<PagingResult<IAttractionWithLinks>> GetPagingWithLinksInternal(PagingResult<IAttraction> paging)
+		{
+			var routes =
+				await GetLink<RouteAttraction>(paging.Items,
+					opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
+
+			var subjects =
+				await GetLink<AttractionSubject>(paging.Items,
+					opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
+
+			var pt =
+				await GetLink<AttractionPlaceType>(paging.Items,
+					opt => paging.Items.Select(t => t.Id).Contains(opt.AttractionId));
+
+
+			return new PagingResult<IAttractionWithLinks>()
+			{
+				Total = paging.Total,
+				Items = paging.Items.Select(t => new AttractionWithLinks()
+				{
+					Attraction = t,
+					RouteIds = routes.Where(w => w.AttractionId == t.Id).Select(s => s.RouteId).ToArray(),
+					SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.SubjectId).ToArray(),
+					PlaceTypeIds = pt.Where(w => w.AttractionId == t.Id).Select(s => s.PlaceTypeId).ToArray(),
+				}).ToArray()
+			};
+		}
 	}
 }
