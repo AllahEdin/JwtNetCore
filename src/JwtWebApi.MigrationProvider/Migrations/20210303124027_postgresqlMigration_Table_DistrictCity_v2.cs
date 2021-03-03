@@ -19,12 +19,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 newName: "IX_DIstrictCities_CityId");
 
             migrationBuilder.CreateIndex(
-                name: "UIX_DistrictCities_DistrictId",
-                schema: "places",
-                table: "DIstrictCities",
-                column: "DistrictId");
-
-            migrationBuilder.CreateIndex(
                 name: "UIX_DistrictCities_DistrictId_CityId",
                 schema: "places",
                 table: "DIstrictCities",
@@ -34,12 +28,8 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "UIX_DistrictCities_DistrictId",
-                schema: "places",
-                table: "DIstrictCities");
 
-            migrationBuilder.DropIndex(
+	        migrationBuilder.DropIndex(
                 name: "UIX_DistrictCities_DistrictId_CityId",
                 schema: "places",
                 table: "DIstrictCities");
