@@ -41,8 +41,10 @@ namespace JwtWebApi.Services
 							? val
 							: deserialized.Value;
 					return deserialized;
-				case "Complex":
-					return JsonConvert.DeserializeObject<ComplexFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
+				case "Binary":
+					return JsonConvert.DeserializeObject<BinaryFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
+				case "Group":
+					return JsonConvert.DeserializeObject<GroupFilterUnit>(jo.ToString(), SpecifiedSubclassConversion);
 				default:
 					throw new InvalidOperationException();
 			}

@@ -12,8 +12,11 @@ namespace JwtWebApi.Services.Services.Expressions
 		[EnumMember(Value = "Const")]
 		Const = 2,
 
-		[EnumMember(Value = "Complex")]
-		Complex = 3
+		[EnumMember(Value = "Binary")]
+		Binary = 3,
+
+		[EnumMember(Value = "Group")]
+		Group = 4,
 	}
 
 	[JsonConverter(typeof(FilterConverter))]
@@ -46,15 +49,26 @@ namespace JwtWebApi.Services.Services.Expressions
 		}
 	}
 
-	public class ComplexFilterUnit : FilterUnitBase
+	public class BinaryFilterUnit : FilterUnitBase
 	{
 		public FilterUnitBase Unit1 { get; set; }
 
 		public FilterUnitBase Unit2 { get; set; }
 
-		public CustomBinaryExpression.OperatorType OperatorType { get; set; }
+		public OperatorType OperatorType { get; set; }
 
-		public ComplexFilterUnit() : base(FilterUnitType.Complex)
+		public BinaryFilterUnit() : base(FilterUnitType.Binary)
+		{
+		}
+	}
+
+	public class GroupFilterUnit : FilterUnitBase
+	{
+		public FilterUnitBase[] Units { get; set; }
+
+		public OperatorType OperatorType { get; set; }
+
+		public GroupFilterUnit() : base(FilterUnitType.Group)
 		{
 		}
 	}

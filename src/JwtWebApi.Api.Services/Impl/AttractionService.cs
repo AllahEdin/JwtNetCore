@@ -114,17 +114,17 @@ namespace JwtWebApi.Api.Services.Impl
 						attrs.Where(w => w.DistrictId == districtId);
 				}
 
-				if (subjectIds?.Any() ?? false)
-				{
-					var attrSubjIds =
-						cp.GetTable<AttractionSubject>()
-							.ToArray()
-							.GroupBy(atts => atts.AttractionId)
-							.Where(w => subjectIds.All(a => w.Select(s => s.SubjectId).Contains(a)) ).Select(s => s.Key);
+				//if (subjectIds?.Any() ?? false)
+				//{
+				//	var attrSubjIds =
+				//		cp.GetTable<AttractionSubject>()
+				//			.ToArray()
+				//			.GroupBy(atts => atts.AttractionId)
+				//			.Where(w => subjectIds.All(a => w.Select(s => s.SubjectId).Contains(a)) ).Select(s => s.Key);
 
-					attrs =
-						attrs.Where(w => attrSubjIds.Contains(w.Id));
-				}
+				//	attrs =
+				//		attrs.Where(w => attrSubjIds.Contains(w.Id));
+				//}
 
 				if (placeTypeIds?.Any() ?? false)
 				{

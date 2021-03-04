@@ -4,7 +4,7 @@
 	{
 		public OrderModel Order { get; set; }
 
-		public ComplexFilterUnit Filter { get; set; }
+		public FilterUnitBase Filter { get; set; }
 	}
 
 }
