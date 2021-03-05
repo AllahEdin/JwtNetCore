@@ -1,7 +1,7 @@
 on:
   push:
     branches: 
-     - development
+     - develop
 jobs:
   build_dev:
 
