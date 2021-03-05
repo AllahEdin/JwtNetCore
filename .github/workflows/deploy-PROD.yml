@@ -1,0 +1,29 @@
+on:
+  push:
+    branches: 
+     - main
+jobs:
+  build_dev:
+
+    name: Deploy Docker Image - PROD
+    runs-on: [self-hosted, dev]
+    
+    steps:
+    
+      - name: Checkout Code
+        uses: actions/checkout@v2.3.4
+   
+      - name: Rmi Images
+        run: docker rmi cheekibreeki228/test_repos:prod --force
+        
+      - name: Build Images
+        run: cd src/; docker build -t cheekibreeki228/test_repos:prod .
+        
+      - name: Deploy Image
+        run:  cat /usr/app/PROD/dockerhub_password | docker login --username cheekibreeki228 --password-stdin; docker push cheekibreeki228/test_repos:prod
+  
+      - name: Stop Service
+        run: cd src/;docker-compose -f docker-compose.PROD.yml down --rmi all
+        
+      - name: Start Service
+        run: cd src/;docker-compose -f docker-compose.PROD.yml up -d
