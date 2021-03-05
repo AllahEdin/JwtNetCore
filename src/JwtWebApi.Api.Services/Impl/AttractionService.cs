@@ -21,15 +21,18 @@ namespace JwtWebApi.Api.Services.Impl
 	{
 		private readonly IContextProviderFactory _contextProviderFactory;
 		private readonly IAttractionSubjectsService _attractionSubjectsService;
+		private readonly IAttractionPlaceTypeService _attractionPlaceTypeService;
 		private readonly IRouteAttractionService _routeAttractionService;
 
 		public AttractionService(IContextProviderFactory contextProviderFactory, 
 			IAttractionSubjectsService attractionSubjectsService, 
-			IRouteAttractionService routeAttractionService) : base(contextProviderFactory)
+			IRouteAttractionService routeAttractionService, 
+			IAttractionPlaceTypeService attractionPlaceTypeService) : base(contextProviderFactory)
 		{
 			_contextProviderFactory = contextProviderFactory;
 			_attractionSubjectsService = attractionSubjectsService;
 			_routeAttractionService = routeAttractionService;
+			_attractionPlaceTypeService = attractionPlaceTypeService;
 		}
 
 		protected override async Task<IAttraction> Update(IContextProvider provider, IAttraction model)
@@ -58,6 +61,7 @@ namespace JwtWebApi.Api.Services.Impl
 					{
 						CityId = model.CityId > 0 ? model.CityId : attraction.CityId,
 						DistrictId = model.DistrictId > 0 ? model.DistrictId : attraction.DistrictId,
+						Discount = model.Discount > -1 ? model.Discount : attraction.Discount,
 						BuildDate = model.BuildDate > default(DateTimeOffset) ? model.BuildDate : attraction.BuildDate,
 						Address = string.IsNullOrEmpty(model.Address) ? attraction.Address : model.Address,
 						Name = string.IsNullOrEmpty(model.Name) ? attraction.Name : model.Name,
@@ -66,6 +70,7 @@ namespace JwtWebApi.Api.Services.Impl
 						Longitude = string.IsNullOrEmpty(model.Longitude) ? attraction.Longitude : model.Longitude,
 						Path = string.IsNullOrEmpty(model.Path) ? attraction.Path : model.Path,
 						Preview = string.IsNullOrEmpty(model.Preview) ? attraction.Preview : model.Preview,
+						Duration = model.Duration > 0 ? model.Duration : attraction.Duration,
 					});
 
 			return model;
@@ -114,28 +119,32 @@ namespace JwtWebApi.Api.Services.Impl
 						attrs.Where(w => w.DistrictId == districtId);
 				}
 
-				//if (subjectIds?.Any() ?? false)
-				//{
-				//	var attrSubjIds =
-				//		cp.GetTable<AttractionSubject>()
-				//			.ToArray()
-				//			.GroupBy(atts => atts.AttractionId)
-				//			.Where(w => subjectIds.All(a => w.Select(s => s.SubjectId).Contains(a)) ).Select(s => s.Key);
+				if (subjectIds?.Any() ?? false)
+				{
+					var attrSubjIds =
+						await
+							_attractionSubjectsService.Get(1, int.MaxValue, new SearchModel()
+							{
+								Filter = ParameterInArray(nameof(AttractionSubject.SubjectId),
+									placeTypeIds.Cast<object>().ToArray())
+							});
 
-				//	attrs =
-				//		attrs.Where(w => attrSubjIds.Contains(w.Id));
-				//}
+					attrs =
+						attrs.Where(w => attrSubjIds.Items.Select(s => s.AttractionId).Contains(w.Id));
+				}
 
 				if (placeTypeIds?.Any() ?? false)
 				{
-					var attrSubjIds =
-						cp.GetTable<AttractionPlaceType>()
-							.ToArray()
-							.GroupBy(atts => atts.AttractionId)
-							.Where(w => placeTypeIds.All(a => w.Select(s => s.PlaceTypeId).Contains(a))).Select(s => s.Key);
+					var attrPlaceTypes =
+						await
+							_attractionPlaceTypeService.Get(1, int.MaxValue, new SearchModel()
+							{
+								Filter = ParameterInArray(nameof(AttractionPlaceType.PlaceTypeId),
+									placeTypeIds.Cast<object>().ToArray())
+							});
 
 					attrs =
-						attrs.Where(w => attrSubjIds.Contains(w.Id));
+						attrs.Where(w => attrPlaceTypes.Items.Select(s => s.AttractionId).Contains(w.Id));
 				}
 
 				IReadOnlyCollection<Attraction> attractions =
@@ -213,7 +222,7 @@ namespace JwtWebApi.Api.Services.Impl
 
 			foreach (var attractionPlaceType in toDelete3)
 			{
-				await _routeAttractionService.Delete(attractionPlaceType.AttractionId, attractionPlaceType.PlaceTypeId);
+				await _attractionPlaceTypeService.Delete(attractionPlaceType.AttractionId, attractionPlaceType.PlaceTypeId);
 			}
 
 			await base.Delete(id);
@@ -247,6 +256,34 @@ namespace JwtWebApi.Api.Services.Impl
 					SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.SubjectId).ToArray(),
 					PlaceTypeIds = pt.Where(w => w.AttractionId == t.Id).Select(s => s.PlaceTypeId).ToArray(),
 				}).ToArray()
+			};
+		}
+
+		private FilterUnitBase ParameterInArray(string parameterName, object[] inRange)
+		{
+			List<FilterUnitBase> units =
+				new List<FilterUnitBase>();
+
+			foreach (var o in inRange)
+			{
+				units.Add(new BinaryFilterUnit()
+				{
+					OperatorType = OperatorType.Equals,
+					Unit1 = new ParameterFilterUnit()
+					{
+						PropertyName = parameterName
+					},
+					Unit2 = new ConstFilterUnit()
+					{
+						Value = o
+					}
+				});
+			}
+
+			return new GroupFilterUnit()
+			{
+				OperatorType = OperatorType.Or,
+				Units = units.ToArray()
 			};
 		}
 	}

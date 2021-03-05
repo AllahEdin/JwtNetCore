@@ -53,6 +53,7 @@ namespace JwtWebApi.Api.Services.Impl
 					{
 						CityId = model.CityId > 0 ? model.CityId : hotel.CityId,
 						DistrictId = model.DistrictId > 0 ? model.DistrictId : hotel.DistrictId,
+						Discount = model.Discount> -1 ? model.Discount: hotel.Discount,
 						BuildDate = model.BuildDate > default(DateTimeOffset) ? model.BuildDate : hotel.BuildDate,
 						Address = string.IsNullOrEmpty(model.Address) ? hotel.Address : model.Address,
 						Name = string.IsNullOrEmpty(model.Name) ? hotel.Name : model.Name,
