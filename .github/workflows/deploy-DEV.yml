@@ -1,17 +1,13 @@
 on:
   push:
-    branches-ignore: [master]
-  pull_request:
-    branches-ignore: []
-
+    branches: 
+     - develop
 jobs:
-  build:
+  build_dev:
 
     name: Deploy Docker Image - DEV
     runs-on: [self-hosted, dev]
-  
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
- 
+    
     steps:
     
       - name: Checkout Code
