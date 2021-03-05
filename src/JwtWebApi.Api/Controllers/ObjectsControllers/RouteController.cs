@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
+using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.Services.Services.Expressions;
@@ -39,6 +41,21 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		[HttpPost("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IRouteWithLinks>(page, pageSize, filter);
+
+
+		[HttpPost("WithLinks/GetPaging/Custom")]
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] RouteFilteringModel filter)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.CustomFilter(page, pageSize, filter.Name, filter.Animals, filter.PeopleTypeIds, filter.AgeTypeIds, filter.SubjectNameIds, filter.SubjectTypeIds);
+
+			return Ok(pages);
+		}
 
 
 		#region PeopleType

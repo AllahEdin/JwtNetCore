@@ -2,6 +2,13 @@
 
 namespace JwtWebApi.Api.Models
 {
+	public class DistrictCityModel : IDistrictCity
+	{
+		public int Id { get; set; }
+		public int DistrictId { get; set; }
+		public int CityId { get; set; }
+	}
+
 	public class RestaurantCuisineTypesModel : IRestaurantCuisineTypes
 	{
 		public int Id { get; set; }

@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
+using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Models;
+using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.Services.Services.Expressions;
@@ -32,6 +35,20 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IAttractionWithLinks>(page, pageSize, filter);
 
+		[HttpPost("WithLinks/GetPaging/Custom")]
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] AttractionFilteringModel filter)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.CustomFilter(page, pageSize, filter.Name, filter.CityId, filter.DistrictId, filter.SubjectIds,
+					filter.PlaceTypeIds);
+
+			return Ok(pages);
+		}
 
 		[Authorize(Roles = "admin")]
 		[HttpPost("{attractionId}/" + nameof(AddSubjectById))]

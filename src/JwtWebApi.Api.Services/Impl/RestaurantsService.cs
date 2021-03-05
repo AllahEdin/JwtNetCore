@@ -63,6 +63,7 @@ namespace JwtWebApi.Api.Services.Impl
 						Longitude = string.IsNullOrEmpty(model.Longitude) ? rest.Longitude : model.Longitude,
 						Path = string.IsNullOrEmpty(model.Path) ? rest.Path : model.Path,
 						Preview = string.IsNullOrEmpty(model.Preview) ? rest.Preview : model.Preview,
+						Discount = model.Discount > -1 ? model.Discount : rest.Discount,
 					});
 
 			return model;

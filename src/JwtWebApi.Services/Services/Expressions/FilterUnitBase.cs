@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -14,8 +12,11 @@ namespace JwtWebApi.Services.Services.Expressions
 		[EnumMember(Value = "Const")]
 		Const = 2,
 
-		[EnumMember(Value = "Complex")]
-		Complex = 3
+		[EnumMember(Value = "Binary")]
+		Binary = 3,
+
+		[EnumMember(Value = "Group")]
+		Group = 4,
 	}
 
 	[JsonConverter(typeof(FilterConverter))]
@@ -48,62 +49,27 @@ namespace JwtWebApi.Services.Services.Expressions
 		}
 	}
 
-	public class ComplexFilterUnit : FilterUnitBase
+	public class BinaryFilterUnit : FilterUnitBase
 	{
 		public FilterUnitBase Unit1 { get; set; }
 
 		public FilterUnitBase Unit2 { get; set; }
 
-		public CustomBinaryExpression.OperatorType OperatorType { get; set; }
+		public OperatorType OperatorType { get; set; }
 
-		public ComplexFilterUnit() : base(FilterUnitType.Complex)
+		public BinaryFilterUnit() : base(FilterUnitType.Binary)
 		{
 		}
 	}
 
-	public class Search<TDb>
+	public class GroupFilterUnit : FilterUnitBase
 	{
-		private ComplexFilterUnit _filter { get; set; }
+		public FilterUnitBase[] Units { get; set; }
 
-		public Search(ComplexFilterUnit filter)
+		public OperatorType OperatorType { get; set; }
+
+		public GroupFilterUnit() : base(FilterUnitType.Group)
 		{
-			_filter =
-				filter;
-		}
-
-		public IExpression CreateExpression(Expression parameter)
-		{
-			var expr =
-				GetByUnit(_filter, parameter);
-
-			return expr;
-		}
-
-		private IExpression GetByUnit(FilterUnitBase unit, Expression parameterExpression)
-		{
-			if (unit is ParameterFilterUnit parameter)
-			{
-				return new PropertyExpression(parameterExpression, parameter.PropertyName);
-			}
-			else
-			if (unit is ConstFilterUnit constant)
-			{
-				return new ConstExpression(constant.Value, constant.Value.GetType());
-			}
-			else if (unit is ComplexFilterUnit complex)
-			{
-				var expr1 =
-					GetByUnit(complex.Unit1, parameterExpression);
-
-				var expr2 =
-					GetByUnit(complex.Unit2, parameterExpression);
-
-				return new CustomBinaryExpression(expr1, expr2, complex.OperatorType);
-			}
-			else
-			{
-				throw new InvalidOperationException("");
-			}
 		}
 	}
 }

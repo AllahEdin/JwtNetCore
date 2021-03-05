@@ -207,4 +207,22 @@ namespace JwtWebApi.Api.Services.Impl
 		public Task<bool> Delete(int routeId, int subjectTypeId)
 			=> base.Delete(het => het.RouteId == routeId && het.SubjectTypeId == subjectTypeId);
 	}
+
+	internal class DistrictCityService : EntityProviderBase<IDistrictCity, DIstrictCity>, IDistrictCityService
+	{
+		public DistrictCityService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+
+		protected override Task<IDistrictCity> Update(IContextProvider provider, IDistrictCity model)
+		{
+			throw new NotSupportedException();
+		}
+
+		protected override bool CanBeDeleted()
+			=> true;
+
+		public Task<bool> Delete(int routeId, int subjectTypeId)
+			=> base.Delete(het => het.DistrictId == routeId && het.CityId == subjectTypeId);
+	}
 }

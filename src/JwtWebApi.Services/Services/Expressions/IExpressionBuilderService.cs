@@ -8,6 +8,20 @@ using System.Runtime.Serialization;
 namespace JwtWebApi.Services.Services.Expressions
 {
 
+	public enum OperatorType
+	{
+		[EnumMember(Value = "And")]
+		And,
+		[EnumMember(Value = "Or")]
+		Or,
+		[EnumMember(Value = "GraterThan")]
+		GraterThan,
+		[EnumMember(Value = "Equals")]
+		Equals,
+		[EnumMember(Value = "Contains")]
+		Contains
+	}
+
 	public interface IExpression
 	{
 		Expression GetExpression();
@@ -109,20 +123,7 @@ namespace JwtWebApi.Services.Services.Expressions
 
 	public class CustomBinaryExpression : IExpression
 	{
-		public enum OperatorType
-		{
-			[EnumMember(Value = "And")]
-			And,
-			[EnumMember(Value = "Or")]
-			Or,
-			[EnumMember(Value = "GraterThan")]
-			GraterThan,
-			[EnumMember(Value = "Equals")]
-			Equals,
-			[EnumMember(Value = "Contains")]
-			Contains
-		}
-
+	
 		private readonly Expression _expression;
 
 		public CustomBinaryExpression(IExpression e1, IExpression e2, OperatorType operatorType)
@@ -147,10 +148,70 @@ namespace JwtWebApi.Services.Services.Expressions
 						Expression.Equal(e1.GetExpression(), e2.GetExpression());
 					break;
 				case OperatorType.Contains:
-					MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-					var containsMethodExp = Expression.Call(e1.GetExpression(), method, e2.GetExpression());
+					MethodInfo toLowerMethod = typeof(string).GetMethod("ToLower", new Type[0] {  });
+					var e1Lower =
+						Expression.Call(e1.GetExpression(), toLowerMethod);
+					var e2Lower =
+						Expression.Call(e2.GetExpression(), toLowerMethod);
+					MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string), typeof(StringComparison) });
+					var containsMethodExp = Expression.Call(e1Lower, method, e2Lower, Expression.Constant(StringComparison.OrdinalIgnoreCase));
 					_expression =
 						containsMethodExp;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(operatorType), operatorType, null);
+			}
+
+		}
+
+		public Expression GetExpression()
+		{
+			return _expression;
+		}
+	}
+
+	public class CustomGroupExpression : IExpression
+	{
+
+		private readonly Expression _expression;
+
+		public CustomGroupExpression(IExpression[] exp, OperatorType operatorType)
+		{
+
+			switch (operatorType)
+			{
+				case OperatorType.And:
+
+					if (exp.Length == 1)
+					{
+						_expression =
+							exp[0].GetExpression();
+					}
+					else
+					{
+						for (var i = 0; i < exp.Length - 1; i++)
+						{
+							_expression =
+								i == 0
+									? Expression.AndAlso(exp[i].GetExpression(), exp[i + 1].GetExpression())
+									: Expression.AndAlso(_expression, exp[i + 1].GetExpression());
+						}
+					}
+					break;
+				case OperatorType.Or:
+
+					if (exp.Length == 1)
+					{
+						_expression =
+							exp[0].GetExpression();
+					}
+					for (var i = 0; i < exp.Length - 1; i++)
+					{
+						_expression =
+							i == 0
+								? Expression.Or(exp[i].GetExpression(), exp[i + 1].GetExpression())
+								: Expression.Or(_expression, exp[i + 1].GetExpression());
+					}
 					break;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(operatorType), operatorType, null);

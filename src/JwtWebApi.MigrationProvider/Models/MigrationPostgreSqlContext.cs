@@ -28,6 +28,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<Cities> Cities { get; set; }
         public virtual DbSet<CuisineTypes> CuisineTypes { get; set; }
         public virtual DbSet<DenyTypes> DenyTypes { get; set; }
+        public virtual DbSet<DistrictCities> DistrictCities { get; set; }
         public virtual DbSet<Districts> Districts { get; set; }
         public virtual DbSet<EquipmentTypes> EquipmentTypes { get; set; }
         public virtual DbSet<HotelEquipmentTypes> HotelEquipmentTypes { get; set; }
@@ -72,7 +73,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<AspNetRoles>(entity =>
@@ -243,7 +246,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<Cities>(entity =>
@@ -267,7 +272,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<DenyTypes>(entity =>
@@ -279,7 +286,33 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<DistrictCities>(entity =>
+            {
+                entity.ToTable("DIstrictCities", "places");
+
+                entity.HasIndex(e => e.CityId, "UIX_DistrictCities_CityId");
+
+                entity.HasIndex(e => e.DistrictId, "UIX_DistrictCities_DistrictId");
+
+                entity.HasIndex(e => new { e.DistrictId, e.CityId }, "UIX_DistrictCities_DistrictId_CityId")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.City)
+                    .WithMany(p => p.DistrictCities)
+                    .HasForeignKey(d => d.CityId)
+                    .HasConstraintName("FK_DIstrictCities_CityId");
+
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.DistrictCities)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_DIstrictCities_DistrictId");
             });
 
             modelBuilder.Entity<Districts>(entity =>
@@ -291,7 +324,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<EquipmentTypes>(entity =>
@@ -303,7 +338,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<HotelEquipmentTypes>(entity =>
@@ -415,7 +452,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<PeopleTypes>(entity =>
@@ -427,7 +466,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<PlaceTypes>(entity =>
@@ -439,7 +480,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<RestaurantCuisineTypes>(entity =>
@@ -655,6 +698,10 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
+                entity.Property(e => e.CityId).HasDefaultValueSql("1");
+
+                entity.Property(e => e.DistrictId).HasDefaultValueSql("1");
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255);
@@ -662,6 +709,16 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Path)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.HasOne(d => d.City)
+                    .WithMany(p => p.Routes)
+                    .HasForeignKey(d => d.CityId)
+                    .HasConstraintName("FK_Routes_CityId");
+
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.Routes)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_Routes_DistrictId");
             });
 
             modelBuilder.Entity<ServiceTypes>(entity =>
@@ -673,7 +730,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<SubjectNames>(entity =>
@@ -685,7 +744,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<SubjectTypes>(entity =>
@@ -697,7 +758,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             modelBuilder.Entity<Subjects>(entity =>
@@ -709,7 +772,9 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
-                entity.Property(e => e.Name).HasMaxLength(255);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -47,7 +47,7 @@ namespace JwtWebApi.Api.Common.Extensions
 
 		}
 
-		public static IQueryable<TDb> Where<TDb>(this IQueryable<TDb> source, ComplexFilterUnit filter)
+		public static IQueryable<TDb> Where<TDb>(this IQueryable<TDb> source, FilterUnitBase filter)
 
 		{
 			JwtWebApi.Services.Services.Expressions.ParameterExpression parameter =
