@@ -105,5 +105,9 @@ namespace JwtWebApi.Api.Services.Dto
 		 public int Length { get; set; } 
 		 public int Time { get; set; } 
 		 public string Path { get; set; } 
+		 
+		 public int DistrictId { get; set; }
+		 
+		 public int CityId { get; set; }
 	}
 }

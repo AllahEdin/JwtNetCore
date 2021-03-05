@@ -66,6 +66,8 @@ namespace JwtWebApi.Api.Services.Impl
 					.Where(t => t.Id == model.Id)
 					.UpdateAsync(t => new Route()
 					{
+						CityId = model.CityId > 0? model.CityId : t.CityId,
+						DistrictId = model.DistrictId > 0 ? model.DistrictId : t.DistrictId,
 						Length = model.Length > 0 ? model.Length : t.Length,
 						Path = string.IsNullOrEmpty(model.Path) ? t.Path : model.Path,
 						Name = string.IsNullOrEmpty(model.Name) ? t.Name : model.Name,
