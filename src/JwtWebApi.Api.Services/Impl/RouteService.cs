@@ -96,12 +96,20 @@ namespace JwtWebApi.Api.Services.Impl
 		}
 
 		public async Task<PagingResult<IRouteWithLinks>> CustomFilter(int page, int pageSize, string name, bool? animals, int[] peopleTypeIds, int[] ageTypeIds,
-			int[] subjectNameIds, int[] subjectTypeIds)
+			int[] subjectNameIds, int[] subjectTypeIds, int? cityId, int? districtId)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
 				var routes =
 					cp.GetTable<Route>();
+
+				if (cityId != null) {
+					routes = routes.Where(w => w.CityId == cityId);
+				}
+				
+				if (districtId != null) {
+					routes = routes.Where(w => w.DistrictId == districtId);
+				}
 
 				if (animals != null)
 				{
@@ -152,13 +160,13 @@ namespace JwtWebApi.Api.Services.Impl
 						routes.Where(w => attrSubjIds.Contains(w.Id));
 				}
 
-				if (subjectNameIds?.Any() ?? false)
+				if (subjectTypeIds?.Any() ?? false)
 				{
 					var attrSubjIds =
 						cp.GetTable<RouteSubjectType>()
 							.ToArray()
 							.GroupBy(atts => atts.RouteId)
-							.Where(w => subjectNameIds.All(a => w.Select(s => s.SubjectTypeId).Contains(a))).Select(s => s.Key);
+							.Where(w => subjectTypeIds.All(a => w.Select(s => s.SubjectTypeId).Contains(a))).Select(s => s.Key);
 
 					routes =
 						routes.Where(w => attrSubjIds.Contains(w.Id));

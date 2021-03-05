@@ -13,5 +13,9 @@
 		public int[] SubjectNameIds { get; set; } 
 		 
 		public int[] SubjectTypeIds { get; set; }
+		
+		public int? CityId { get; set; }
+		
+		public int? DistrictId { get; set; }
 	}
 }

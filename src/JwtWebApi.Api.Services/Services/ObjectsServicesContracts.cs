@@ -20,6 +20,7 @@ namespace JwtWebApi.Api.Services.Services
 
 	public interface IRouteService : IEntityProvider<IRoute>, IPagingWithLinksProvider<IRouteWithLinks>
 	{
-		public Task<PagingResult<IRouteWithLinks>> CustomFilter(int page, int pageSize, string name, bool? animals, int[] peopleTypeIds, int[] ageTypeIds, int[] subjectNameIds, int[] subjectTypeIds);
+		public Task<PagingResult<IRouteWithLinks>> CustomFilter(int page, int pageSize, string name, bool? animals, int[] peopleTypeIds, int[] ageTypeIds, int[] subjectNameIds, int[] subjectTypeIds,
+			int? cityId, int? districtId);
 	}
 }
