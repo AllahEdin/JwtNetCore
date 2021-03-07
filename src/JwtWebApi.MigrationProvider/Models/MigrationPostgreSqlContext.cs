@@ -38,6 +38,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<Hotels> Hotels { get; set; }
         public virtual DbSet<HousingTypes> HousingTypes { get; set; }
         public virtual DbSet<PeopleTypes> PeopleTypes { get; set; }
+        public virtual DbSet<PlaceTypeSubjects> PlaceTypeSubjects { get; set; }
         public virtual DbSet<PlaceTypes> PlaceTypes { get; set; }
         public virtual DbSet<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual DbSet<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }
@@ -461,6 +462,17 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsRequired()
                     .HasMaxLength(255)
                     .HasDefaultValueSql("''::character varying");
+            });
+
+            modelBuilder.Entity<PlaceTypeSubjects>(entity =>
+            {
+                entity.ToTable("PlaceTypeSubjects", "places");
+
+                entity.HasIndex(e => new { e.PlaceTypeId, e.SubjectId }, "UIX_PlaceTypeSubjects_PlaceTypeId_SubjectId")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.SubjectId, "UIX_PlaceTypeSubjects_SubjectId")
+                    .IsUnique();
             });
 
             modelBuilder.Entity<PlaceTypes>(entity =>
