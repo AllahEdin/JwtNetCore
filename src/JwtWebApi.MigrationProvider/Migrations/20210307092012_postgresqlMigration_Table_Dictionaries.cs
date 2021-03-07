@@ -79,10 +79,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 schema: "places",
                 table: "RestaurantCuisineTypes");
 
-            migrationBuilder.DropIndex(
-                name: "UIX_DistrictCities_CityId",
-                schema: "places",
-                table: "DIstrictCities");
 
             migrationBuilder.DropIndex(
                 name: "UIX_DistrictCities_DistrictId",
@@ -544,12 +540,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 table: "RestaurantCuisineTypes",
                 columns: new[] { "RestaurantId", "CuisineTypeId" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "UIX_DistrictCities_CityId",
-                schema: "places",
-                table: "DIstrictCities",
-                column: "CityId");
 
             migrationBuilder.CreateIndex(
                 name: "UIX_DistrictCities_DistrictId",
