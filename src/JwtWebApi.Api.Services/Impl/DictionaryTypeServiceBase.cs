@@ -104,6 +104,14 @@ namespace JwtWebApi.Api.Services.Impl
 					filterUnit.Filter = DictRowFilter;
 				}
 			}
+			else
+			{
+				filterUnit =
+					new SearchModel()
+					{
+						Filter = DictRowFilter
+					};
+			}
 
 			var rows =
 				await _dictionaryRowService.Get(page, pageSize, filterUnit);
