@@ -23,7 +23,7 @@ jobs:
         run:  cat /usr/app/PROD/dockerhub_password | docker login --username cheekibreeki228 --password-stdin; docker push cheekibreeki228/test_repos:prod
   
       - name: Stop Service
-        run: cd src/;docker-compose -f docker-compose.PROD.yml down --rmi all
+        run: cd src/;docker-compose -f docker-compose.prod.yml down --rmi all
         
       - name: Start Service
-        run: cd src/;docker-compose -f docker-compose.PROD.yml up -d
+        run: cd src/;docker-compose -f docker-compose.prod.yml up -d
