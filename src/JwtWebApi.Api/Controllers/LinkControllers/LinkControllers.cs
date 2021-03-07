@@ -83,4 +83,11 @@ namespace JwtWebApi.Api.Controllers.LinkControllers
 		{
 		}
 	}
+
+	public class PlaceTypeSubjectController : AuthorizeAdminApiControllerBase<IPlaceTypeSubject, PlaceTypeSubjectModel, IPlaceTypeSubjectService>
+	{
+		public PlaceTypeSubjectController(IPlaceTypeSubjectService service) : base(service)
+		{
+		}
+	}
 }

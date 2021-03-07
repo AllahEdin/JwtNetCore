@@ -120,7 +120,11 @@ namespace JwtWebApi.Api.Services
 				.As<IDistrictCityService>()
 				.SingleInstance();
 
-			
+			builder.RegisterType<PlaceTypeSubjectService>()
+				.As<IPlaceTypeSubjectService>()
+				.SingleInstance();
+
+
 
 			builder.RegisterType<RestaurantsService>()
 				.As<IRestaurantService>()
