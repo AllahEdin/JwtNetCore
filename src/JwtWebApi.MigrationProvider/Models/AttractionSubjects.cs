@@ -12,6 +12,5 @@ namespace JwtWebApi.MigrationProvider.Models
         public int SubjectId { get; set; }
 
         public virtual Attractions Attraction { get; set; }
-        public virtual Subjects Subject { get; set; }
     }
 }

@@ -76,4 +76,11 @@ namespace JwtWebApi.Api.Controllers.LinkControllers
 		{
 		}
 	}
+
+	public class SubjectTypeSubjectNameController : AuthorizeAdminApiControllerBase<ISubjectTypeSubjectName, SubjectTypeSubjectNameModel, ISubjectTypeSubjectNameService>
+	{
+		public SubjectTypeSubjectNameController(ISubjectTypeSubjectNameService service) : base(service)
+		{
+		}
+	}
 }

@@ -10,8 +10,5 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Id { get; set; }
         public int DistrictId { get; set; }
         public int CityId { get; set; }
-
-        public virtual Cities City { get; set; }
-        public virtual Districts District { get; set; }
     }
 }

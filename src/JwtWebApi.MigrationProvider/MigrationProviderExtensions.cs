@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using JwtWebApi.MigrationProvider.Migrations.DataUpdates;
 using JwtWebApi.MigrationProvider.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +9,7 @@ namespace JwtWebApi.MigrationProvider
 {
 	public static class MigrationProviderExtensions
 	{
-		public static void Migrate(this IServiceCollection services, string connectionString, bool dataMigration)
+		public static void Migrate(this IServiceCollection services, string connectionString, bool dataMigration, IEnumerable<IMigrationDataUpdate> additionalMigrations)
 		{
 			if (string.IsNullOrWhiteSpace(connectionString))
 			{
@@ -23,7 +25,7 @@ namespace JwtWebApi.MigrationProvider
 
 			using (MigrationPostgreSqlContext myDbContext = new MigrationPostgreSqlContext(dbContextOptions.Options))
 			{
-				myDbContext.Migrate(new Configuration { AutomaticDataMigrationsEnabled = dataMigration });
+				myDbContext.Migrate(new Configuration(additionalMigrations) { AutomaticDataMigrationsEnabled = dataMigration });
 			}
 		}
 

@@ -11,7 +11,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public int HotelId { get; set; }
         public int EquipmentTypeId { get; set; }
 
-        public virtual EquipmentTypes EquipmentType { get; set; }
         public virtual Hotels Hotel { get; set; }
     }
 }

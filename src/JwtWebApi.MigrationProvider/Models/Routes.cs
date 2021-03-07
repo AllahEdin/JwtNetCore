@@ -22,11 +22,9 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Length { get; set; }
         public int Time { get; set; }
         public string Path { get; set; }
-        public int DistrictId { get; set; }
         public int CityId { get; set; }
+        public int DistrictId { get; set; }
 
-        public virtual Cities City { get; set; }
-        public virtual Districts District { get; set; }
         public virtual ICollection<RouteAgeTypes> RouteAgeTypes { get; set; }
         public virtual ICollection<RouteAttractions> RouteAttractions { get; set; }
         public virtual ICollection<RoutePeopleTypes> RoutePeopleTypes { get; set; }

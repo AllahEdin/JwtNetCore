@@ -4,4 +4,9 @@
 	{
 		string Name { get; set; }
 	}
+
+	public interface IWeight
+	{
+		int Weight { get; set; }
+	}
 }

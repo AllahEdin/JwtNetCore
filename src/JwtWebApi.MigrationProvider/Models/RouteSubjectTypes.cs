@@ -12,6 +12,5 @@ namespace JwtWebApi.MigrationProvider.Models
         public int SubjectTypeId { get; set; }
 
         public virtual Routes Route { get; set; }
-        public virtual SubjectTypes SubjectType { get; set; }
     }
 }

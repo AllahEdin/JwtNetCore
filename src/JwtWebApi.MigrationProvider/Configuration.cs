@@ -1,4 +1,5 @@
-﻿using JwtWebApi.MigrationProvider.Migrations.DataUpdates;
+﻿using System.Collections.Generic;
+using JwtWebApi.MigrationProvider.Migrations.DataUpdates;
 using JwtWebApi.MigrationProvider.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,22 +8,24 @@ namespace JwtWebApi.MigrationProvider
 	/// <inheritdoc />
 	internal sealed class Configuration : DbMigrationConfiguration<MigrationPostgreSqlContext>
 	{
+		private readonly IEnumerable<IMigrationDataUpdate> _migrations;
+
 		private static readonly IMigrationDataUpdate[] DataUpdateServices =
 		{
 			new RolesMigrationDataUpdate(),
-			new CateringTypesMigrationDataUpdate(),
-			new CuisineTypesMigrationDataUpdate(),
-			new DenyTypesMigrationDataUpdate(),
-			new CitiesMigrationDataUpdate(),
-			new EquipmentTypesMigrationDataUpdate(),
-			new HousingTypesMigrationDataUpdate(),
-			new ServiceTypesMigrationDataUpdate(),
-			new DistrictsMigrationDataUpdate()
+			//new CateringTypesMigrationDataUpdate(),
+			//new CuisineTypesMigrationDataUpdate(),
+			//new DenyTypesMigrationDataUpdate(),
+			//new EquipmentTypesMigrationDataUpdate(),
+			//new HousingTypesMigrationDataUpdate(),
+			//new ServiceTypesMigrationDataUpdate(),
+			//new DistrictsMigrationDataUpdate()
 		};
 
 		/// <inheritdoc />
-		public Configuration()
+		public Configuration(IEnumerable<IMigrationDataUpdate> migrations)
 		{
+			_migrations = migrations;
 			AutomaticMigrationsEnabled = false;
 		}
 
@@ -30,6 +33,11 @@ namespace JwtWebApi.MigrationProvider
 		protected override void Seed(MigrationPostgreSqlContext context)
 		{
 			foreach (IMigrationDataUpdate migrationDataUpdate in DataUpdateServices)
+			{
+				migrationDataUpdate.Update(context);
+			}
+
+			foreach (IMigrationDataUpdate migrationDataUpdate in _migrations)
 			{
 				migrationDataUpdate.Update(context);
 			}

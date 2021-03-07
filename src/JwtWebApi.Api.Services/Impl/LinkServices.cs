@@ -19,6 +19,13 @@ namespace JwtWebApi.Api.Services.Impl
 			throw new NotSupportedException();
 		}
 
+		//protected override Func<RestaurantCuisineType, IRestaurantCuisineTypes, RestaurantCuisineType> GetUpdateFunc() =>
+		//	(type, types) => new RestaurantCuisineType()
+		//	{
+		//		CuisineTypeId = types.CuisineTypeId > 0 ? types.CuisineTypeId : type.CuisineTypeId,
+		//		RestaurantId = types.RestaurantId > 0 ? types.RestaurantId : type.RestaurantId,
+		//	};
+
 		protected override bool CanBeDeleted()
 			=> true;
 
@@ -224,5 +231,23 @@ namespace JwtWebApi.Api.Services.Impl
 
 		public Task<bool> Delete(int routeId, int subjectTypeId)
 			=> base.Delete(het => het.DistrictId == routeId && het.CityId == subjectTypeId);
+	}
+
+	internal class SubjectTypeSubjectNameService : EntityProviderBase<ISubjectTypeSubjectName, SubjectTypeSubjectName>, ISubjectTypeSubjectNameService
+	{
+		public SubjectTypeSubjectNameService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+
+		protected override Task<ISubjectTypeSubjectName> Update(IContextProvider provider, ISubjectTypeSubjectName model)
+		{
+			throw new NotSupportedException();
+		}
+
+		protected override bool CanBeDeleted()
+			=> true;
+
+		public Task<bool> Delete(int subjectTypeId, int subjectNameId)
+			=> base.Delete(het => het.SubjectTypeId == subjectTypeId && het.SubjectNameId == subjectNameId);
 	}
 }

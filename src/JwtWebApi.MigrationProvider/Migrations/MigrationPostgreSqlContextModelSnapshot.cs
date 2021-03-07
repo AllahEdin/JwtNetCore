@@ -29,8 +29,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -224,9 +226,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DistrictId");
-
                     b.HasIndex(new[] { "CityId" }, "IX_Attractions_CityId");
+
+                    b.HasIndex(new[] { "DistrictId" }, "IX_Attractions_DistrictId");
 
                     b.ToTable("Attractions", "places");
                 });
@@ -240,8 +242,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -279,8 +283,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -299,8 +305,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -308,6 +316,54 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsUnique();
 
                     b.ToTable("DenyTypes", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Dictionaries", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Code" }, "UIX_Dictionaries_Code")
+                        .IsUnique();
+
+                    b.ToTable("Dictionaries", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.DictionaryRows", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("DictionaryCode")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("Weight")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "DictionaryCode", "Value" }, "UIX_DictionaryRows_DictionaryCode_Value")
+                        .IsUnique();
+
+                    b.ToTable("DictionaryRows", "places");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.DistrictCities", b =>
@@ -325,9 +381,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "CityId" }, "UIX_DistrictCities_CityId");
+                    b.HasIndex(new[] {"CityId"}, "IX_DIstrictCities_CityId");
 
-                    b.HasIndex(new[] { "DistrictId" }, "UIX_DistrictCities_DistrictId");
+                    b.HasIndex(new[] {"DistrictId"}, "IX_DIstrictCities_DistrictId");
 
                     b.HasIndex(new[] { "DistrictId", "CityId" }, "UIX_DistrictCities_DistrictId_CityId")
                         .IsUnique();
@@ -340,12 +396,14 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .UseIdentityAlwaysColumn();
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -364,8 +422,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -484,9 +544,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DistrictId");
-
                     b.HasIndex(new[] { "CityId" }, "IX_Hotels_CityId");
+
+                    b.HasIndex(new[] { "DistrictId" }, "IX_Hotels_DistrictId");
 
                     b.HasIndex(new[] { "HousingTypeId" }, "IX_Hotels_HousingTypeId");
 
@@ -502,8 +562,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -522,8 +584,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -542,8 +606,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -568,10 +634,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "CuisineTypeId" }, "IX_RestaurantCuisineTypes_CuisineTypeId");
-
-                    b.HasIndex(new[] { "RestaurantId", "CuisineTypeId" }, "UIX_RestaurantCuisineTypes_CuisineTypeId_RestaurantId")
-                        .IsUnique();
+                    b.HasIndex("RestaurantId");
 
                     b.ToTable("RestaurantCuisineTypes", "places");
                 });
@@ -659,11 +722,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DistrictId");
-
                     b.HasIndex(new[] { "CateringTypeId" }, "IX_Restaurants_CateringTypeId");
 
                     b.HasIndex(new[] { "CityId" }, "IX_Restaurants_CityId");
+
+                    b.HasIndex(new[] { "DistrictId" }, "IX_Restaurants_DistrictId");
 
                     b.ToTable("Restaurants", "places");
                 });
@@ -706,9 +769,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AttractionId");
+                    b.HasIndex(new[] { "AttractionId" }, "IX_RouteAttractions_AttractionId");
 
-                    b.HasIndex(new[] { "RouteId" }, "IX_RouteAttractions_RouteId");
+                    b.HasIndex(new[] { "RouteId", "AttractionId" }, "UIX_RouteAttractions_RouteId_AttractionId")
+                        .IsUnique();
 
                     b.ToTable("RouteAttractions", "places");
                 });
@@ -820,9 +884,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId");
+                    b.HasIndex(new[] { "CityId" }, "IX_Routes_CityId");
 
-                    b.HasIndex("DistrictId");
+                    b.HasIndex(new[] { "DistrictId" }, "IX_Routes_DistrictId");
 
                     b.ToTable("Routes", "places");
                 });
@@ -836,8 +900,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -856,8 +922,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -865,6 +933,30 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsUnique();
 
                     b.ToTable("SubjectNames", "places");
+                });
+
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.SubjectTypeSubjectNames", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("SubjectNameId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubjectTypeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "SubjectNameId" }, "UIX_SubjectTypeSubjectNames_SubjectNameId")
+                        .IsUnique();
+
+                    b.HasIndex(new[] { "SubjectTypeId", "SubjectNameId" }, "UIX_SubjectTypeSubjectNames_SubjectNameId_SubjectTypeId")
+                        .IsUnique();
+
+                    b.ToTable("SubjectTypeSubjectNames", "places");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.SubjectTypes", b =>
@@ -876,8 +968,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -896,8 +990,10 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id");
 
@@ -937,16 +1033,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.PlaceTypes", "PlaceType")
-                        .WithMany("AttractionPlaceTypes")
-                        .HasForeignKey("PlaceTypeId")
-                        .HasConstraintName("FK_AttractionPlaceTypes_PlaceTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Attraction");
-
-                    b.Navigation("PlaceType");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AttractionSubjects", b =>
@@ -958,77 +1045,30 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Subjects", "Subject")
-                        .WithMany("AttractionSubjects")
-                        .HasForeignKey("SubjectId")
-                        .HasConstraintName("FK_AttractionSubjects_SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Attraction");
-
-                    b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Attractions", b =>
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.DictionaryRows", b =>
                 {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Cities", "City")
-                        .WithMany("Attractions")
-                        .HasForeignKey("CityId")
-                        .HasConstraintName("FK_Attractions_CityId")
+                    b.HasOne("JwtWebApi.MigrationProvider.Models.Dictionaries", "DictionaryCodeNavigation")
+                        .WithMany("DictionaryRows")
+                        .HasForeignKey("DictionaryCode")
+                        .HasConstraintName("FK_DictionaryRows_DictionaryCode")
+                        .HasPrincipalKey("Code")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Districts", "District")
-                        .WithMany("Attractions")
-                        .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK_Attractions_DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("City");
-
-                    b.Navigation("District");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.DistrictCities", b =>
-                {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Cities", "City")
-                        .WithMany("DistrictCities")
-                        .HasForeignKey("CityId")
-                        .HasConstraintName("FK_DIstrictCities_CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Districts", "District")
-                        .WithMany("DistrictCities")
-                        .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK_DIstrictCities_DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("City");
-
-                    b.Navigation("District");
+                    b.Navigation("DictionaryCodeNavigation");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.HotelEquipmentTypes", b =>
                 {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.EquipmentTypes", "EquipmentType")
-                        .WithMany("HotelEquipmentTypes")
-                        .HasForeignKey("EquipmentTypeId")
-                        .HasConstraintName("FK_HotelEquipmentTypes_CousineTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Hotels", "Hotel")
                         .WithMany("HotelEquipmentTypes")
                         .HasForeignKey("HotelId")
                         .HasConstraintName("FK_HotelEquipmentTypes_HotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("EquipmentType");
 
                     b.Navigation("Hotel");
                 });
@@ -1042,57 +1082,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.ServiceTypes", "ServiceType")
-                        .WithMany("HotelServiceTypes")
-                        .HasForeignKey("ServiceTypeId")
-                        .HasConstraintName("FK_HotelServiceTypes_ServiceTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Hotel");
-
-                    b.Navigation("ServiceType");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Hotels", b =>
-                {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Cities", "City")
-                        .WithMany("Hotels")
-                        .HasForeignKey("CityId")
-                        .HasConstraintName("FK_Hotels_CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Districts", "District")
-                        .WithMany("Hotels")
-                        .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK_Hotels_DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.HousingTypes", "HousingType")
-                        .WithMany("Hotels")
-                        .HasForeignKey("HousingTypeId")
-                        .HasConstraintName("FK_Hotels_HousingTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("City");
-
-                    b.Navigation("District");
-
-                    b.Navigation("HousingType");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RestaurantCuisineTypes", b =>
                 {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.CuisineTypes", "CuisineType")
-                        .WithMany("RestaurantCuisineTypes")
-                        .HasForeignKey("CuisineTypeId")
-                        .HasConstraintName("FK_RestaurantCoisineTypes_CousineTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Restaurants", "Restaurant")
                         .WithMany("RestaurantCuisineTypes")
                         .HasForeignKey("RestaurantId")
@@ -1100,20 +1094,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CuisineType");
-
                     b.Navigation("Restaurant");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RestaurantDenyTypes", b =>
                 {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.DenyTypes", "DenyType")
-                        .WithMany("RestaurantDenyTypes")
-                        .HasForeignKey("DenyTypeId")
-                        .HasConstraintName("FK_RestaurantDenyTypes_DenyTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Restaurants", "Restaurant")
                         .WithMany("RestaurantDenyTypes")
                         .HasForeignKey("RestaurantId")
@@ -1121,58 +1106,17 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DenyType");
-
                     b.Navigation("Restaurant");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Restaurants", b =>
-                {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.CateringTypes", "CateringType")
-                        .WithMany("Restaurants")
-                        .HasForeignKey("CateringTypeId")
-                        .HasConstraintName("FK_Restaurants_CateringTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Cities", "City")
-                        .WithMany("Restaurants")
-                        .HasForeignKey("CityId")
-                        .HasConstraintName("FK_Restaurants_CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Districts", "District")
-                        .WithMany("Restaurants")
-                        .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK_Restaurants_DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CateringType");
-
-                    b.Navigation("City");
-
-                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteAgeTypes", b =>
                 {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.AgeTypes", "AgeType")
-                        .WithMany("RouteAgeTypes")
-                        .HasForeignKey("AgeTypeId")
-                        .HasConstraintName("FK_RouteAgeTypes_AgeTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Routes", "Route")
                         .WithMany("RouteAgeTypes")
                         .HasForeignKey("RouteId")
                         .HasConstraintName("FK_RouteAgeTypes_RouteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AgeType");
 
                     b.Navigation("Route");
                 });
@@ -1200,21 +1144,12 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RoutePeopleTypes", b =>
                 {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.PeopleTypes", "PeopleType")
-                        .WithMany("RoutePeopleTypes")
-                        .HasForeignKey("PeopleTypeId")
-                        .HasConstraintName("FK_RoutePeopleTypes_PeopleTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Routes", "Route")
                         .WithMany("RoutePeopleTypes")
                         .HasForeignKey("RouteId")
                         .HasConstraintName("FK_RoutePeopleTypes_RouteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("PeopleType");
 
                     b.Navigation("Route");
                 });
@@ -1228,16 +1163,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.SubjectNames", "SubjectName")
-                        .WithMany("RouteSubjectNames")
-                        .HasForeignKey("SubjectNameId")
-                        .HasConstraintName("FK_RouteSubjectNames_SubjectNameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Route");
-
-                    b.Navigation("SubjectName");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.RouteSubjectTypes", b =>
@@ -1249,42 +1175,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.SubjectTypes", "SubjectType")
-                        .WithMany("RouteSubjectTypes")
-                        .HasForeignKey("SubjectTypeId")
-                        .HasConstraintName("FK_RouteSubjectTypes_SubjectTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Route");
-
-                    b.Navigation("SubjectType");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Routes", b =>
-                {
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Cities", "City")
-                        .WithMany("Routes")
-                        .HasForeignKey("CityId")
-                        .HasConstraintName("FK_Routes_CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JwtWebApi.MigrationProvider.Models.Districts", "District")
-                        .WithMany("Routes")
-                        .HasForeignKey("DistrictId")
-                        .HasConstraintName("FK_Routes_DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("City");
-
-                    b.Navigation("District");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.AgeTypes", b =>
-                {
-                    b.Navigation("RouteAgeTypes");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Attractions", b =>
@@ -1296,50 +1187,9 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Navigation("RouteAttractions");
                 });
 
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.CateringTypes", b =>
+            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Dictionaries", b =>
                 {
-                    b.Navigation("Restaurants");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Cities", b =>
-                {
-                    b.Navigation("Attractions");
-
-                    b.Navigation("DistrictCities");
-
-                    b.Navigation("Hotels");
-
-                    b.Navigation("Restaurants");
-
-                    b.Navigation("Routes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.CuisineTypes", b =>
-                {
-                    b.Navigation("RestaurantCuisineTypes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.DenyTypes", b =>
-                {
-                    b.Navigation("RestaurantDenyTypes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Districts", b =>
-                {
-                    b.Navigation("Attractions");
-
-                    b.Navigation("DistrictCities");
-
-                    b.Navigation("Hotels");
-
-                    b.Navigation("Restaurants");
-
-                    b.Navigation("Routes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.EquipmentTypes", b =>
-                {
-                    b.Navigation("HotelEquipmentTypes");
+                    b.Navigation("DictionaryRows");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Hotels", b =>
@@ -1347,21 +1197,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Navigation("HotelEquipmentTypes");
 
                     b.Navigation("HotelServiceTypes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.HousingTypes", b =>
-                {
-                    b.Navigation("Hotels");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.PeopleTypes", b =>
-                {
-                    b.Navigation("RoutePeopleTypes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.PlaceTypes", b =>
-                {
-                    b.Navigation("AttractionPlaceTypes");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Restaurants", b =>
@@ -1382,26 +1217,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Navigation("RouteSubjectNames");
 
                     b.Navigation("RouteSubjectTypes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.ServiceTypes", b =>
-                {
-                    b.Navigation("HotelServiceTypes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.SubjectNames", b =>
-                {
-                    b.Navigation("RouteSubjectNames");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.SubjectTypes", b =>
-                {
-                    b.Navigation("RouteSubjectTypes");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Subjects", b =>
-                {
-                    b.Navigation("AttractionSubjects");
                 });
 #pragma warning restore 612, 618
         }

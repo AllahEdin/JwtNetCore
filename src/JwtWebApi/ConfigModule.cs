@@ -2,6 +2,7 @@
 using JwtWebApi.Common.Services;
 using JwtWebApi.Impl;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.MigrationProvider.Migrations.DataUpdates;
 using JwtWebApi.Services.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -47,6 +48,10 @@ namespace JwtWebApi
 
 			builder.RegisterType<GoogleSecretKeyProvider>()
 				.As<IGoogleSecretKeyProvider>()
+				.SingleInstance();
+
+			builder.RegisterType<ToDictDataUpdate>()
+				.As<IMigrationDataUpdate>()
 				.SingleInstance();
 		}
 	}

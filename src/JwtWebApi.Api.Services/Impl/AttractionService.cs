@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
-using JwtWebApi.DataProviders.Common.DataObjects;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
 using JwtWebApi.Services.Services.Expressions;
-using Microsoft.EntityFrameworkCore;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -94,7 +91,8 @@ namespace JwtWebApi.Api.Services.Impl
 			};
 		}
 
-		public async Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page, int pageSize, string name, int? cityId, int? districtId, int[] subjectIds, int[] placeTypeIds)
+
+		public async Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page, int pageSize, string name, int? cityId, int? districtId, int[] subjectIds, int[] placeTypeIds, OrderModel orderModel)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -126,11 +124,15 @@ namespace JwtWebApi.Api.Services.Impl
 							_attractionSubjectsService.Get(1, int.MaxValue, new SearchModel()
 							{
 								Filter = ParameterInArray(nameof(AttractionSubject.SubjectId),
-									placeTypeIds.Cast<object>().ToArray())
+									subjectIds.Cast<object>().ToArray())
 							});
 
+					var groups =
+						attrSubjIds.Items.GroupBy(k => k.AttractionId).Where(w => subjectIds
+							.All(a => w.Select(s => s.SubjectId).Contains(a)));
+
 					attrs =
-						attrs.Where(w => attrSubjIds.Items.Select(s => s.AttractionId).Contains(w.Id));
+						attrs.Where(w => groups.Select(t => t.Key).Contains(w.Id));
 				}
 
 				if (placeTypeIds?.Any() ?? false)
@@ -143,12 +145,21 @@ namespace JwtWebApi.Api.Services.Impl
 									placeTypeIds.Cast<object>().ToArray())
 							});
 
+					var groups =
+						attrPlaceTypes.Items.GroupBy(k => k.AttractionId).Where(w => placeTypeIds
+							.All(a => w.Select(s => s.PlaceTypeId).Contains(a)));
+
 					attrs =
-						attrs.Where(w => attrPlaceTypes.Items.Select(s => s.AttractionId).Contains(w.Id));
+						attrs.Where(w => groups.Select(t => t.Key).Contains(w.Id));
 				}
 
+			
 				IReadOnlyCollection<Attraction> attractions =
-					await attrs.Skip((page - 1) * pageSize)
+					await attrs.GetFilteredTable(new SearchModel()
+						{
+							Order = orderModel
+						}, cp)
+						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();
 

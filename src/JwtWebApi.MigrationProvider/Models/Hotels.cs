@@ -28,9 +28,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public int DistrictId { get; set; }
         public int Discount { get; set; }
 
-        public virtual Cities City { get; set; }
-        public virtual Districts District { get; set; }
-        public virtual HousingTypes HousingType { get; set; }
         public virtual ICollection<HotelEquipmentTypes> HotelEquipmentTypes { get; set; }
         public virtual ICollection<HotelServiceTypes> HotelServiceTypes { get; set; }
     }

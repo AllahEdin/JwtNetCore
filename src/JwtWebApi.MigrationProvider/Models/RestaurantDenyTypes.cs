@@ -11,7 +11,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public int RestaurantId { get; set; }
         public int DenyTypeId { get; set; }
 
-        public virtual DenyTypes DenyType { get; set; }
         public virtual Restaurants Restaurant { get; set; }
     }
 }
