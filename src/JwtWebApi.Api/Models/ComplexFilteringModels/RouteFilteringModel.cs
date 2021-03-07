@@ -1,4 +1,6 @@
-﻿namespace JwtWebApi.Api.Models.ComplexFilteringModels
+﻿using JwtWebApi.Api.Services.Dto;
+
+namespace JwtWebApi.Api.Models.ComplexFilteringModels
 {
 	public class RouteFilteringModel
 	{
@@ -17,5 +19,23 @@
 		public int? CityId { get; set; }
 		
 		public int? DistrictId { get; set; }
+
+		public DurationFilter DurationFilter { get; set; }
+
+		public LengthFilter LengthFilter { get; set; }
+	}
+
+	public class DurationFilter : IFromToFilter<float>
+	{
+		public float From { get; set; }
+
+		public float To { get; set; }
+	}
+
+	public class LengthFilter : IFromToFilter<float>
+	{
+		public float From { get; set; }
+
+		public float To { get; set; }
 	}
 }

@@ -3,61 +3,158 @@ using JwtWebApi.DataProviders.Common.DataObjects;
 
 namespace JwtWebApi.Api.Services.Dto
 {
-	public interface  IDenyType : IEntity, INamed
+	public interface  IDenyType : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface ICateringType : IEntity, INamed
+	internal class DenyTypeLocal : IDenyType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface ICateringType : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface ICuisineType : IEntity, INamed
+	internal class CateringTypeLocal : ICateringType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface ICuisineType : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface ICity : IEntity, INamed
+	internal class CuisineTypeLocal : ICuisineType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface ICity : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface IEquipmentType : IEntity, INamed
+	internal class CityLocal : ICity
 	{
-	}
-
-	public interface IHousingType : IEntity, INamed
-	{
-	}
-
-	public interface IServiceType : IEntity, INamed
-	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 
-
-	public interface IAgeType : IEntity, INamed
+	public interface IEquipmentType : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface IPeopleType : IEntity, INamed
+	internal class EquipmentTypeLocal : IEquipmentType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface IHousingType : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface ISubjectName : IEntity, INamed
+	internal class HousingTypeLocal : IHousingType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface IServiceType : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface ISubject : IEntity, INamed
+	internal class ServiceTypeLocal : IServiceType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface IAgeType : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface ISubjectType : IEntity, INamed
+	internal class AgeTypeLocal : IAgeType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface IPeopleType : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface IPlaceType : IEntity, INamed
+	internal class PeopleTypeLocal : IPeopleType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface ISubjectName : IEntity, INamed, IWeight
 	{
 	}
 
-	public interface IDistrict : IEntity, INamed
+	internal class SubjectNameLocal : ISubjectName
 	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface ISubject : IEntity, INamed, IWeight
+	{
+	}
+
+	internal class SubjectLocal : ISubject
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface ISubjectType : IEntity, INamed, IWeight
+	{
+	}
+
+	internal class SubjectTypeLocal : ISubjectType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface IPlaceType : IEntity, INamed, IWeight
+	{
+	}
+
+	internal class PlaceTypeLocal : IPlaceType
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
+	}
+
+	public interface IDistrict : IEntity, INamed, IWeight
+	{
+	}
+
+	internal class DistrictLocal : IDistrict
+	{
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 }

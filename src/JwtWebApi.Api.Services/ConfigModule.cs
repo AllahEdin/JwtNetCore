@@ -134,6 +134,16 @@ namespace JwtWebApi.Api.Services
 			builder.RegisterType<RouteService>()
 				.As<IRouteService>()
 				.SingleInstance();
+
+
+
+			builder.RegisterType<DictionaryService>()
+				.As<IDictionaryService>()
+				.SingleInstance();
+
+			builder.RegisterType<DictionaryRowService>()
+				.As<IDictionaryRowService>()
+				.SingleInstance();
 		}
 	}
 }

@@ -19,6 +19,13 @@ namespace JwtWebApi.Api.Services.Impl
 			throw new NotSupportedException();
 		}
 
+		//protected override Func<RestaurantCuisineType, IRestaurantCuisineTypes, RestaurantCuisineType> GetUpdateFunc() =>
+		//	(type, types) => new RestaurantCuisineType()
+		//	{
+		//		CuisineTypeId = types.CuisineTypeId > 0 ? types.CuisineTypeId : type.CuisineTypeId,
+		//		RestaurantId = types.RestaurantId > 0 ? types.RestaurantId : type.RestaurantId,
+		//	};
+
 		protected override bool CanBeDeleted()
 			=> true;
 

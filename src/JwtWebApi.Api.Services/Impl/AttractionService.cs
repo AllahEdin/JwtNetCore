@@ -126,11 +126,15 @@ namespace JwtWebApi.Api.Services.Impl
 							_attractionSubjectsService.Get(1, int.MaxValue, new SearchModel()
 							{
 								Filter = ParameterInArray(nameof(AttractionSubject.SubjectId),
-									placeTypeIds.Cast<object>().ToArray())
+									subjectIds.Cast<object>().ToArray())
 							});
 
+					var groups =
+						attrSubjIds.Items.GroupBy(k => k.AttractionId).Where(w => subjectIds
+							.All(a => w.Select(s => s.SubjectId).Contains(a)));
+
 					attrs =
-						attrs.Where(w => attrSubjIds.Items.Select(s => s.AttractionId).Contains(w.Id));
+						attrs.Where(w => groups.Select(t => t.Key).Contains(w.Id));
 				}
 
 				if (placeTypeIds?.Any() ?? false)
@@ -143,8 +147,12 @@ namespace JwtWebApi.Api.Services.Impl
 									placeTypeIds.Cast<object>().ToArray())
 							});
 
+					var groups =
+						attrPlaceTypes.Items.GroupBy(k => k.AttractionId).Where(w => placeTypeIds
+							.All(a => w.Select(s => s.PlaceTypeId).Contains(a)));
+
 					attrs =
-						attrs.Where(w => attrPlaceTypes.Items.Select(s => s.AttractionId).Contains(w.Id));
+						attrs.Where(w => groups.Select(t => t.Key).Contains(w.Id));
 				}
 
 				IReadOnlyCollection<Attraction> attractions =

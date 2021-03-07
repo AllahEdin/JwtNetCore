@@ -21,6 +21,7 @@ namespace JwtWebApi.Api.Common.Services
 		public IMapper DtoMapper { get; set; }
 		protected readonly IContextProviderFactory ContextProviderFactory;
 
+		
 		protected EntityProviderBase(IContextProviderFactory contextProviderFactory)
 		{
 			ContextProviderFactory = contextProviderFactory;
@@ -90,10 +91,23 @@ namespace JwtWebApi.Api.Common.Services
 				}
 				else if (model.Id > 0)
 				{
-					var res =
-						await Update(cp, model);
+					if (GetUpdateFunc() == null)
+					{
+						var res =
+							await Update(cp, model);
 
-					return res;
+						return res;
+					}
+					else
+					{
+						var res =
+						await 
+							cp.GetTable<TDb>()
+								.Where(t => t.Id == model.Id)
+								.UpdateAsync(t => GetUpdateFunc()(t, model));
+
+						return model;
+					}
 				}
 				else
 				{
@@ -185,8 +199,13 @@ namespace JwtWebApi.Api.Common.Services
 			return res;
 		}
 
+		protected virtual Func<TDb, T, TDb> GetUpdateFunc()
+		{
+			return null;
+		}
+
 		protected abstract bool CanBeDeleted();
 
-		
+
 	}
 }

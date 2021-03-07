@@ -5,9 +5,10 @@ using System.Collections.Generic;
 
 namespace JwtWebApi.MigrationProvider.Models
 {
-    public partial class SubjectNames
+    public partial class SubjectTypeSubjectNames
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public int SubjectTypeId { get; set; }
+        public int SubjectNameId { get; set; }
     }
 }

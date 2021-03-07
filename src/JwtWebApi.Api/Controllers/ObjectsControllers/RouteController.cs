@@ -53,7 +53,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 			var pages =
 				await Service.CustomFilter(page, pageSize, filter.Name, filter.Animals, filter.PeopleTypeIds, filter.AgeTypeIds, filter.SubjectNameIds, filter.SubjectTypeIds,
-					filter.CityId, filter.DistrictId);
+					filter.CityId, filter.DistrictId, filter.DurationFilter, filter.LengthFilter);
 
 			return Ok(pages);
 		}

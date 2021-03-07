@@ -38,24 +38,28 @@ namespace JwtWebApi.Api.Services.Dto
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 	internal class LocalDenyType : IDenyType
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 	internal class LocalEquipmentType : IEquipmentType
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 	internal class LocalServiceType : IServiceType
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 
@@ -63,6 +67,7 @@ namespace JwtWebApi.Api.Services.Dto
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 
@@ -70,24 +75,28 @@ namespace JwtWebApi.Api.Services.Dto
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 	internal class LocalPeopleType : IPeopleType
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 	internal class LocalSubjectName : ISubjectName
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 	internal class LocalSubjectType : ISubjectType
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public int Weight { get; set; }
 	}
 
 }

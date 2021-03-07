@@ -96,7 +96,8 @@ namespace JwtWebApi.Api.Services.Impl
 		}
 
 		public async Task<PagingResult<IRouteWithLinks>> CustomFilter(int page, int pageSize, string name, bool? animals, int[] peopleTypeIds, int[] ageTypeIds,
-			int[] subjectNameIds, int[] subjectTypeIds, int? cityId, int? districtId)
+			int[] subjectNameIds, int[] subjectTypeIds, int? cityId, int? districtId, IFromToFilter<float> durationFilter,
+			IFromToFilter<float> lengthFilter)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -170,6 +171,18 @@ namespace JwtWebApi.Api.Services.Impl
 
 					routes =
 						routes.Where(w => attrSubjIds.Contains(w.Id));
+				}
+
+				if (durationFilter != null)
+				{
+					routes =
+						routes.Where(w => w.Time >= durationFilter.From && w.Time <= durationFilter.To);
+				}
+
+				if (lengthFilter != null)
+				{
+					routes =
+						routes.Where(w => w.Length >= lengthFilter.From && w.Length <= lengthFilter.To);
 				}
 
 				IReadOnlyCollection<Route> routesFinal =

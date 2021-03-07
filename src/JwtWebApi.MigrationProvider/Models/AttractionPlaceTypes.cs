@@ -12,6 +12,5 @@ namespace JwtWebApi.MigrationProvider.Models
         public int PlaceTypeId { get; set; }
 
         public virtual Attractions Attraction { get; set; }
-        public virtual PlaceTypes PlaceType { get; set; }
     }
 }

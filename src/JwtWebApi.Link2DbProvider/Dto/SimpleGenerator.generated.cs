@@ -34,6 +34,8 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<City>                  Cities                 { get { return this.GetTable<City>(); } }
 		public ITable<CuisineType>           CuisineTypes           { get { return this.GetTable<CuisineType>(); } }
 		public ITable<DenyType>              DenyTypes              { get { return this.GetTable<DenyType>(); } }
+		public ITable<Dictionary>            Dictionaries           { get { return this.GetTable<Dictionary>(); } }
+		public ITable<DictionaryRow>         DictionaryRows         { get { return this.GetTable<DictionaryRow>(); } }
 		public ITable<District>              Districts              { get { return this.GetTable<District>(); } }
 		public ITable<DIstrictCity>          DIstrictCities         { get { return this.GetTable<DIstrictCity>(); } }
 		public ITable<EquipmentType>         EquipmentTypes         { get { return this.GetTable<EquipmentType>(); } }
@@ -181,6 +183,22 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string Name { get; set; } // character varying(255)
 	}
 
+	[Table(Schema="places", Name="Dictionaries")]
+	public partial class Dictionary : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
+		[Column,     NotNull ] public string Code { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="DictionaryRows")]
+	public partial class DictionaryRow : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int    Id             { get; set; } // integer
+		[Column,     NotNull ] public string DictionaryCode { get; set; } // character varying(255)
+		[Column,     NotNull ] public string Value          { get; set; } // character varying(255)
+		[Column,     NotNull ] public int    Weight         { get; set; } // integer
+	}
+
 	[Table(Schema="places", Name="Districts")]
 	public partial class District : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
 	{
@@ -302,8 +320,8 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public int    Length     { get; set; } // integer
 		[Column,     NotNull ] public int    Time       { get; set; } // integer
 		[Column,     NotNull ] public string Path       { get; set; } // character varying(255)
-		[Column,     NotNull ] public int    DistrictId { get; set; } // integer
 		[Column,     NotNull ] public int    CityId     { get; set; } // integer
+		[Column,     NotNull ] public int    DistrictId { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="RouteAgeTypes")]
