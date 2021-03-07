@@ -3,15 +3,17 @@ using System;
 using JwtWebApi.MigrationProvider.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace JwtWebApi.MigrationProvider.Migrations
 {
     [DbContext(typeof(MigrationPostgreSqlContext))]
-    partial class MigrationPostgreSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20210307105700_postgresqlMigration_Table_Fix")]
+    partial class postgresqlMigration_Table_Fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -381,9 +383,11 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] {"CityId"}, "IX_DIstrictCities_CityId");
+                    b.HasIndex(new[] { "CityId" }, "IX_DIstrictCities_CityId")
+                        .IsUnique();
 
-                    b.HasIndex(new[] {"DistrictId"}, "IX_DIstrictCities_DistrictId");
+                    b.HasIndex(new[] { "DistrictId" }, "IX_DIstrictCities_DistrictId")
+                        .IsUnique();
 
                     b.HasIndex(new[] { "DistrictId", "CityId" }, "UIX_DistrictCities_DistrictId_CityId")
                         .IsUnique();

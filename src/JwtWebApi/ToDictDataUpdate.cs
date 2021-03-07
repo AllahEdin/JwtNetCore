@@ -244,6 +244,30 @@ namespace JwtWebApi
 					cp.RouteSubjectTypes,
 					types => types.SubjectTypeId,
 					(types, i) => types.SubjectTypeId = i);
+
+				await UpdateLinks(cp,
+					_map[cp.Cities.GetType()],
+					cp.Attractions,
+					types => types.CityId,
+					(types, i) => types.CityId = i);
+
+				await UpdateLinks(cp,
+					_map[cp.Cities.GetType()],
+					cp.Routes,
+					types => types.CityId,
+					(types, i) => types.CityId = i);
+
+				await UpdateLinks(cp,
+					_map[cp.Districts.GetType()],
+					cp.Attractions,
+					types => types.DistrictId,
+					(types, i) => types.DistrictId = i);
+
+				await UpdateLinks(cp,
+					_map[cp.Districts.GetType()],
+					cp.Routes,
+					types => types.DistrictId,
+					(types, i) => types.DistrictId = i);
 			}
 
 			return true;

@@ -13,9 +13,33 @@ namespace JwtWebApi.Api.Common.Extensions
 	{
 		public static IQueryable<TDb> OrderBy<TDb>(this IQueryable<TDb> source, OrderModel model)
 		{
+
 			var x = Expression.Parameter(source.ElementType, "x");
 
-			var selector = Expression.Lambda(Expression.PropertyOrField(x, model.PropertyName), x);
+			System.Linq.Expressions.LambdaExpression selector = null;
+
+			if ((model?.ByDistance ?? false))
+			{
+				var dbParameterX = Expression.PropertyOrField(x, "Latitude");
+				var dbParameterY = Expression.PropertyOrField(x, "Longitude");
+				var xParameterLocal = Expression.Constant(model.X);
+				var yParameterLocal = Expression.Constant(model.Y);
+				var xParameter = Expression.Subtract(dbParameterX, xParameterLocal);
+				var yParameter = Expression.Subtract(dbParameterY, yParameterLocal);
+				var xSquared = Expression.Multiply(xParameter, xParameter);
+				var ySquared = Expression.Multiply(yParameter, yParameter);
+				var sum = Expression.Add(xSquared, ySquared);
+				var sqrtMethod = typeof(Math).GetMethod("Sqrt", new[] { typeof(double) });
+				var distance = Expression.Call(sqrtMethod, sum);
+				selector = Expression.Lambda(
+					distance,
+					x);
+			}
+			else
+			{
+				selector = Expression.Lambda(Expression.PropertyOrField(x, model.PropertyName), x);
+			}
+			
 
 			return
 				source.Provider.CreateQuery<TDb>(

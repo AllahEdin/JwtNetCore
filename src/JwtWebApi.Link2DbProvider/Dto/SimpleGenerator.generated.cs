@@ -23,41 +23,42 @@ namespace JwtWebApi.Link2DbProvider
 	/// </summary>
 	public partial class DbTest1DB : LinqToDB.Data.DataConnection
 	{
-		public ITable<AgeType>               AgeTypes               { get { return this.GetTable<AgeType>(); } }
-		public ITable<AspNetRole>            AspNetRoles            { get { return this.GetTable<AspNetRole>(); } }
-		public ITable<AspNetUser>            AspNetUsers            { get { return this.GetTable<AspNetUser>(); } }
-		public ITable<AspNetUserRole>        AspNetUserRoles        { get { return this.GetTable<AspNetUserRole>(); } }
-		public ITable<Attraction>            Attractions            { get { return this.GetTable<Attraction>(); } }
-		public ITable<AttractionPlaceType>   AttractionPlaceTypes   { get { return this.GetTable<AttractionPlaceType>(); } }
-		public ITable<AttractionSubject>     AttractionSubjects     { get { return this.GetTable<AttractionSubject>(); } }
-		public ITable<CateringType>          CateringTypes          { get { return this.GetTable<CateringType>(); } }
-		public ITable<City>                  Cities                 { get { return this.GetTable<City>(); } }
-		public ITable<CuisineType>           CuisineTypes           { get { return this.GetTable<CuisineType>(); } }
-		public ITable<DenyType>              DenyTypes              { get { return this.GetTable<DenyType>(); } }
-		public ITable<Dictionary>            Dictionaries           { get { return this.GetTable<Dictionary>(); } }
-		public ITable<DictionaryRow>         DictionaryRows         { get { return this.GetTable<DictionaryRow>(); } }
-		public ITable<District>              Districts              { get { return this.GetTable<District>(); } }
-		public ITable<DIstrictCity>          DIstrictCities         { get { return this.GetTable<DIstrictCity>(); } }
-		public ITable<EquipmentType>         EquipmentTypes         { get { return this.GetTable<EquipmentType>(); } }
-		public ITable<Hotel>                 Hotels                 { get { return this.GetTable<Hotel>(); } }
-		public ITable<HotelEquipmentType>    HotelEquipmentTypes    { get { return this.GetTable<HotelEquipmentType>(); } }
-		public ITable<HotelServiceType>      HotelServiceTypes      { get { return this.GetTable<HotelServiceType>(); } }
-		public ITable<HousingType>           HousingTypes           { get { return this.GetTable<HousingType>(); } }
-		public ITable<PeopleType>            PeopleTypes            { get { return this.GetTable<PeopleType>(); } }
-		public ITable<PlaceType>             PlaceTypes             { get { return this.GetTable<PlaceType>(); } }
-		public ITable<Restaurant>            Restaurants            { get { return this.GetTable<Restaurant>(); } }
-		public ITable<RestaurantCuisineType> RestaurantCuisineTypes { get { return this.GetTable<RestaurantCuisineType>(); } }
-		public ITable<RestaurantDenyType>    RestaurantDenyTypes    { get { return this.GetTable<RestaurantDenyType>(); } }
-		public ITable<Route>                 Routes                 { get { return this.GetTable<Route>(); } }
-		public ITable<RouteAgeType>          RouteAgeTypes          { get { return this.GetTable<RouteAgeType>(); } }
-		public ITable<RouteAttraction>       RouteAttractions       { get { return this.GetTable<RouteAttraction>(); } }
-		public ITable<RoutePeopleType>       RoutePeopleTypes       { get { return this.GetTable<RoutePeopleType>(); } }
-		public ITable<RouteSubjectName>      RouteSubjectNames      { get { return this.GetTable<RouteSubjectName>(); } }
-		public ITable<RouteSubjectType>      RouteSubjectTypes      { get { return this.GetTable<RouteSubjectType>(); } }
-		public ITable<ServiceType>           ServiceTypes           { get { return this.GetTable<ServiceType>(); } }
-		public ITable<Subject>               Subjects               { get { return this.GetTable<Subject>(); } }
-		public ITable<SubjectName>           SubjectNames           { get { return this.GetTable<SubjectName>(); } }
-		public ITable<SubjectType>           SubjectTypes           { get { return this.GetTable<SubjectType>(); } }
+		public ITable<AgeType>                AgeTypes                { get { return this.GetTable<AgeType>(); } }
+		public ITable<AspNetRole>             AspNetRoles             { get { return this.GetTable<AspNetRole>(); } }
+		public ITable<AspNetUser>             AspNetUsers             { get { return this.GetTable<AspNetUser>(); } }
+		public ITable<AspNetUserRole>         AspNetUserRoles         { get { return this.GetTable<AspNetUserRole>(); } }
+		public ITable<Attraction>             Attractions             { get { return this.GetTable<Attraction>(); } }
+		public ITable<AttractionPlaceType>    AttractionPlaceTypes    { get { return this.GetTable<AttractionPlaceType>(); } }
+		public ITable<AttractionSubject>      AttractionSubjects      { get { return this.GetTable<AttractionSubject>(); } }
+		public ITable<CateringType>           CateringTypes           { get { return this.GetTable<CateringType>(); } }
+		public ITable<City>                   Cities                  { get { return this.GetTable<City>(); } }
+		public ITable<CuisineType>            CuisineTypes            { get { return this.GetTable<CuisineType>(); } }
+		public ITable<DenyType>               DenyTypes               { get { return this.GetTable<DenyType>(); } }
+		public ITable<Dictionary>             Dictionaries            { get { return this.GetTable<Dictionary>(); } }
+		public ITable<DictionaryRow>          DictionaryRows          { get { return this.GetTable<DictionaryRow>(); } }
+		public ITable<District>               Districts               { get { return this.GetTable<District>(); } }
+		public ITable<DIstrictCity>           DIstrictCities          { get { return this.GetTable<DIstrictCity>(); } }
+		public ITable<EquipmentType>          EquipmentTypes          { get { return this.GetTable<EquipmentType>(); } }
+		public ITable<Hotel>                  Hotels                  { get { return this.GetTable<Hotel>(); } }
+		public ITable<HotelEquipmentType>     HotelEquipmentTypes     { get { return this.GetTable<HotelEquipmentType>(); } }
+		public ITable<HotelServiceType>       HotelServiceTypes       { get { return this.GetTable<HotelServiceType>(); } }
+		public ITable<HousingType>            HousingTypes            { get { return this.GetTable<HousingType>(); } }
+		public ITable<PeopleType>             PeopleTypes             { get { return this.GetTable<PeopleType>(); } }
+		public ITable<PlaceType>              PlaceTypes              { get { return this.GetTable<PlaceType>(); } }
+		public ITable<Restaurant>             Restaurants             { get { return this.GetTable<Restaurant>(); } }
+		public ITable<RestaurantCuisineType>  RestaurantCuisineTypes  { get { return this.GetTable<RestaurantCuisineType>(); } }
+		public ITable<RestaurantDenyType>     RestaurantDenyTypes     { get { return this.GetTable<RestaurantDenyType>(); } }
+		public ITable<Route>                  Routes                  { get { return this.GetTable<Route>(); } }
+		public ITable<RouteAgeType>           RouteAgeTypes           { get { return this.GetTable<RouteAgeType>(); } }
+		public ITable<RouteAttraction>        RouteAttractions        { get { return this.GetTable<RouteAttraction>(); } }
+		public ITable<RoutePeopleType>        RoutePeopleTypes        { get { return this.GetTable<RoutePeopleType>(); } }
+		public ITable<RouteSubjectName>       RouteSubjectNames       { get { return this.GetTable<RouteSubjectName>(); } }
+		public ITable<RouteSubjectType>       RouteSubjectTypes       { get { return this.GetTable<RouteSubjectType>(); } }
+		public ITable<ServiceType>            ServiceTypes            { get { return this.GetTable<ServiceType>(); } }
+		public ITable<Subject>                Subjects                { get { return this.GetTable<Subject>(); } }
+		public ITable<SubjectName>            SubjectNames            { get { return this.GetTable<SubjectName>(); } }
+		public ITable<SubjectType>            SubjectTypes            { get { return this.GetTable<SubjectType>(); } }
+		public ITable<SubjectTypeSubjectName> SubjectTypeSubjectNames { get { return this.GetTable<SubjectTypeSubjectName>(); } }
 
 		partial void InitMappingSchema()
 		{
@@ -390,6 +391,14 @@ namespace JwtWebApi.Link2DbProvider
 	{
 		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
 		[Column,     NotNull ] public string Name { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="SubjectTypeSubjectNames")]
+	public partial class SubjectTypeSubjectName : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id            { get; set; } // integer
+		[Column,     NotNull ] public int SubjectTypeId { get; set; } // integer
+		[Column,     NotNull ] public int SubjectNameId { get; set; } // integer
 	}
 }
 

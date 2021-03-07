@@ -112,6 +112,9 @@ namespace JwtWebApi.Api.Services
 				.As<IAttractionPlaceTypeService>()
 				.SingleInstance();
 
+			builder.RegisterType<SubjectTypeSubjectNameService>()
+				.As<ISubjectTypeSubjectNameService>()
+				.SingleInstance();
 
 			builder.RegisterType<DistrictCityService>()
 				.As<IDistrictCityService>()
