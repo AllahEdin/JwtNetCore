@@ -45,6 +45,7 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<HousingType>            HousingTypes            { get { return this.GetTable<HousingType>(); } }
 		public ITable<PeopleType>             PeopleTypes             { get { return this.GetTable<PeopleType>(); } }
 		public ITable<PlaceType>              PlaceTypes              { get { return this.GetTable<PlaceType>(); } }
+		public ITable<PlaceTypeSubject>       PlaceTypeSubjects       { get { return this.GetTable<PlaceTypeSubject>(); } }
 		public ITable<Restaurant>             Restaurants             { get { return this.GetTable<Restaurant>(); } }
 		public ITable<RestaurantCuisineType>  RestaurantCuisineTypes  { get { return this.GetTable<RestaurantCuisineType>(); } }
 		public ITable<RestaurantDenyType>     RestaurantDenyTypes     { get { return this.GetTable<RestaurantDenyType>(); } }
@@ -276,6 +277,14 @@ namespace JwtWebApi.Link2DbProvider
 	{
 		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
 		[Column,     NotNull ] public string Name { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="PlaceTypeSubjects")]
+	public partial class PlaceTypeSubject : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity] public int Id          { get; set; } // integer
+		[Column,     NotNull ] public int PlaceTypeId { get; set; } // integer
+		[Column,     NotNull ] public int SubjectId   { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="Restaurants")]

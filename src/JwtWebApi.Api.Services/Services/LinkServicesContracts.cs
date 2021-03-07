@@ -57,4 +57,8 @@ namespace JwtWebApi.Api.Services.Services
 	public interface ISubjectTypeSubjectNameService : IEntityProvider<ISubjectTypeSubjectName>, IEntityLinkDeleteService
 	{
 	}
+
+	public interface IPlaceTypeSubjectService : IEntityProvider<IPlaceTypeSubject>, IEntityLinkDeleteService
+	{
+	}
 }

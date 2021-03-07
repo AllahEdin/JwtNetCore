@@ -250,4 +250,22 @@ namespace JwtWebApi.Api.Services.Impl
 		public Task<bool> Delete(int subjectTypeId, int subjectNameId)
 			=> base.Delete(het => het.SubjectTypeId == subjectTypeId && het.SubjectNameId == subjectNameId);
 	}
+
+	internal class PlaceTypeSubjectService : EntityProviderBase<IPlaceTypeSubject, PlaceTypeSubject>, IPlaceTypeSubjectService
+	{
+		public PlaceTypeSubjectService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
+		{
+		}
+
+		protected override Task<IPlaceTypeSubject> Update(IContextProvider provider, IPlaceTypeSubject model)
+		{
+			throw new NotSupportedException();
+		}
+
+		protected override bool CanBeDeleted()
+			=> true;
+
+		public Task<bool> Delete(int placeTypeId, int subjectId)
+			=> base.Delete(het => het.PlaceTypeId == placeTypeId && het.SubjectId == subjectId);
+	}
 }

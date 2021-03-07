@@ -92,4 +92,11 @@ namespace JwtWebApi.Api.Services.Dto
 		public int SubjectNameId { get; set; }
 	}
 
+	public interface IPlaceTypeSubject : IEntity
+	{
+		public int PlaceTypeId { get; set; } 
+		public int SubjectId { get; set; }
+	}
+
+
 }
