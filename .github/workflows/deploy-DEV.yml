@@ -23,7 +23,7 @@ jobs:
         run:  cat /usr/app/dev/dockerhub_password | docker login --username cheekibreeki228 --password-stdin; docker push cheekibreeki228/test_repos:dev
   
       - name: Stop Service
-        run: cd src/;docker-compose down --rmi all
+        run: cd src/;docker-compose down;docker rmi -f cheekibreeki228/test_repos:dev
         
       - name: Start Service
         run: cd src/;docker-compose up -d
