@@ -20,8 +20,13 @@ namespace JwtWebApi.Api.Common.Extensions
 
 			if ((model?.ByDistance ?? false))
 			{
-				var dbParameterX = Expression.PropertyOrField(x, "Latitude");
-				var dbParameterY = Expression.PropertyOrField(x, "Longitude");
+				var parseMethod = typeof(double).GetMethod("Parse", new[] { typeof(string) });
+				var dbParameterXstr = Expression.PropertyOrField(x, "Latitude");
+				var dbParameterX =
+					Expression.Call(parseMethod, dbParameterXstr);
+					var dbParameterYstr = Expression.PropertyOrField(x, "Longitude");
+					var dbParameterY =
+						Expression.Call(parseMethod, dbParameterYstr);
 				var xParameterLocal = Expression.Constant(model.X);
 				var yParameterLocal = Expression.Constant(model.Y);
 				var xParameter = Expression.Subtract(dbParameterX, xParameterLocal);

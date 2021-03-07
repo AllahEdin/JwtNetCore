@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -90,7 +91,8 @@ namespace JwtWebApi.Api.Services.Impl
 			};
 		}
 
-		public async Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page, int pageSize, string name, int? cityId, int? districtId, int[] subjectIds, int[] placeTypeIds)
+
+		public async Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page, int pageSize, string name, int? cityId, int? districtId, int[] subjectIds, int[] placeTypeIds, OrderModel orderModel)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -151,8 +153,13 @@ namespace JwtWebApi.Api.Services.Impl
 						attrs.Where(w => groups.Select(t => t.Key).Contains(w.Id));
 				}
 
+			
 				IReadOnlyCollection<Attraction> attractions =
-					await attrs.Skip((page - 1) * pageSize)
+					await attrs.GetFilteredTable(new SearchModel()
+						{
+							Order = orderModel
+						}, cp)
+						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();
 

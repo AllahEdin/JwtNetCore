@@ -1,9 +1,12 @@
 ﻿using JwtWebApi.Api.Services.Dto;
+using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Models.ComplexFilteringModels
 {
 	public class RouteFilteringModel
 	{
+		public OrderModel Order { get; set; }
+
 		public string Name { get; set; }
 
 		public bool? Animals { get; set; }

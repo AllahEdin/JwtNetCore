@@ -97,7 +97,7 @@ namespace JwtWebApi.Api.Services.Impl
 
 		public async Task<PagingResult<IRouteWithLinks>> CustomFilter(int page, int pageSize, string name, bool? animals, int[] peopleTypeIds, int[] ageTypeIds,
 			int[] subjectNameIds, int[] subjectTypeIds, int? cityId, int? districtId, IFromToFilter<float> durationFilter,
-			IFromToFilter<float> lengthFilter)
+			IFromToFilter<float> lengthFilter, OrderModel orderModel)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -186,7 +186,11 @@ namespace JwtWebApi.Api.Services.Impl
 				}
 
 				IReadOnlyCollection<Route> routesFinal =
-					await routes.Skip((page - 1) * pageSize)
+					await routes.GetFilteredTable(new SearchModel()
+						{
+							Order = orderModel
+						},cp )
+						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();
 
