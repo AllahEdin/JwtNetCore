@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  webapp:
+  webapp_prod:
     image: cheekibreeki228/test_repos:prod
     ports:
       - 44222:44222

@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  webapp:
+  webapp_dev:
     image: cheekibreeki228/test_repos:dev
     ports:
       - 22111:22111
