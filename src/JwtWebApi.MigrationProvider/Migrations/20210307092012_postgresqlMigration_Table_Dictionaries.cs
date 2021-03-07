@@ -80,11 +80,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 table: "RestaurantCuisineTypes");
 
 
-            migrationBuilder.DropIndex(
-                name: "UIX_DistrictCities_DistrictId",
-                schema: "places",
-                table: "DIstrictCities");
-
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 schema: "places",
@@ -541,11 +536,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 columns: new[] { "RestaurantId", "CuisineTypeId" },
                 unique: true);
 
-            migrationBuilder.CreateIndex(
-                name: "UIX_DistrictCities_DistrictId",
-                schema: "places",
-                table: "DIstrictCities",
-                column: "DistrictId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AttractionPlaceTypes_PlaceTypeId",
