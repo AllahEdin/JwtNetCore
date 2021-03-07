@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  webapp:
+    image: cheekibreeki228/test_repos:prod
+    ports:
+      - 44222:44222
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:44222
+    secrets:
+      - TravelDbConnectionString
+      - JWTKey
+      - GoogleSecret
+    volumes:
+      - /usr/app/PROD/fs:/usr/share/fs
+    networks:
+      - backend
+networks:
+  backend:
+    external:
+      name: prod
+secrets:
+   TravelDbConnectionString:
+      file: /usr/app/PROD/TravelDbConnectionString
+   JWTKey:
+      file: /usr/app/PROD/JWTKey
+   GoogleSecret:
+      file: /usr/app/PROD/GoogleSecret
+      
