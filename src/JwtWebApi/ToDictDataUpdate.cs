@@ -349,7 +349,7 @@ namespace JwtWebApi
 				var toId =
 					newArray.FirstOrDefault(f => f.From == targetId(link));
 
-				if (toId != null)
+				if (toId != null && toId.From != toId.To)
 					setResult(link, toId.To);
 			}
 
