@@ -13,13 +13,13 @@ namespace JwtWebApi.MigrationProvider
 		private static readonly IMigrationDataUpdate[] DataUpdateServices =
 		{
 			new RolesMigrationDataUpdate(),
-			new CateringTypesMigrationDataUpdate(),
-			new CuisineTypesMigrationDataUpdate(),
-			new DenyTypesMigrationDataUpdate(),
-			new EquipmentTypesMigrationDataUpdate(),
-			new HousingTypesMigrationDataUpdate(),
-			new ServiceTypesMigrationDataUpdate(),
-			new DistrictsMigrationDataUpdate()
+			//new CateringTypesMigrationDataUpdate(),
+			//new CuisineTypesMigrationDataUpdate(),
+			//new DenyTypesMigrationDataUpdate(),
+			//new EquipmentTypesMigrationDataUpdate(),
+			//new HousingTypesMigrationDataUpdate(),
+			//new ServiceTypesMigrationDataUpdate(),
+			//new DistrictsMigrationDataUpdate()
 		};
 
 		/// <inheritdoc />
@@ -41,8 +41,6 @@ namespace JwtWebApi.MigrationProvider
 			{
 				migrationDataUpdate.Update(context);
 			}
-
-
 		}
 	}
 
