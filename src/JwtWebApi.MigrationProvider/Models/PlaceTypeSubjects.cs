@@ -10,5 +10,8 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Id { get; set; }
         public int PlaceTypeId { get; set; }
         public int SubjectId { get; set; }
+
+        public virtual DictionaryRows PlaceType { get; set; }
+        public virtual DictionaryRows Subject { get; set; }
     }
 }

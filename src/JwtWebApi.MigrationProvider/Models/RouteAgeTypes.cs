@@ -11,6 +11,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public int RouteId { get; set; }
         public int AgeTypeId { get; set; }
 
+        public virtual DictionaryRows AgeType { get; set; }
         public virtual Routes Route { get; set; }
     }
 }

@@ -3,15 +3,17 @@ using System;
 using JwtWebApi.MigrationProvider.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace JwtWebApi.MigrationProvider.Migrations
 {
     [DbContext(typeof(MigrationPostgreSqlContext))]
-    partial class MigrationPostgreSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20210308050132_postgresqlMigration_Table_FKS")]
+    partial class postgresqlMigration_Table_FKS
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1221,7 +1223,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Restaurants", "Restaurant")
                         .WithMany("RestaurantCuisineTypes")
                         .HasForeignKey("RestaurantId")
-                        .HasConstraintName("FK_RestaurantCuisineTypes_RestaurantId")
+                        .HasConstraintName("FK_RestaurantCoisineTypes_RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
