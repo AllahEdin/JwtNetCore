@@ -215,7 +215,7 @@ namespace JwtWebApi.Api.Services.Impl
 			=> base.Delete(het => het.RouteId == routeId && het.SubjectTypeId == subjectTypeId);
 	}
 
-	internal class DistrictCityService : EntityProviderBase<IDistrictCity, DIstrictCity>, IDistrictCityService
+	internal class DistrictCityService : EntityProviderBase<IDistrictCity, DistrictCity>, IDistrictCityService
 	{
 		public DistrictCityService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
 		{
