@@ -63,6 +63,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public string Path { get; set; }
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
+		public int Weight { get; set; }
 	}
 
 	public interface IHotel : IEntity
@@ -80,6 +81,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public string Path { get; set; }
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
+		public int Weight { get; set; }
 	}
 
 	public interface IAttraction : IEntity
@@ -96,6 +98,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public string Path { get; set; }
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
+		public int Weight { get; set; }
 	}
 
 	public interface IRoute : IEntity
@@ -109,5 +112,6 @@ namespace JwtWebApi.Api.Services.Dto
 		 public int DistrictId { get; set; }
 		 
 		 public int CityId { get; set; }
+		 public int Weight { get; set; }
 	}
 }

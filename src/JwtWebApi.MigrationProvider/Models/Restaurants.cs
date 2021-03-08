@@ -26,6 +26,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Path { get; set; }
         public int DistrictId { get; set; }
         public int Discount { get; set; }
+        public int Weight { get; set; }
 
         public virtual ICollection<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual ICollection<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }

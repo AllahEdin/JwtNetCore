@@ -64,6 +64,7 @@ namespace JwtWebApi.Api.Services.Impl
 						Preview = string.IsNullOrEmpty(model.Preview) ? hotel.Preview : model.Preview,
 						ClassType = (model.ClassType > 0 && model.ClassType <= 5) ? model.ClassType : hotel.ClassType,
 						HousingTypeId = model.HousingTypeId > 0 ? model.HousingTypeId : hotel.HousingTypeId,
+						Weight = model.Weight > 0 ? model.Weight : hotel.Weight
 					});
 
 			return model;

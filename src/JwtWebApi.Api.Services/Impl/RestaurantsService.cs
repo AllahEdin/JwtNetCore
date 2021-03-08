@@ -64,6 +64,7 @@ namespace JwtWebApi.Api.Services.Impl
 						Path = string.IsNullOrEmpty(model.Path) ? rest.Path : model.Path,
 						Preview = string.IsNullOrEmpty(model.Preview) ? rest.Preview : model.Preview,
 						Discount = model.Discount > -1 ? model.Discount : rest.Discount,
+						Weight = model.Weight > 0 ? model.Weight : rest.Weight,
 					});
 
 			return model;

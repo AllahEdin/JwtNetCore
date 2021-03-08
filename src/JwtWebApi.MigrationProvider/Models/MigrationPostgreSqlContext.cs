@@ -164,6 +164,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.AttractionPlaceTypes)
                     .HasForeignKey(d => d.AttractionId)
                     .HasConstraintName("FK_AttractionPlaceTypes_AttractionId");
+
+                entity.HasOne(d => d.PlaceType)
+                    .WithMany(p => p.AttractionPlaceTypes)
+                    .HasForeignKey(d => d.PlaceTypeId)
+                    .HasConstraintName("FK_AttractionPlaceTypes_PlaceTypeId");
             });
 
             modelBuilder.Entity<AttractionSubjects>(entity =>
@@ -181,6 +186,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.AttractionSubjects)
                     .HasForeignKey(d => d.AttractionId)
                     .HasConstraintName("FK_AttractionSubjects_AttractionId");
+
+                entity.HasOne(d => d.Subject)
+                    .WithMany(p => p.AttractionSubjects)
+                    .HasForeignKey(d => d.SubjectId)
+                    .HasConstraintName("FK_AttractionSubjects_SubjectId");
             });
 
             modelBuilder.Entity<Attractions>(entity =>
@@ -222,6 +232,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
             modelBuilder.Entity<CateringTypes>(entity =>
@@ -317,16 +329,26 @@ namespace JwtWebApi.MigrationProvider.Models
 
             modelBuilder.Entity<DistrictCities>(entity =>
             {
-                entity.ToTable("DIstrictCities", "places");
+                entity.ToTable("DistrictCities", "places");
 
-                entity.HasIndex(e => e.CityId, "IX_DIstrictCities_CityId");
+                entity.HasIndex(e => e.CityId, "IX_DistrictCities_CityId");
 
-                entity.HasIndex(e => e.DistrictId, "IX_DIstrictCities_DistrictId");
+                entity.HasIndex(e => e.DistrictId, "IX_DistrictCities_DistrictId");
 
                 entity.HasIndex(e => new { e.DistrictId, e.CityId }, "UIX_DistrictCities_DistrictId_CityId")
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.City)
+                    .WithMany(p => p.DistrictCitiesCity)
+                    .HasForeignKey(d => d.CityId)
+                    .HasConstraintName("FK_DistrictCities_CityId");
+
+                entity.HasOne(d => d.District)
+                    .WithMany(p => p.DistrictCitiesDistrict)
+                    .HasForeignKey(d => d.DistrictId)
+                    .HasConstraintName("FK_DistrictCities_DistrictId");
             });
 
             modelBuilder.Entity<Districts>(entity =>
@@ -368,6 +390,11 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
+                entity.HasOne(d => d.EquipmentType)
+                    .WithMany(p => p.HotelEquipmentTypes)
+                    .HasForeignKey(d => d.EquipmentTypeId)
+                    .HasConstraintName("FK_HotelEquipmentTypes_EquipmentTypeId");
+
                 entity.HasOne(d => d.Hotel)
                     .WithMany(p => p.HotelEquipmentTypes)
                     .HasForeignKey(d => d.HotelId)
@@ -389,6 +416,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.HotelServiceTypes)
                     .HasForeignKey(d => d.HotelId)
                     .HasConstraintName("FK_HotelServiceTypes_HoletId");
+
+                entity.HasOne(d => d.ServiceType)
+                    .WithMany(p => p.HotelServiceTypes)
+                    .HasForeignKey(d => d.ServiceTypeId)
+                    .HasConstraintName("FK_HotelServiceTypes_ServiceTypeId");
             });
 
             modelBuilder.Entity<Hotels>(entity =>
@@ -432,6 +464,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
             modelBuilder.Entity<HousingTypes>(entity =>
@@ -473,6 +507,16 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.HasIndex(e => e.SubjectId, "UIX_PlaceTypeSubjects_SubjectId")
                     .IsUnique();
+
+                entity.HasOne(d => d.PlaceType)
+                    .WithMany(p => p.PlaceTypeSubjectsPlaceType)
+                    .HasForeignKey(d => d.PlaceTypeId)
+                    .HasConstraintName("FK_PlaceTypeSubjects_PlaceTypeId");
+
+                entity.HasOne(d => d.Subject)
+                    .WithOne(p => p.PlaceTypeSubjectsSubject)
+                    .HasForeignKey<PlaceTypeSubjects>(d => d.SubjectId)
+                    .HasConstraintName("FK_PlaceTypeSubjects_SubjectId");
             });
 
             modelBuilder.Entity<PlaceTypes>(entity =>
@@ -496,6 +540,11 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
+                entity.HasOne(d => d.CuisineType)
+                    .WithMany(p => p.RestaurantCuisineTypes)
+                    .HasForeignKey(d => d.CuisineTypeId)
+                    .HasConstraintName("FK_RestaurantCuisineTypes_CuisineTypeId");
+
                 entity.HasOne(d => d.Restaurant)
                     .WithMany(p => p.RestaurantCuisineTypes)
                     .HasForeignKey(d => d.RestaurantId)
@@ -512,6 +561,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.DenyType)
+                    .WithMany(p => p.RestaurantDenyTypes)
+                    .HasForeignKey(d => d.DenyTypeId)
+                    .HasConstraintName("FK_RestaurantDenyTypes_DenyTypeId");
 
                 entity.HasOne(d => d.Restaurant)
                     .WithMany(p => p.RestaurantDenyTypes)
@@ -560,6 +614,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
             modelBuilder.Entity<RouteAgeTypes>(entity =>
@@ -572,6 +628,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.HasOne(d => d.AgeType)
+                    .WithMany(p => p.RouteAgeTypes)
+                    .HasForeignKey(d => d.AgeTypeId)
+                    .HasConstraintName("FK_RouteAgeTypes_AgeTypeId");
 
                 entity.HasOne(d => d.Route)
                     .WithMany(p => p.RouteAgeTypes)
@@ -612,6 +673,11 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
+                entity.HasOne(d => d.PeopleType)
+                    .WithMany(p => p.RoutePeopleTypes)
+                    .HasForeignKey(d => d.PeopleTypeId)
+                    .HasConstraintName("FK_RoutePeopleTypes_PeopleTypeId");
+
                 entity.HasOne(d => d.Route)
                     .WithMany(p => p.RoutePeopleTypes)
                     .HasForeignKey(d => d.RouteId)
@@ -633,6 +699,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.RouteSubjectNames)
                     .HasForeignKey(d => d.RouteId)
                     .HasConstraintName("FK_RouteSubjectNames_RouteId");
+
+                entity.HasOne(d => d.SubjectName)
+                    .WithMany(p => p.RouteSubjectNames)
+                    .HasForeignKey(d => d.SubjectNameId)
+                    .HasConstraintName("FK_RouteSubjectNames_SubjectNameId");
             });
 
             modelBuilder.Entity<RouteSubjectTypes>(entity =>
@@ -650,6 +721,11 @@ namespace JwtWebApi.MigrationProvider.Models
                     .WithMany(p => p.RouteSubjectTypes)
                     .HasForeignKey(d => d.RouteId)
                     .HasConstraintName("FK_RouteSubjectTypes_RouteId");
+
+                entity.HasOne(d => d.SubjectType)
+                    .WithMany(p => p.RouteSubjectTypes)
+                    .HasForeignKey(d => d.SubjectTypeId)
+                    .HasConstraintName("FK_RouteSubjectTypes_SubjectTypeId");
             });
 
             modelBuilder.Entity<Routes>(entity =>
@@ -673,6 +749,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Path)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
             modelBuilder.Entity<ServiceTypes>(entity =>
@@ -714,6 +792,16 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.HasIndex(e => new { e.SubjectTypeId, e.SubjectNameId }, "UIX_SubjectTypeSubjectNames_SubjectNameId_SubjectTypeId")
                     .IsUnique();
+
+                entity.HasOne(d => d.SubjectName)
+                    .WithOne(p => p.SubjectTypeSubjectNamesSubjectName)
+                    .HasForeignKey<SubjectTypeSubjectNames>(d => d.SubjectNameId)
+                    .HasConstraintName("FK_SubjectTypeSubjectNames_SubjectNameId");
+
+                entity.HasOne(d => d.SubjectType)
+                    .WithMany(p => p.SubjectTypeSubjectNamesSubjectType)
+                    .HasForeignKey(d => d.SubjectTypeId)
+                    .HasConstraintName("FK_SubjectTypeSubjectNames_SubjectTypeId");
             });
 
             modelBuilder.Entity<SubjectTypes>(entity =>

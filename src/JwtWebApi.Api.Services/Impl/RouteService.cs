@@ -57,10 +57,7 @@ namespace JwtWebApi.Api.Services.Impl
 			{
 				throw new InvalidOperationException($"По идентификатор найдено более 1 соответствия");
 			}
-
-			var route =
-				routes.First();
-
+			
 			var res =
 				await provider.GetTable<Route>()
 					.Where(t => t.Id == model.Id)
@@ -73,6 +70,7 @@ namespace JwtWebApi.Api.Services.Impl
 						Name = string.IsNullOrEmpty(model.Name) ? t.Name : model.Name,
 						Animals = model.Animals,
 						Time = model.Time > 0 ? model.Time : t.Time,
+						Weight = model.Weight > 0 ? model.Weight : t.Weight
 					});
 
 			return model;

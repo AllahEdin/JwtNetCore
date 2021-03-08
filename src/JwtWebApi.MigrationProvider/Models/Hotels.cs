@@ -27,6 +27,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Path { get; set; }
         public int DistrictId { get; set; }
         public int Discount { get; set; }
+        public int Weight { get; set; }
 
         public virtual ICollection<HotelEquipmentTypes> HotelEquipmentTypes { get; set; }
         public virtual ICollection<HotelServiceTypes> HotelServiceTypes { get; set; }

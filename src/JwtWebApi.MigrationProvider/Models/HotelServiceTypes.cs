@@ -12,5 +12,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public int ServiceTypeId { get; set; }
 
         public virtual Hotels Hotel { get; set; }
+        public virtual DictionaryRows ServiceType { get; set; }
     }
 }

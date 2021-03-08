@@ -139,6 +139,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string         Path        { get; set; } // character varying(255)
 		[Column,     NotNull ] public int            DistrictId  { get; set; } // integer
 		[Column,     NotNull ] public int            Discount    { get; set; } // integer
+		[Column,     NotNull ] public int            Weight      { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="AttractionPlaceTypes")]
@@ -240,6 +241,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string         Path          { get; set; } // character varying(255)
 		[Column,     NotNull ] public int            DistrictId    { get; set; } // integer
 		[Column,     NotNull ] public int            Discount      { get; set; } // integer
+		[Column,     NotNull ] public int            Weight        { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="HotelEquipmentTypes")]
@@ -303,6 +305,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string         Path           { get; set; } // character varying(255)
 		[Column,     NotNull ] public int            DistrictId     { get; set; } // integer
 		[Column,     NotNull ] public int            Discount       { get; set; } // integer
+		[Column,     NotNull ] public int            Weight         { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="RestaurantCuisineTypes")]
@@ -332,6 +335,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string Path       { get; set; } // character varying(255)
 		[Column,     NotNull ] public int    CityId     { get; set; } // integer
 		[Column,     NotNull ] public int    DistrictId { get; set; } // integer
+		[Column,     NotNull ] public int    Weight     { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="RouteAgeTypes")]
