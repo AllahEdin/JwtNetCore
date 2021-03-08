@@ -18,11 +18,15 @@ namespace SqlGen
 
 		private const string SimpleTableFile = "SimpleTable.txt";
 		private const string LinkTableFile = "LinkTable.txt";
+		private const string SQL = "script.sql";
 		private const string ParamsFile = "Params.txt";
 		private const string OutputFile = "Output.txt";
 
 		static void Main(string[] args)
 		{
+
+			Class1.Nsert(SQL);
+
 			while (true)
 			{
 				var key =

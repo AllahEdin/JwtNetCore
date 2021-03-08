@@ -37,7 +37,7 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<Dictionary>             Dictionaries            { get { return this.GetTable<Dictionary>(); } }
 		public ITable<DictionaryRow>          DictionaryRows          { get { return this.GetTable<DictionaryRow>(); } }
 		public ITable<District>               Districts               { get { return this.GetTable<District>(); } }
-		public ITable<DIstrictCity>           DIstrictCities          { get { return this.GetTable<DIstrictCity>(); } }
+		public ITable<DistrictCity>           DistrictCities          { get { return this.GetTable<DistrictCity>(); } }
 		public ITable<EquipmentType>          EquipmentTypes          { get { return this.GetTable<EquipmentType>(); } }
 		public ITable<Hotel>                  Hotels                  { get { return this.GetTable<Hotel>(); } }
 		public ITable<HotelEquipmentType>     HotelEquipmentTypes     { get { return this.GetTable<HotelEquipmentType>(); } }
@@ -209,8 +209,8 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public string Name { get; set; } // character varying(255)
 	}
 
-	[Table(Schema="places", Name="DIstrictCities")]
-	public partial class DIstrictCity : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	[Table(Schema="places", Name="DistrictCities")]
+	public partial class DistrictCity : JwtWebApi.DataProviders.Common.DataObjects.IEntity
 	{
 		[PrimaryKey, Identity] public int Id         { get; set; } // integer
 		[Column,     NotNull ] public int DistrictId { get; set; } // integer

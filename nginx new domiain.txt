@@ -1,0 +1,36 @@
+sudo mkdir -p /var/www/dev.app-novgorod.ru/html
+sudo chown -R $USER:$USER /var/www/dev.app-novgorod.ru/html
+sudo chmod -R 755 /var/www/dev.app-novgorod.ru
+nano /var/www/dev.app-novgorod.ru/html/index.html
+
+<html>
+    <head>
+        <title>Welcome to dev.app-novgorod.ru</title>
+    </head>
+    <body>
+        <h1>Success! Your Nginx server is successfully configured for <em>dev.app-novgorod.ru</em>. </h1>
+<p>This is a sample page.</p>
+    </body>
+</html>
+
+sudo nano /etc/nginx/sites-available/dev.app-novgorod.ru
+
+server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/dev.app-novgorod.ru/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name dev.app-novgorod.ru www.dev.app-novgorod.ru;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+}
+
+sudo ln -s /etc/nginx/sites-available/dev.app-novgorod.ru /etc/nginx/sites-enabled/
+
+sudo nginx -t
+
+sudo systemctl restart nginx
