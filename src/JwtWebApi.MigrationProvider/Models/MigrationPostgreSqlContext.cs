@@ -538,6 +538,8 @@ namespace JwtWebApi.MigrationProvider.Models
             {
                 entity.ToTable("RestaurantCuisineTypes", "places");
 
+                entity.HasIndex(e => e.CuisineTypeId, "IX_RestaurantCuisineTypes_CuisineTypeId");
+
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
                 entity.HasOne(d => d.CuisineType)
@@ -548,7 +550,7 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.HasOne(d => d.Restaurant)
                     .WithMany(p => p.RestaurantCuisineTypes)
                     .HasForeignKey(d => d.RestaurantId)
-                    .HasConstraintName("FK_RestaurantCoisineTypes_RestaurantId");
+                    .HasConstraintName("FK_RestaurantCuisineTypes_RestaurantId");
             });
 
             modelBuilder.Entity<RestaurantDenyTypes>(entity =>
@@ -650,6 +652,8 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsUnique();
 
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+                entity.Property(e => e.Order).HasDefaultValueSql("1");
 
                 entity.HasOne(d => d.Attraction)
                     .WithMany(p => p.RouteAttractions)

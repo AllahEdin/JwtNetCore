@@ -36,6 +36,7 @@ namespace JwtWebApi.Api.Services.Services
 
 	public interface IRouteAttractionService : IEntityProvider<IRouteAttraction>, IEntityLinkDeleteService
 	{
+		public Task<IRouteAttraction> UpdateByIds(int attractionId, int routeId, int order);
 	}
 
 	public interface IRoutePeopleTypeService : IEntityProvider<IRoutePeopleType>, IEntityLinkDeleteService

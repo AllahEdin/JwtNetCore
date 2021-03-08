@@ -32,56 +32,49 @@ namespace JwtWebApi.Api.Services.Dto
 
 	public interface IAttractionSubjects : IEntity
 	{
-		int Id { get; set; } 
 		int AttractionId { get; set; } 
 		int SubjectId { get; set; } 
 	}
 
 	public interface IRouteAgeType : IEntity
 	{
-		 public int Id { get; set; } 
 		public int RouteId { get; set; } 
 		public int AgeTypeId { get; set; }
 	}
 
 	public interface IRouteAttraction : IEntity
 	{
-		 public int Id { get; set; }
 		public int RouteId { get; set; } 
-		public int AttractionId { get; set; } 
+		public int AttractionId { get; set; }
+		public int Order { get; set; }
 	}
 
 	public interface IRoutePeopleType : IEntity
 	{
-		 public int Id { get; set; }
 		public int RouteId { get; set; }
 		public int PeopleTypeId { get; set; }
 	}
 
 	public interface IRouteSubjectName : IEntity
 	{
-		 public int Id { get; set; } 
 		public int RouteId { get; set; }
 		public int SubjectNameId { get; set; } 
 	}
 
 	public interface IRouteSubjectType : IEntity
 	{
-		 public int Id { get; set; } 
 		public int RouteId { get; set; }
 		public int SubjectTypeId { get; set; } 
 	}
 
 	public interface IAttractionPlaceType : IEntity
 	{
-		int Id { get; set; } 
 		int AttractionId { get; set; } 
 		int PlaceTypeId { get; set; } 
 	}
 
 	public interface IDistrictCity : IEntity
 	{
-		public int Id { get; set; }
 		public int DistrictId { get; set; }
 		public int CityId { get; set; }
 	}

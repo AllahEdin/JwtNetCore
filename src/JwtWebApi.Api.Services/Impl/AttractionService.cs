@@ -264,7 +264,7 @@ namespace JwtWebApi.Api.Services.Impl
 				Items = paging.Items.Select(t => new AttractionWithLinks()
 				{
 					Attraction = t,
-					RouteIds = routes.Where(w => w.AttractionId == t.Id).Select(s => s.RouteId).ToArray(),
+					RouteIds = routes.OrderBy(o => o.Order).Where(w => w.AttractionId == t.Id).Select(s => s.RouteId).ToArray(),
 					SubjectIds = subjects.Where(w => w.AttractionId == t.Id).Select(s => s.SubjectId).ToArray(),
 					PlaceTypeIds = pt.Where(w => w.AttractionId == t.Id).Select(s => s.PlaceTypeId).ToArray(),
 				}).ToArray()

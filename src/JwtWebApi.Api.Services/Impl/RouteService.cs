@@ -290,7 +290,7 @@ namespace JwtWebApi.Api.Services.Impl
 					Route = t,
 					SubjectNameIds = sn.Where(w => w.RouteId == t.Id).Select(s => s.SubjectNameId),
 					SubjectTypeIds = st.Where(w => w.RouteId == t.Id).Select(s => s.SubjectTypeId),
-					Attractions = ra.Where(w => w.RouteId == t.Id).Select(s => s.AttractionId),
+					Attractions = ra.OrderBy(o => o.Order).Where(w => w.RouteId == t.Id).Select(s => s.AttractionId),
 				}).ToArray()
 			};
 		}

@@ -57,6 +57,7 @@ namespace JwtWebApi.Api.Models
 		public int Id { get; set; }
 		public int RouteId { get; set; }
 		public int AttractionId { get; set; }
+		public int Order { get; set; }
 	}
 
 	public class RoutePeopleTypeModel : IRoutePeopleType

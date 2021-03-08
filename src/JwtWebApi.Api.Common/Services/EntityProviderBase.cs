@@ -91,7 +91,7 @@ namespace JwtWebApi.Api.Common.Services
 				}
 				else if (model.Id > 0)
 				{
-					if (GetUpdateFunc() == null)
+					if (!UpdateByFunc())
 					{
 						var res =
 							await Update(cp, model);
@@ -100,11 +100,9 @@ namespace JwtWebApi.Api.Common.Services
 					}
 					else
 					{
-						var res =
-						await 
-							cp.GetTable<TDb>()
-								.Where(t => t.Id == model.Id)
-								.UpdateAsync(t => GetUpdateFunc()(t, model));
+						bool res =
+						await GetUpdateFunc(cp.GetTable<TDb>()
+							.Where(t => t.Id == model.Id), model);
 
 						return model;
 					}
@@ -199,13 +197,14 @@ namespace JwtWebApi.Api.Common.Services
 			return res;
 		}
 
-		protected virtual Func<TDb, T, TDb> GetUpdateFunc()
+		protected virtual async Task<bool> GetUpdateFunc(IQueryable<TDb> source, T model)
 		{
-			return null;
+			return false;
 		}
 
 		protected abstract bool CanBeDeleted();
 
 
+		protected virtual bool UpdateByFunc() => false;
 	}
 }

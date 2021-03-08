@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using LinqToDB;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -146,10 +148,30 @@ namespace JwtWebApi.Api.Services.Impl
 
 	internal class RouteAttractionService : EntityProviderBase<IRouteAttraction, RouteAttraction>, IRouteAttractionService
 	{
+		private class RouteAttractionLocal : IRouteAttraction
+		{
+			public int Id { get; set; }
+			public int RouteId { get; set; }
+			public int AttractionId { get; set; }
+			public int Order { get; set; }
+		}
+
 		protected override Task<IRouteAttraction> Update(IContextProvider provider, IRouteAttraction model)
 		{
 			throw new NotSupportedException();
 		}
+
+		protected override async Task<bool> GetUpdateFunc(IQueryable<RouteAttraction> source, IRouteAttraction model)
+		{
+			await 
+				source.UpdateAsync(t => new RouteAttraction()
+				{
+					Order = model.Order,
+				});
+
+			return true;
+		}
+
 		public RouteAttractionService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
 		{
 		}
@@ -157,8 +179,47 @@ namespace JwtWebApi.Api.Services.Impl
 		protected override bool CanBeDeleted()
 			=> true;
 
+		protected override bool UpdateByFunc()
+			=> true;
+
 		public Task<bool> Delete(int routeId, int attractionId)
 			=> base.Delete(het => het.RouteId == routeId && het.AttractionId == attractionId);
+
+		public async Task<IRouteAttraction> UpdateByIds(int attractionId, int routeId, int order)
+		{
+			using (var cp = ContextProviderFactory.Create())
+			{
+				var links =
+					cp.GetTable<RouteAttraction>()
+						.Where(w => w.AttractionId == attractionId && w.RouteId == routeId);
+
+				if (!links.Any())
+				{
+					throw new InvalidOperationException();
+				}
+
+				if (links.Count() > 1)
+				{
+					throw new InvalidOperationException();
+				}
+
+				var link =
+					links.First();
+
+				var model =
+					new RouteAttractionLocal()
+					{
+						Id = link.Id,
+						AttractionId = link.AttractionId,
+						Order = order,
+						RouteId = link.RouteId,
+					};
+
+				await AddOrUpdate(model);
+
+				return model;
+			}
+		}
 	}
 
 	internal class RoutePeopleTypeService : EntityProviderBase<IRoutePeopleType, RoutePeopleType>, IRoutePeopleTypeService
