@@ -246,6 +246,100 @@ namespace JwtWebApi.Api.Controllers
 			}
 		}
 
+		[HttpPost(nameof(ManageRole))]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> ManageRole(string email, string roleName, bool hasOption)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Email == email);
+
+				if (!found.Any())
+				{
+					return BadRequest();
+				}
+
+				if (found.Count() > 1)
+				{
+					throw new InvalidOperationException("More 1 user by email!!");
+				}
+
+				var user =
+					found.First();
+
+				if (user.Id == this.GetUserId())
+				{
+					return BadRequest();
+				}
+
+				if (user.IsBanned ?? false)
+				{
+					return BadRequest();
+				}
+
+				var roles =
+				  contextProvider.GetTable<AspNetRole>()
+					.Where(t => t.RoleName == roleName);
+
+
+				if (!roles.Any())
+				{
+					return BadRequest();
+				}
+
+				if (roles.Count() > 1)
+				{
+					throw new InvalidOperationException("More 1 role by name!!");
+				}
+
+				var role =
+					roles.First();
+
+				var userRoles =
+					contextProvider.GetTable<AspNetUserRole>()
+						.Where(w => w.AspNetUserId == user.Id);
+
+				if (hasOption)
+				{
+					if (userRoles.Any(t => t.RoleId == role.Id))
+					{
+						return Ok(true);
+					}
+					else
+					{
+						var res =
+							await
+								contextProvider.InsertNonEntityAsync(new AspNetUserRole()
+								{
+									RoleId = role.Id,
+									AspNetUserId = user.Id,
+								});
+
+						return Ok(true);
+					}
+				}
+				else
+				{
+					if (userRoles.Any(t => t.RoleId == role.Id))
+					{
+						var res =
+							await
+								contextProvider.GetTable<AspNetUserRole>()
+									.Where(w => w.RoleId == role.Id && w.AspNetUserId == user.Id)
+									.DeleteAsync();
+
+						return Ok(true);
+					}
+					else
+					{
+						return Ok(true);
+					}
+				}
+			}
+		}
+
 		[ProducesResponseType(typeof(RegistrationModel), 200)]
 		[HttpPost(nameof(Register))]
 		[AllowAnonymous]

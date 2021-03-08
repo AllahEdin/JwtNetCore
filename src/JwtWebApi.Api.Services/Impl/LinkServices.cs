@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using LinqToDB;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -150,11 +152,26 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 			throw new NotSupportedException();
 		}
+
+		protected override async Task<bool> GetUpdateFunc(IQueryable<RouteAttraction> source, IRouteAttraction model)
+		{
+			await 
+				source.UpdateAsync(t => new RouteAttraction()
+				{
+					Order = model.Order,
+				});
+
+			return true;
+		}
+
 		public RouteAttractionService(IContextProviderFactory contextProviderFactory) : base(contextProviderFactory)
 		{
 		}
 
 		protected override bool CanBeDeleted()
+			=> true;
+
+		protected override bool UpdateByFunc()
 			=> true;
 
 		public Task<bool> Delete(int routeId, int attractionId)

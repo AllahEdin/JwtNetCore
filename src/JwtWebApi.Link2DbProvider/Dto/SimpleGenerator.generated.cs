@@ -352,6 +352,7 @@ namespace JwtWebApi.Link2DbProvider
 		[PrimaryKey, Identity] public int Id           { get; set; } // integer
 		[Column,     NotNull ] public int RouteId      { get; set; } // integer
 		[Column,     NotNull ] public int AttractionId { get; set; } // integer
+		[Column,     NotNull ] public int Order        { get; set; } // integer
 	}
 
 	[Table(Schema="places", Name="RoutePeopleTypes")]

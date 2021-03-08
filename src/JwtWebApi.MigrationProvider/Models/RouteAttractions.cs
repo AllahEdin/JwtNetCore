@@ -10,6 +10,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Id { get; set; }
         public int RouteId { get; set; }
         public int AttractionId { get; set; }
+        public int Order { get; set; }
 
         public virtual Attractions Attraction { get; set; }
         public virtual Routes Route { get; set; }
