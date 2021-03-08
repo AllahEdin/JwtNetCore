@@ -15,6 +15,9 @@
     <None Update="Params.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="script.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="SimpleTable.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
