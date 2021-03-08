@@ -1,7 +1,10 @@
-﻿using JwtWebApi.Api.Common.ApiController;
+﻿using System.Threading.Tasks;
+using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JwtWebApi.Api.Controllers.LinkControllers
 {
@@ -47,6 +50,17 @@ namespace JwtWebApi.Api.Controllers.LinkControllers
 		public RouteAttractionController(IRouteAttractionService service) : base(service)
 		{
 		}
+
+		[HttpPut(nameof(UpdateOrder))]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> UpdateOrder(int attractionId, int routeId, int order)
+		{
+			var res =
+				await Service.UpdateByIds(attractionId, routeId, order);
+
+			return Ok(res);
+		}
+
 	}
 
 	public class RoutePeopleTypeController : AuthorizeAdminApiControllerBase<IRoutePeopleType, RoutePeopleTypeModel, IRoutePeopleTypeService>
