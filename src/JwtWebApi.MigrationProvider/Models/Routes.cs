@@ -24,6 +24,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Path { get; set; }
         public int CityId { get; set; }
         public int DistrictId { get; set; }
+        public int Weight { get; set; }
 
         public virtual ICollection<RouteAgeTypes> RouteAgeTypes { get; set; }
         public virtual ICollection<RouteAttractions> RouteAttractions { get; set; }

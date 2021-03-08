@@ -222,6 +222,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
             modelBuilder.Entity<CateringTypes>(entity =>
@@ -432,6 +434,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
             modelBuilder.Entity<HousingTypes>(entity =>
@@ -560,6 +564,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
             modelBuilder.Entity<RouteAgeTypes>(entity =>
@@ -673,6 +679,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Path)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
             modelBuilder.Entity<ServiceTypes>(entity =>
