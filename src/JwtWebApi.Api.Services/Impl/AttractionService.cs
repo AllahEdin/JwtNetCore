@@ -109,7 +109,7 @@ namespace JwtWebApi.Api.Services.Impl
 				if (!string.IsNullOrEmpty(name))
 				{
 					attrs =
-						attrs.Where(w => w.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+						attrs.Where(w => w.Name.ToLower().Contains(name.ToLower(), StringComparison.OrdinalIgnoreCase));
 				}
 
 				if (districtId != null)

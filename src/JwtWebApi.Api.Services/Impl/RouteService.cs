@@ -119,7 +119,7 @@ namespace JwtWebApi.Api.Services.Impl
 				if (!string.IsNullOrEmpty(name))
 				{
 					routes =
-						routes.Where(w => w.Name.Contains(name, StringComparison.InvariantCultureIgnoreCase));
+						routes.Where(w => w.Name.ToLower().Contains(name.ToLower(), StringComparison.InvariantCultureIgnoreCase));
 				}
 
 
