@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
@@ -58,6 +59,15 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(pages);
 		}
 
+		[HttpPut(nameof(RecalculateDistance))]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> RecalculateDistance(int routeId)
+		{
+			var res =
+				await Service.RecalculateLength(routeId);
+
+			return Ok(res);
+		}
 
 		#region PeopleType
 

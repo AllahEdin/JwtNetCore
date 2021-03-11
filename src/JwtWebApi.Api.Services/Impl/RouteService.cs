@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
 using JwtWebApi.Api.Common.Extensions;
@@ -13,24 +15,54 @@ using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
 using JwtWebApi.Services.Services.Expressions;
+using Newtonsoft.Json;
 
 namespace JwtWebApi.Api.Services.Impl
 {
 	internal class RouteService : EntityProviderBase<IRoute, Route>, IRouteService
 	{
+		private class RouteResponse
+		{
+			public string Code { get; set; }
+
+			public RouteUnit[] Routes { get; set; }
+		}
+
+		private class RouteUnit
+		{
+			public string Weight_name { get; set; }
+
+			public double Weight { get; set; }
+
+			public double Distance { get; set; }
+
+			public double Duration { get; set; }
+
+			public LegUnit[] Legs { get; set; }
+		}
+
+		private class LegUnit
+		{
+			public double Weight { get; set; }
+			public double Distance { get; set; }
+			public string Summary { get; set; }
+			public double Duration { get; set; }
+		}
+
 		private readonly IContextProviderFactory _contextProviderFactory;
 		private readonly IRouteAttractionService _routeAttractionService;
 		private readonly IRouteAgeTypeService _routeAgeTypeService;
 		private readonly IRoutePeopleTypeService _routePeopleTypeService;
 		private readonly IRouteSubjectNameService _routeSubjectNameService;
 		private readonly IRouteSubjectTypeService _routeSubjectTypeService;
+		private readonly IAttractionService _attractionService;
 
 		public RouteService(IContextProviderFactory contextProviderFactory,
 			IRouteAttractionService routeAttractionService,
 			IRouteAgeTypeService routeAgeTypeService,
 			IRouteSubjectNameService routeSubjectNameService, 
 			IRoutePeopleTypeService routePeopleTypeService,
-			IRouteSubjectTypeService routeSubjectTypeService) : base(contextProviderFactory)
+			IRouteSubjectTypeService routeSubjectTypeService, IAttractionService attractionService) : base(contextProviderFactory)
 		{
 			_contextProviderFactory = contextProviderFactory;
 			_routeAttractionService = routeAttractionService;
@@ -38,6 +70,7 @@ namespace JwtWebApi.Api.Services.Impl
 			_routeSubjectNameService = routeSubjectNameService;
 			_routePeopleTypeService = routePeopleTypeService;
 			_routeSubjectTypeService = routeSubjectTypeService;
+			_attractionService = attractionService;
 			_routeAgeTypeService = routeAgeTypeService;
 		}
 
@@ -208,8 +241,96 @@ namespace JwtWebApi.Api.Services.Impl
 			}
 		}
 
-
+		public async Task<string> RecalculateLength(int routeId)
+		{
+			string profile = "driving";
 		
+			List<(double lat, double longt)> list =
+				new List<(double lat, double longt)>();
+
+			SearchModel s =
+				new SearchModel()
+				{
+					Filter = new BinaryFilterUnit()
+					{
+						OperatorType =OperatorType.Equals,
+						Unit1 = new ParameterFilterUnit()
+						{
+							PropertyName = "Id"
+						},
+						Unit2 = new ConstFilterUnit()
+						{
+							Value = routeId
+						},
+					}
+				};
+
+			var paging =
+				await Get(1, 1, s);
+
+			if (paging.Total != 1)
+			{
+				throw new InvalidOperationException();
+			}
+
+			var ra = 
+				await GetLink<RouteAttraction>(paging.Items,
+					opt => paging.Items.Select(t => t.Id).Contains(opt.RouteId));
+
+			var withAttr =
+				ra.OrderBy(o => o.Order).ThenBy(o => o.Id).Where(w => w.RouteId == routeId)
+					.Select(s => s.AttractionId);
+
+			foreach (var attractionId in withAttr)
+			{
+				var attr =
+					await _attractionService.Get(attractionId);
+				
+				list.Add((double.Parse(attr.Latitude, CultureInfo.InvariantCulture), double.Parse(attr.Longitude, CultureInfo.InvariantCulture)));
+			}
+
+			using (var client = new HttpClient(new HttpClientHandler()))
+			{
+				client.BaseAddress = new Uri("http://router.project-osrm.org/");
+				var res =
+					await client.GetAsync(
+						$"route/v1/{profile}/{string.Join(';', list.Select(s => $"{s.longt.ToString(CultureInfo.InvariantCulture)},{s.lat.ToString(CultureInfo.InvariantCulture)}"))}?alternatives=false&steps=false&overview=false&annotations=false");
+
+				var resp =
+					JsonConvert.DeserializeObject<RouteResponse>(await res.Content.ReadAsStringAsync());
+
+				if (resp.Code != "Ok")
+				{
+					throw new InvalidOperationException(resp.Code);
+				}
+
+				var result =
+					resp.Routes.FirstOrDefault();
+
+				if (result == null)
+				{
+					throw new InvalidOperationException(resp.Code);
+				}
+
+				int distance =  Convert.ToInt32(result.Distance / 1000);
+
+				using (var cp = ContextProviderFactory.Create())
+				{
+
+					await cp.GetTable<Route>()
+						.Where(w => w.Id == routeId)
+						.UpdateAsync(route => new Route()
+						{
+							Length = distance,
+							Time = (distance <= 2)
+							? Convert.ToInt32(result.Distance * 60 / 5000)
+							: Convert.ToInt32(TimeSpan.FromSeconds(Convert.ToInt32(result.Duration)).TotalMinutes)
+						});
+				}
+
+				return await res.Content.ReadAsStringAsync();
+			}
+		}
 
 		public override async Task<bool> Delete(int id)
 		{
@@ -233,6 +354,8 @@ namespace JwtWebApi.Api.Services.Impl
 
 			return true;
 		}
+
+
 
 		private async Task<bool> DeleteLink<TDb,TEntity, TService>(Expression<Func<TDb,bool>> check, TService service)
 		where TDb : class,IEntity
@@ -290,7 +413,7 @@ namespace JwtWebApi.Api.Services.Impl
 					Route = t,
 					SubjectNameIds = sn.Where(w => w.RouteId == t.Id).Select(s => s.SubjectNameId),
 					SubjectTypeIds = st.Where(w => w.RouteId == t.Id).Select(s => s.SubjectTypeId),
-					Attractions = ra.OrderBy(o => o.Order).Where(w => w.RouteId == t.Id).Select(s => s.AttractionId),
+					Attractions = ra.OrderBy(o => o.Order).ThenBy(o => o.Id).Where(w => w.RouteId == t.Id).Select(s => s.AttractionId),
 				}).ToArray()
 			};
 		}
