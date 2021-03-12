@@ -327,15 +327,16 @@ namespace JwtWebApi.Link2DbProvider
 	[Table(Schema="places", Name="Routes")]
 	public partial class Route : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
 	{
-		[PrimaryKey, Identity] public int    Id         { get; set; } // integer
-		[Column,     NotNull ] public string Name       { get; set; } // character varying(255)
-		[Column,     NotNull ] public bool   Animals    { get; set; } // boolean
-		[Column,     NotNull ] public int    Length     { get; set; } // integer
-		[Column,     NotNull ] public int    Time       { get; set; } // integer
-		[Column,     NotNull ] public string Path       { get; set; } // character varying(255)
-		[Column,     NotNull ] public int    CityId     { get; set; } // integer
-		[Column,     NotNull ] public int    DistrictId { get; set; } // integer
-		[Column,     NotNull ] public int    Weight     { get; set; } // integer
+		[PrimaryKey, Identity   ] public int    Id          { get; set; } // integer
+		[Column,     NotNull    ] public string Name        { get; set; } // character varying(255)
+		[Column,     NotNull    ] public bool   Animals     { get; set; } // boolean
+		[Column,     NotNull    ] public int    Length      { get; set; } // integer
+		[Column,     NotNull    ] public int    Time        { get; set; } // integer
+		[Column,     NotNull    ] public string Path        { get; set; } // character varying(255)
+		[Column,     NotNull    ] public int    CityId      { get; set; } // integer
+		[Column,     NotNull    ] public int    DistrictId  { get; set; } // integer
+		[Column,     NotNull    ] public int    Weight      { get; set; } // integer
+		[Column,        Nullable] public string Description { get; set; } // text
 	}
 
 	[Table(Schema="places", Name="RouteAgeTypes")]

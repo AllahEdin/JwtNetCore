@@ -113,5 +113,6 @@ namespace JwtWebApi.Api.Services.Dto
 		 
 		 public int CityId { get; set; }
 		 public int Weight { get; set; }
+		 public string Description { get; set; }
 	}
 }

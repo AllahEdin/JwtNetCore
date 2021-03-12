@@ -23,5 +23,7 @@ namespace JwtWebApi.Api.Services.Services
 	{
 		public Task<PagingResult<IRouteWithLinks>> CustomFilter(int page, int pageSize, string name, bool? animals, int[] peopleTypeIds, int[] ageTypeIds, int[] subjectNameIds, int[] subjectTypeIds,
 			int? cityId, int? districtId, IFromToFilter<float> durationFilter, IFromToFilter<float> lengthFilter, OrderModel orderModel);
+
+		public Task<string> RecalculateLength(int routeId);
 	}
 }
