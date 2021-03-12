@@ -103,7 +103,8 @@ namespace JwtWebApi.Api.Services.Impl
 						Name = string.IsNullOrEmpty(model.Name) ? t.Name : model.Name,
 						Animals = model.Animals,
 						Time = model.Time > 0 ? model.Time : t.Time,
-						Weight = model.Weight > 0 ? model.Weight : t.Weight
+						Weight = model.Weight > 0 ? model.Weight : t.Weight,
+						Description = string.IsNullOrEmpty(model.Description) ? t.Description : model.Description
 					});
 
 			return model;

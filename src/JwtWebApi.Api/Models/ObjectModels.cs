@@ -71,5 +71,6 @@ namespace JwtWebApi.Api.Models
 		
 		public int CityId { get; set; }
 		public int Weight { get; set; }
+		public string Description { get; set; }
 	}
 }

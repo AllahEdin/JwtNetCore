@@ -297,6 +297,9 @@ namespace JwtWebApi.MigrationProvider.Models
             {
                 entity.ToTable("Dictionaries", "places");
 
+                entity.HasIndex(e => e.Code, "AK_Dictionaries_Code")
+                    .IsUnique();
+
                 entity.HasIndex(e => e.Code, "UIX_Dictionaries_Code")
                     .IsUnique();
 
