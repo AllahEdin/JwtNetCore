@@ -15,5 +15,9 @@ namespace JwtWebApi.Api.Models.ComplexFilteringModels
 		public int[] SubjectIds { get; set; }
 
 		public int[] PlaceTypeIds { get; set; }
+
+		public bool? AtLeastOneSubject { get; set; }
+
+		public bool? AtLeastOnePlaceType { get; set; }
 	}
 }

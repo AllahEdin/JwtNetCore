@@ -92,8 +92,16 @@ namespace JwtWebApi.Api.Services.Impl
 			};
 		}
 
-
-		public async Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page, int pageSize, string name, int? cityId, int? districtId, int[] subjectIds, int[] placeTypeIds, OrderModel orderModel)
+		public async Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page,
+			int pageSize,
+			string name,
+			int? cityId,
+			int? districtId, 
+			int[] subjectIds,
+			bool subjectsAtLeastOne,
+			int[] placeTypeIds,
+			bool placeTypesAtLeastOne,
+			OrderModel orderModel)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -129,8 +137,9 @@ namespace JwtWebApi.Api.Services.Impl
 							});
 
 					var groups =
-						attrSubjIds.Items.GroupBy(k => k.AttractionId).Where(w => subjectIds
-							.All(a => w.Select(s => s.SubjectId).Contains(a)));
+						attrSubjIds.Items.GroupBy(k => k.AttractionId).Where(w =>
+							subjectsAtLeastOne ? subjectIds.Any(a => w.Select(s => s.SubjectId).Contains(a)) 
+								: subjectIds.All(a => w.Select(s => s.SubjectId).Contains(a)));
 
 					attrs =
 						attrs.Where(w => groups.Select(t => t.Key).Contains(w.Id));
@@ -147,8 +156,9 @@ namespace JwtWebApi.Api.Services.Impl
 							});
 
 					var groups =
-						attrPlaceTypes.Items.GroupBy(k => k.AttractionId).Where(w => placeTypeIds
-							.All(a => w.Select(s => s.PlaceTypeId).Contains(a)));
+						attrPlaceTypes.Items.GroupBy(k => k.AttractionId).Where(w =>
+							placeTypesAtLeastOne ? placeTypeIds.Any(a => w.Select(s => s.PlaceTypeId).Contains(a))
+								: placeTypeIds.All(a => w.Select(s => s.PlaceTypeId).Contains(a)));
 
 					attrs =
 						attrs.Where(w => groups.Select(t => t.Key).Contains(w.Id));

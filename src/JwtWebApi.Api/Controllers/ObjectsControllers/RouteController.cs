@@ -53,8 +53,20 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			}
 
 			var pages =
-				await Service.CustomFilter(page, pageSize, filter.Name, filter.Animals, filter.PeopleTypeIds, filter.AgeTypeIds, filter.SubjectNameIds, filter.SubjectTypeIds,
-					filter.CityId, filter.DistrictId, filter.DurationFilter, filter.LengthFilter, filter.Order);
+				await Service.CustomFilter(page, pageSize, 
+					filter.Name,
+					filter.Animals, 
+					filter.PeopleTypeIds,
+					filter.AgeTypeIds,
+					filter.SubjectNameIds,
+					filter.AtLeastOneSubjectName ?? false,
+					filter.SubjectTypeIds,
+					filter.AtLeastOneSubjectType ?? false,
+					filter.CityId,
+					filter.DistrictId,
+					filter.DurationFilter, 
+					filter.LengthFilter, 
+					filter.Order);
 
 			return Ok(pages);
 		}

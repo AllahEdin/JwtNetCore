@@ -23,6 +23,10 @@ namespace JwtWebApi.Api.Models.ComplexFilteringModels
 		
 		public int? DistrictId { get; set; }
 
+		public bool? AtLeastOneSubjectName { get; set; }
+
+		public bool? AtLeastOneSubjectType { get; set; }
+
 		public DurationFilter DurationFilter { get; set; }
 
 		public LengthFilter LengthFilter { get; set; }
