@@ -127,8 +127,18 @@ namespace JwtWebApi.Api.Services.Impl
 
 		}
 
-		public async Task<PagingResult<IRouteWithLinks>> CustomFilter(int page, int pageSize, string name, bool? animals, int[] peopleTypeIds, int[] ageTypeIds,
-			int[] subjectNameIds, int[] subjectTypeIds, int? cityId, int? districtId, IFromToFilter<float> durationFilter,
+		public async Task<PagingResult<IRouteWithLinks>> CustomFilter(int page, int pageSize,
+			string name,
+			bool? animals,
+			int[] peopleTypeIds,
+			int[] ageTypeIds,
+			int[] subjectNameIds,
+			bool subjectNamesAtLeastOne,
+			int[] subjectTypeIds,
+			bool subjectTypesAtLeastOne,
+			int? cityId,
+			int? districtId,
+			IFromToFilter<float> durationFilter,
 			IFromToFilter<float> lengthFilter, OrderModel orderModel)
 		{
 			using (var cp = _contextProviderFactory.Create())
@@ -187,7 +197,11 @@ namespace JwtWebApi.Api.Services.Impl
 						cp.GetTable<RouteSubjectName>()
 							.ToArray()
 							.GroupBy(atts => atts.RouteId)
-							.Where(w => subjectNameIds.All(a => w.Select(s => s.SubjectNameId).Contains(a))).Select(s => s.Key);
+							.Where(w =>
+								subjectNamesAtLeastOne
+									? subjectNameIds.Any(a => w.Select(s => s.SubjectNameId).Contains(a))
+									: subjectNameIds.All(a => w.Select(s => s.SubjectNameId).Contains(a)))
+							.Select(s => s.Key);
 
 					routes =
 						routes.Where(w => attrSubjIds.Contains(w.Id));
@@ -199,7 +213,10 @@ namespace JwtWebApi.Api.Services.Impl
 						cp.GetTable<RouteSubjectType>()
 							.ToArray()
 							.GroupBy(atts => atts.RouteId)
-							.Where(w => subjectTypeIds.All(a => w.Select(s => s.SubjectTypeId).Contains(a))).Select(s => s.Key);
+							.Where(w => subjectTypesAtLeastOne 
+								? subjectTypeIds.Any(a => w.Select(s => s.SubjectTypeId).Contains(a))
+								: subjectTypeIds.All(a => w.Select(s => s.SubjectTypeId).Contains(a)))
+							.Select(s => s.Key);
 
 					routes =
 						routes.Where(w => attrSubjIds.Contains(w.Id));
@@ -241,6 +258,7 @@ namespace JwtWebApi.Api.Services.Impl
 				return res;
 			}
 		}
+
 
 		public async Task<string> RecalculateLength(int routeId)
 		{
