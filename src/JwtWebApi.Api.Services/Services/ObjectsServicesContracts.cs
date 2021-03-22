@@ -2,19 +2,20 @@
 using JwtWebApi.Api.Common.Dto;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
+using JwtWebApi.Link2DbProvider;
 using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Services.Services
 {
-	public interface IRestaurantService : IEntityProvider<IRestaurant>, IPagingWithLinksProvider<IRestaurantWithLinks>
+	public interface IRestaurantService : IEntityProvider<IRestaurant>, IPagingWithLinksProvider<IRestaurantWithLinks>, IRatingService<Restaurant>
 	{
 	}
 
-	public interface IHotelService : IEntityProvider<IHotel>, IPagingWithLinksProvider<IHotelWithLinks>
+	public interface IHotelService : IEntityProvider<IHotel>, IPagingWithLinksProvider<IHotelWithLinks>, IRatingService<Hotel>
 	{
 	}
 
-	public interface IAttractionService : IEntityProvider<IAttraction>, IPagingWithLinksProvider<IAttractionWithLinks>
+	public interface IAttractionService : IEntityProvider<IAttraction>, IPagingWithLinksProvider<IAttractionWithLinks>, IRatingService<Attraction>
 	{
 		public Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page,
 			int pageSize, 
@@ -28,7 +29,7 @@ namespace JwtWebApi.Api.Services.Services
 			OrderModel orderModel);
 	}
 
-	public interface IRouteService : IEntityProvider<IRoute>, IPagingWithLinksProvider<IRouteWithLinks>
+	public interface IRouteService : IEntityProvider<IRoute>, IPagingWithLinksProvider<IRouteWithLinks>, IRatingService<Route>
 	{
 		public Task<PagingResult<IRouteWithLinks>> CustomFilter(int page,
 			int pageSize,

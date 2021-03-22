@@ -26,6 +26,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public int DistrictId { get; set; }
         public int Weight { get; set; }
         public string Description { get; set; }
+        public float Rating { get; set; }
 
         public virtual ICollection<RouteAgeTypes> RouteAgeTypes { get; set; }
         public virtual ICollection<RouteAttractions> RouteAttractions { get; set; }

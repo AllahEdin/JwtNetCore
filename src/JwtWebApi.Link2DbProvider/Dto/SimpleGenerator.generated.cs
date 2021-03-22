@@ -49,6 +49,7 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<Restaurant>             Restaurants             { get { return this.GetTable<Restaurant>(); } }
 		public ITable<RestaurantCuisineType>  RestaurantCuisineTypes  { get { return this.GetTable<RestaurantCuisineType>(); } }
 		public ITable<RestaurantDenyType>     RestaurantDenyTypes     { get { return this.GetTable<RestaurantDenyType>(); } }
+		public ITable<Review>                 Reviews                 { get { return this.GetTable<Review>(); } }
 		public ITable<Route>                  Routes                  { get { return this.GetTable<Route>(); } }
 		public ITable<RouteAgeType>           RouteAgeTypes           { get { return this.GetTable<RouteAgeType>(); } }
 		public ITable<RouteAttraction>        RouteAttractions        { get { return this.GetTable<RouteAttraction>(); } }
@@ -124,7 +125,7 @@ namespace JwtWebApi.Link2DbProvider
 	}
 
 	[Table(Schema="places", Name="Attractions")]
-	public partial class Attraction : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	public partial class Attraction : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed,JwtWebApi.DataProviders.Common.DataObjects.IHasRating
 	{
 		[PrimaryKey, Identity] public int            Id          { get; set; } // integer
 		[Column,     NotNull ] public string         Name        { get; set; } // character varying(255)
@@ -140,6 +141,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public int            DistrictId  { get; set; } // integer
 		[Column,     NotNull ] public int            Discount    { get; set; } // integer
 		[Column,     NotNull ] public int            Weight      { get; set; } // integer
+		[Column,     NotNull ] public float          Rating      { get; set; } // real
 	}
 
 	[Table(Schema="places", Name="AttractionPlaceTypes")]
@@ -225,7 +227,7 @@ namespace JwtWebApi.Link2DbProvider
 	}
 
 	[Table(Schema="places", Name="Hotels")]
-	public partial class Hotel : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	public partial class Hotel : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed,JwtWebApi.DataProviders.Common.DataObjects.IHasRating
 	{
 		[PrimaryKey, Identity] public int            Id            { get; set; } // integer
 		[Column,     NotNull ] public string         Name          { get; set; } // character varying(255)
@@ -242,6 +244,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public int            DistrictId    { get; set; } // integer
 		[Column,     NotNull ] public int            Discount      { get; set; } // integer
 		[Column,     NotNull ] public int            Weight        { get; set; } // integer
+		[Column,     NotNull ] public float          Rating        { get; set; } // real
 	}
 
 	[Table(Schema="places", Name="HotelEquipmentTypes")]
@@ -290,7 +293,7 @@ namespace JwtWebApi.Link2DbProvider
 	}
 
 	[Table(Schema="places", Name="Restaurants")]
-	public partial class Restaurant : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	public partial class Restaurant : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed,JwtWebApi.DataProviders.Common.DataObjects.IHasRating
 	{
 		[PrimaryKey, Identity] public int            Id             { get; set; } // integer
 		[Column,     NotNull ] public string         Name           { get; set; } // character varying(255)
@@ -306,6 +309,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public int            DistrictId     { get; set; } // integer
 		[Column,     NotNull ] public int            Discount       { get; set; } // integer
 		[Column,     NotNull ] public int            Weight         { get; set; } // integer
+		[Column,     NotNull ] public float          Rating         { get; set; } // real
 	}
 
 	[Table(Schema="places", Name="RestaurantCuisineTypes")]
@@ -324,8 +328,21 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull ] public int DenyTypeId   { get; set; } // integer
 	}
 
+	[Table(Schema="places", Name="Reviews")]
+	public partial class Review : JwtWebApi.DataProviders.Common.DataObjects.IEntity
+	{
+		[PrimaryKey, Identity   ] public int       Id         { get; set; } // integer
+		[Column,     NotNull    ] public float     Rate       { get; set; } // real
+		[Column,        Nullable] public string    Text       { get; set; } // text
+		[Column,     NotNull    ] public string    UserId     { get; set; } // character varying
+		[Column,     NotNull    ] public string    PlaceType  { get; set; } // character varying(255)
+		[Column,     NotNull    ] public int       PlaceId    { get; set; } // integer
+		[Column,     NotNull    ] public bool      IsVisible  { get; set; } // boolean
+		[Column,        Nullable] public DateTime? CreateDate { get; set; } // date
+	}
+
 	[Table(Schema="places", Name="Routes")]
-	public partial class Route : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed
+	public partial class Route : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed,JwtWebApi.DataProviders.Common.DataObjects.IHasRating
 	{
 		[PrimaryKey, Identity   ] public int    Id          { get; set; } // integer
 		[Column,     NotNull    ] public string Name        { get; set; } // character varying(255)
@@ -337,6 +354,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull    ] public int    DistrictId  { get; set; } // integer
 		[Column,     NotNull    ] public int    Weight      { get; set; } // integer
 		[Column,        Nullable] public string Description { get; set; } // text
+		[Column,     NotNull    ] public float  Rating      { get; set; } // real
 	}
 
 	[Table(Schema="places", Name="RouteAgeTypes")]

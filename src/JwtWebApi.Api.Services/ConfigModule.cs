@@ -142,6 +142,9 @@ namespace JwtWebApi.Api.Services
 				.As<IRouteService>()
 				.SingleInstance();
 
+			builder.RegisterType<ReviewService>()
+				.As<IReviewService>()
+				.SingleInstance();
 
 
 			builder.RegisterType<DictionaryService>()

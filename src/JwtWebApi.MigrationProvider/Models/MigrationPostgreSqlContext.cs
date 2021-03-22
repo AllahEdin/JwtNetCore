@@ -43,6 +43,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual DbSet<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }
         public virtual DbSet<Restaurants> Restaurants { get; set; }
+        public virtual DbSet<Reviews> Reviews { get; set; }
         public virtual DbSet<RouteAgeTypes> RouteAgeTypes { get; set; }
         public virtual DbSet<RouteAttractions> RouteAttractions { get; set; }
         public virtual DbSet<RoutePeopleTypes> RoutePeopleTypes { get; set; }
@@ -621,6 +622,24 @@ namespace JwtWebApi.MigrationProvider.Models
                     .HasMaxLength(255);
 
                 entity.Property(e => e.Weight).HasDefaultValueSql("1");
+            });
+
+            modelBuilder.Entity<Reviews>(entity =>
+            {
+                entity.ToTable("Reviews", "places");
+
+                entity.HasIndex(e => new { e.UserId, e.PlaceType, e.PlaceId }, "UIX_Reviews_UserId_PlaceType_PlaceId")
+                    .IsUnique();
+
+                entity.Property(e => e.CreateDate).HasColumnType("date");
+
+                entity.Property(e => e.PlaceType)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasColumnType("character varying");
             });
 
             modelBuilder.Entity<RouteAgeTypes>(entity =>
