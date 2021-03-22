@@ -78,7 +78,7 @@ namespace JwtWebApi.Api.Common.Services
 			}
 		}
 
-		public async Task<T> AddOrUpdate(T model)
+		public virtual async Task<T> AddOrUpdate(T model)
 		{
 			using (var cp = ContextProviderFactory.Create())
 			{

@@ -3,15 +3,17 @@ using System;
 using JwtWebApi.MigrationProvider.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace JwtWebApi.MigrationProvider.Migrations
 {
     [DbContext(typeof(MigrationPostgreSqlContext))]
-    partial class MigrationPostgreSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20210322122610_postgresqlMigration_Table_Review")]
+    partial class postgresqlMigration_Table_Review
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,9 +225,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
-
-                    b.Property<float>("Rating")
-                        .HasColumnType("real");
 
                     b.Property<int>("Weight")
                         .ValueGeneratedOnAdd()
@@ -553,9 +552,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<float>("Rating")
-                        .HasColumnType("real");
-
                     b.Property<int>("Weight")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -764,9 +760,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
-
-                    b.Property<float>("Rating")
-                        .HasColumnType("real");
 
                     b.Property<int>("Weight")
                         .ValueGeneratedOnAdd()
@@ -978,9 +971,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
-
-                    b.Property<float>("Rating")
-                        .HasColumnType("real");
 
                     b.Property<int>("Time")
                         .HasColumnType("integer");

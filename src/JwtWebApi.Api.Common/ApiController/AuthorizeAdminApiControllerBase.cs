@@ -20,29 +20,26 @@ namespace JwtWebApi.Api.Common.ApiController
 
 
 		[HttpGet("{id}")]
-		[Authorize]
 		public Task<IActionResult> GetById(int id)
 			=> base.Get(id);
 
 		[HttpGet("")]
-		[Authorize]
 		public Task<IActionResult> GetPaging([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize)
 			=> base.Get(page, pageSize);
 		
 		[HttpPost(nameof(GetPagingFiltered))]
-		[Authorize]
 		public Task<IActionResult> GetPagingFiltered([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize, [FromBody] SearchModel filterUnit)
 			=> base.GetFiltered(filterUnit, page, pageSize);
 
 
 		[HttpPost("")]
 		[Authorize(Roles = "admin")]
-		public Task<IActionResult> Post([FromBody] TModel model)
+		public virtual Task<IActionResult> Post([FromBody] TModel model)
 			=> base.Add(model);
 
 		[HttpPut("")]
 		[Authorize(Roles = "admin")]
-		public Task<IActionResult> Put([FromBody] TModel model)
+		public virtual Task<IActionResult> Put([FromBody] TModel model)
 			=> base.Update(model);
 
 		[HttpDelete(nameof(DeleteById))]

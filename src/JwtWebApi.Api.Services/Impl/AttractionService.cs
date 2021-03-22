@@ -20,6 +20,7 @@ namespace JwtWebApi.Api.Services.Impl
 		private readonly IAttractionSubjectsService _attractionSubjectsService;
 		private readonly IAttractionPlaceTypeService _attractionPlaceTypeService;
 		private readonly IRouteAttractionService _routeAttractionService;
+		private string _objectCode;
 
 		public AttractionService(IContextProviderFactory contextProviderFactory, 
 			IAttractionSubjectsService attractionSubjectsService, 
@@ -308,5 +309,7 @@ namespace JwtWebApi.Api.Services.Impl
 				Units = units.ToArray()
 			};
 		}
+
+		string IRatingService<Attraction>.ObjectCode => PlaceTypesConfig.AttractionCode;
 	}
 }

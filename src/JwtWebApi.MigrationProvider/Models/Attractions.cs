@@ -28,6 +28,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public int DistrictId { get; set; }
         public int Discount { get; set; }
         public int Weight { get; set; }
+        public float Rating { get; set; }
 
         public virtual ICollection<AttractionPlaceTypes> AttractionPlaceTypes { get; set; }
         public virtual ICollection<AttractionSubjects> AttractionSubjects { get; set; }

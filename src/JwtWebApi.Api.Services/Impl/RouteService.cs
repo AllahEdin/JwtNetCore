@@ -56,6 +56,7 @@ namespace JwtWebApi.Api.Services.Impl
 		private readonly IRouteSubjectNameService _routeSubjectNameService;
 		private readonly IRouteSubjectTypeService _routeSubjectTypeService;
 		private readonly IAttractionService _attractionService;
+		private string _objectCode;
 
 		public RouteService(IContextProviderFactory contextProviderFactory,
 			IRouteAttractionService routeAttractionService,
@@ -437,6 +438,7 @@ namespace JwtWebApi.Api.Services.Impl
 			};
 		}
 
-		
+
+		string IRatingService<Route>.ObjectCode => PlaceTypesConfig.RouteCode;
 	}
 }

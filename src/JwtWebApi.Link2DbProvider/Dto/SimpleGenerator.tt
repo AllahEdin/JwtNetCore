@@ -93,6 +93,11 @@
 			baseCl += ",JwtWebApi.DataProviders.Common.DataObjects.INamed";
 		}
 
+		if (t.Columns.Values.Any(t => t.MemberName == "Rating"))
+		{
+			baseCl += ",JwtWebApi.DataProviders.Common.DataObjects.IHasRating";
+		}
+
 		t.BaseClass = baseCl;
 	}
 

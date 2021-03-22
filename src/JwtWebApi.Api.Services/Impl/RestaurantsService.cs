@@ -18,6 +18,7 @@ namespace JwtWebApi.Api.Services.Impl
 		
 		private readonly IRestaurantCuisineTypesService _cuisineTypesService;
 		private readonly IRestaurantDenyTypesService _denyTypesService;
+		private string _objectCode;
 
 		public RestaurantsService(IContextProviderFactory contextProviderFactory,
 			IRestaurantCuisineTypesService cuisineTypesService,
@@ -145,5 +146,7 @@ namespace JwtWebApi.Api.Services.Impl
 
 		protected override bool CanBeDeleted()
 			=> true;
+
+		string IRatingService<Restaurant>.ObjectCode => PlaceTypesConfig.RestaurantCode;
 	}
 }

@@ -17,6 +17,7 @@ namespace JwtWebApi.Api.Services.Impl
 	{
 		private readonly IHotelEquipmentTypesService _hotelEquipmentTypesService;
 		private readonly IHotelServiceTypesService _hotelServiceTypesService;
+		private string _objectCode;
 
 		public HotelService(IContextProviderFactory contextProviderFactory,
 			IHotelEquipmentTypesService hotelEquipmentTypesService, 
@@ -147,5 +148,6 @@ namespace JwtWebApi.Api.Services.Impl
 		protected override bool CanBeDeleted()
 			=> true;
 
+		string IRatingService<Hotel>.ObjectCode => PlaceTypesConfig.HotelCode;
 	}
 }

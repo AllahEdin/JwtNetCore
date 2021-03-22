@@ -72,5 +72,4 @@ namespace JwtWebApi.Api.Services.Services
 	{
 
 	}
-
 }

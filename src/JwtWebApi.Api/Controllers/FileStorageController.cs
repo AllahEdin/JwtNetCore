@@ -29,7 +29,6 @@ namespace JwtWebApi.Api.Controllers
 
 	
 		[HttpGet]
-		[Authorize]
 		public async Task<IActionResult> GetFileInfos(FileType type, string path)
 		{
 
@@ -44,7 +43,6 @@ namespace JwtWebApi.Api.Controllers
 		
 
 		[HttpPost]
-		[Authorize]
 		public async Task<IActionResult> GetStream(FileType type , string path, string fileName)
 		{
 			var fullPath = GetPath(type, path);
