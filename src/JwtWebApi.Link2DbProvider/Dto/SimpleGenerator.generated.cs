@@ -355,6 +355,8 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull    ] public int    Weight      { get; set; } // integer
 		[Column,        Nullable] public string Description { get; set; } // text
 		[Column,     NotNull    ] public float  Rating      { get; set; } // real
+		[Column,     NotNull    ] public bool   Visible     { get; set; } // boolean
+		[Column,        Nullable] public string OwnerId     { get; set; } // character varying(255)
 	}
 
 	[Table(Schema="places", Name="RouteAgeTypes")]
