@@ -7,7 +7,11 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
+using JwtWebApi.DataProviders.Common.Services;
+using JwtWebApi.Link2DbProvider;
+using LinqToDB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -21,13 +25,20 @@ namespace JwtWebApi.Api.Controllers
 		private const string FILESTORAGE_PATH = "/usr/share/fs/";
 		private const string AUDIO_BASE = "audio/";
 		private const string PICTURES_BASE = "pictures/";
+		private const string AVATAR_BASE = "avatar/";
 
 		private const int BUFFER_SIZE = 1024 * 1024;
 
 		private readonly ConcurrentDictionary<string, string> _hashFiles =
 			new ConcurrentDictionary<string, string>();
 
-	
+		private readonly IContextProviderFactory _contextProviderFactory;
+
+		public FileStorageController(IContextProviderFactory contextProviderFactory)
+		{
+			_contextProviderFactory = contextProviderFactory;
+		}
+
 		[HttpGet]
 		public async Task<IActionResult> GetFileInfos(FileType type, string path)
 		{
@@ -89,10 +100,46 @@ namespace JwtWebApi.Api.Controllers
 		}
 
 
-		[HttpPost(nameof(Upload))] 
-		[Authorize(Roles = "admin")]
+		[HttpPost(nameof(Upload))]
 		public async Task<IActionResult> Upload(FileType type, string path,string fileName)
 		{
+			bool isAdmin =
+				this.GetUserRole() == "admin";
+
+			if (type != FileType.Avatar && !isAdmin)
+			{
+				return BadRequest();
+			}
+
+			if (type == FileType.Avatar)
+			{
+				if (!isAdmin)
+				{
+					fileName = this.GetUserId();
+					if (string.IsNullOrWhiteSpace(fileName))
+					{
+						return BadRequest();
+					}
+				}
+				else
+				{
+					using (var contextProvider = _contextProviderFactory.Create())
+					{
+						var user =
+							contextProvider
+								.GetTable<AspNetUser>()
+								.FirstOrDefault(w => w.Id == fileName);
+
+						if (user == null)
+						{
+							return BadRequest();
+						}
+					}
+				}
+
+				path = fileName;
+			}
+
 			var fullPath = GetPath(type, path);
 
 			if (!Directory.Exists(fullPath))
@@ -158,6 +205,21 @@ namespace JwtWebApi.Api.Controllers
 				await str.WriteAsync(array);
 			}
 
+			if (type == FileType.Avatar)
+			{
+				using (var contextProvider = _contextProviderFactory.Create())
+				{
+					var res =
+						await contextProvider
+							.GetTable<AspNetUser>()
+							.Where(w => w.Id == fileName)
+							.UpdateAsync(user => new AspNetUser()
+							{
+								Avatar = "custom"
+							});
+				}
+			}
+
 			return Ok(pathWithFile);
 		}
 
@@ -193,6 +255,9 @@ namespace JwtWebApi.Api.Controllers
 					break;
 				case FileType.Picture:
 					fullPath += $"{PICTURES_BASE}{path}";
+					break;
+				case FileType.Avatar:
+					fullPath += $"{AVATAR_BASE}{path}";
 					break;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(type), type, null);
