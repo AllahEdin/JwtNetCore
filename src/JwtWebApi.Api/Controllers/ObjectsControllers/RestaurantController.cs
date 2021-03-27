@@ -34,9 +34,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, filter);
 
 
-		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypeByIds))]
+		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddCuisineTypeByIds(int restaurantId, int[] cuisineTypeIds)
+		public async Task<IActionResult> AddCuisineTypeById(int restaurantId, int[] cuisineTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -61,9 +61,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == cuisineTypeIds.Length);
 		}
 
-		[HttpDelete("{restaurantId}/" + nameof(DeleteCuisineTypeByIds))]
+		[HttpDelete("{restaurantId}/" + nameof(DeleteCuisineTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteCuisineTypeByIds(int restaurantId, int[] cuisineTypeIds)
+		public async Task<IActionResult> DeleteCuisineTypeById(int restaurantId, int[] cuisineTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -83,9 +83,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == cuisineTypeIds.Length);
 		}
 
-		[HttpPost("{restaurantId}/" + nameof(AddDenyTypeByIds))]
+		[HttpPost("{restaurantId}/" + nameof(AddDenyTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddDenyTypeByIds(int restaurantId, int[] denyTypeIds)
+		public async Task<IActionResult> AddDenyTypeById(int restaurantId, int[] denyTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -110,9 +110,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == denyTypeIds.Length);
 		}
 
-		[HttpDelete("{restaurantId}/" + nameof(DeleteDenyTypeByIds))]
+		[HttpDelete("{restaurantId}/" + nameof(DeleteDenyTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteDenyTypeByIds(int restaurantId, int[] denyTypeIds)
+		public async Task<IActionResult> DeleteDenyTypeById(int restaurantId, int[] denyTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
