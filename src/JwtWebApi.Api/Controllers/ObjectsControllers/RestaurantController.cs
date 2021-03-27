@@ -34,9 +34,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, filter);
 
 
-		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypesByIds))]
+		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypeByIds))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddCuisineTypesByIds(int restaurantId, int[] cuisineTypeIds)
+		public async Task<IActionResult> AddCuisineTypeByIds(int restaurantId, int[] cuisineTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -61,9 +61,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == cuisineTypeIds.Length);
 		}
 
-		[HttpDelete("{restaurantId}/" + nameof(DeleteCuisineTypesByIds))]
+		[HttpDelete("{restaurantId}/" + nameof(DeleteCuisineTypeByIds))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteCuisineTypesByIds(int restaurantId, int[] cuisineTypeIds)
+		public async Task<IActionResult> DeleteCuisineTypeByIds(int restaurantId, int[] cuisineTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -83,9 +83,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == cuisineTypeIds.Length);
 		}
 
-		[HttpPost("{restaurantId}/" + nameof(AddDenyTypesByIds))]
+		[HttpPost("{restaurantId}/" + nameof(AddDenyTypeByIds))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddDenyTypesByIds(int restaurantId, int[] denyTypeIds)
+		public async Task<IActionResult> AddDenyTypeByIds(int restaurantId, int[] denyTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -110,9 +110,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == denyTypeIds.Length);
 		}
 
-		[HttpDelete("{restaurantId}/" + nameof(DeleteDenyTypesByIds))]
+		[HttpDelete("{restaurantId}/" + nameof(DeleteDenyTypeByIds))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteDenyTypesByIds(int restaurantId, int[] denyTypeIds)
+		public async Task<IActionResult> DeleteDenyTypeByIds(int restaurantId, int[] denyTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
