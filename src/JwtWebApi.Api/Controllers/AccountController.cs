@@ -37,6 +37,43 @@ namespace JwtWebApi.Api.Controllers
 			_jwtGenerator = jwtGenerator;
 		}
 
+		/// <summary>
+		/// Открытая информация о незабаненных подтвержденных пользователях
+		/// </summary>
+		/// <param name="userId"></param>
+		/// <returns></returns>
+		[HttpGet(nameof(GetUserSharedInfo))]
+		public async Task<IActionResult> GetUserSharedInfo(string userId)
+		{
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					await contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Id == userId && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false))
+						.ToArrayAsync();
+
+				if (!found.Any())
+				{
+					return BadRequest("");
+				}
+
+				if (found.Length > 1)
+				{
+					return BadRequest("");
+				}
+
+				var usr = found.First();
+
+				return Ok(new UserSharedInfoModel()
+				{
+					Id = usr.Id,
+					RegistrationDate = usr.RegistrationDate ?? DateTimeOffset.Now,
+					UserName = usr.UserName,
+					Avatar = usr.Avatar
+				});
+			}
+		}
+
 		[HttpGet(nameof(GetSelfInfo))]
 		[Authorize]
 		public async Task<IActionResult> GetSelfInfo()
@@ -69,6 +106,7 @@ namespace JwtWebApi.Api.Controllers
 					EmailConfirmed = usr.EmailConfirmed ?? false,
 					UserName = usr.UserName,
 					RoleName = this.GetUserRole(),
+					Avatar = usr.Avatar
 				});
 			}
 		}
@@ -107,6 +145,7 @@ namespace JwtWebApi.Api.Controllers
 							RegistrationDate = t.Usr.RegistrationDate ?? DateTimeOffset.Now,
 							UserName = t.Usr.UserName,
 							RoleName = t.Role,
+							Avatar = t.Usr.Avatar
 						}).ToArray(),
 						Total = contextProvider.GetTable<AspNetUser>().Count()
 					};
@@ -190,7 +229,6 @@ namespace JwtWebApi.Api.Controllers
 			}
 		}
 
-
 		[ProducesResponseType(typeof(string), 200)]
 		[HttpPost(nameof(Login))]
 		[AllowAnonymous]
@@ -208,6 +246,51 @@ namespace JwtWebApi.Api.Controllers
 				await _jwtGenerator.Generate(ident.name, ident.role, ident.id);
 
 			return Ok(encodedJwt);
+		}
+
+		[ProducesResponseType(typeof(string), 200)]
+		[HttpPost(nameof(EditProfile))]
+		[Authorize]
+		public async Task<IActionResult> EditProfile([FromBody] UserEditProfileModel model)
+		{
+			if (this.GetUserRole() == "admin")
+			{
+				if (string.IsNullOrWhiteSpace(model.UserId))
+				{
+					return BadRequest();
+				}
+			}
+			else
+			{
+				model.UserId = this.GetUserId();
+			}
+
+			using (var contextProvider = _contextProviderFactory.Create())
+			{
+				var found =
+					contextProvider.GetTable<AspNetUser>()
+						.Where(t => t.Id == model.UserId && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false));
+
+				if (!found.Any())
+				{
+					return BadRequest("");
+				}
+
+				if (found.Count() > 1)
+				{
+					return BadRequest("");
+				}
+
+				var res =
+					await
+						found.UpdateAsync(user => new AspNetUser()
+						{
+							UserName = string.IsNullOrEmpty(model.UserName) ? found.First().UserName : model.UserName,
+							Avatar = string.IsNullOrEmpty(model.Avatar) ? found.First().Avatar : model.Avatar
+						});
+
+				return Ok(model);
+			}
 		}
 
 		[HttpPost(nameof(BanUser))]
