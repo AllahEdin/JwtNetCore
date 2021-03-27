@@ -11,6 +11,5 @@ namespace JwtWebApi.Api.Models
 		public DateTimeOffset RegistrationDate { get; set; } // timestamp (6) with time zone
 		public bool IsBanned { get; set; } // boolean
 		public string RoleName { get; set; }
-		public string Avatar { get; set; }
 	}
 }

@@ -115,7 +115,6 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,        Nullable] public string          SecurityStamp    { get; set; } // character varying(255)
 		[Column,        Nullable] public DateTimeOffset? RegistrationDate { get; set; } // timestamp (6) with time zone
 		[Column,        Nullable] public bool?           IsBanned         { get; set; } // boolean
-		[Column,        Nullable] public string          Avatar           { get; set; } // character varying(255)
 	}
 
 	[Table(Schema="aspnet", Name="AspNetUserRoles")]
@@ -356,8 +355,6 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull    ] public int    Weight      { get; set; } // integer
 		[Column,        Nullable] public string Description { get; set; } // text
 		[Column,     NotNull    ] public float  Rating      { get; set; } // real
-		[Column,     NotNull    ] public bool   Visible     { get; set; } // boolean
-		[Column,        Nullable] public string OwnerId     { get; set; } // character varying(255)
 	}
 
 	[Table(Schema="places", Name="RouteAgeTypes")]

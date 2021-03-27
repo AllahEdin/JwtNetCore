@@ -11,8 +11,6 @@ namespace JwtWebApi.Api.Models
 		[EnumMember(Value = "Audio")]
 		Audio,
 		[EnumMember(Value = "Picture")]
-		Picture,
-		[EnumMember(Value = "Avatar")]
-		Avatar
+		Picture
 	}
 }

@@ -974,10 +974,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<string>("OwnerId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -988,9 +984,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<int>("Time")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("Visible")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("Weight")
                         .ValueGeneratedOnAdd()

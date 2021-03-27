@@ -772,8 +772,6 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsRequired()
                     .HasMaxLength(255);
 
-                entity.Property(e => e.OwnerId).HasMaxLength(255);
-
                 entity.Property(e => e.Path)
                     .IsRequired()
                     .HasMaxLength(255);

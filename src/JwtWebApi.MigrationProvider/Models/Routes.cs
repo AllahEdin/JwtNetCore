@@ -27,8 +27,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Weight { get; set; }
         public string Description { get; set; }
         public float Rating { get; set; }
-        public bool Visible { get; set; }
-        public string OwnerId { get; set; }
 
         public virtual ICollection<RouteAgeTypes> RouteAgeTypes { get; set; }
         public virtual ICollection<RouteAttractions> RouteAttractions { get; set; }
