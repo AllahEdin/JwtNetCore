@@ -9,6 +9,17 @@ namespace JwtWebApi.Api.Services.Services
 {
 	public interface IRestaurantService : IEntityProvider<IRestaurant>, IPagingWithLinksProvider<IRestaurantWithLinks>, IRatingService<Restaurant>
 	{
+		public Task<PagingResult<IRestaurantWithLinks>> CustomFilter(int page,
+			int pageSize, 
+			string name, 
+			int? cityId, 
+			int? districtId,
+			int? cateringTypeId,
+			int[] cuisineTypeIds,
+			bool atLeastOneCuisineType,
+			int[] denyTypeIds,
+			bool atLeastOneDenyType,
+			OrderModel orderModel);
 	}
 
 	public interface IHotelService : IEntityProvider<IHotel>, IPagingWithLinksProvider<IHotelWithLinks>, IRatingService<Hotel>

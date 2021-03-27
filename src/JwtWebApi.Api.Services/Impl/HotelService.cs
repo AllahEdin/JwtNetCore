@@ -166,6 +166,11 @@ namespace JwtWebApi.Api.Services.Impl
 						hotels.Where(w => w.CityId == cityId);
 				}
 
+				if (housingTypeId != null) {
+					hotels =
+						hotels.Where(w => w.HousingTypeId == housingTypeId);
+				}
+
 				if (!string.IsNullOrEmpty(name))
 				{
 					hotels =

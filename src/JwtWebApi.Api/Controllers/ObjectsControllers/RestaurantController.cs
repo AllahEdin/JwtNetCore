@@ -2,6 +2,7 @@
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
+using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.Services.Services.Expressions;
@@ -14,8 +15,6 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 	{
 		private readonly IRestaurantCuisineTypesService _restaurantCuisineTypesService;
 		private readonly IRestaurantDenyTypesService _restaurantDenyTypesService;
-
-
 
 		public RestaurantController(IRestaurantCuisineTypesService restaurantCuisineTypesService,
 			IRestaurantDenyTypesService restaurantDenyTypesService,
@@ -32,6 +31,29 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		[HttpPost("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, filter);
+		
+		[HttpPost("WithLinks/GetPaging/Custom")]
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] RestaurantFilteringModel filter)
+		{
+			if (!this.IsValidModel(out var error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.CustomFilter(page, pageSize, 
+					filter.Name,
+					filter.CityId, 
+					filter.DistrictId,
+					filter.CateringTypeId,
+					filter.CuisineTypeIds,
+					filter.AtLeastOneCuisineType ?? false,
+					filter.DenyTypeIds,
+					filter.AtLeastOneDenyType ?? false,
+					filter.Order);
+
+			return Ok(pages);
+		}
 
 
 		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypeById))]
