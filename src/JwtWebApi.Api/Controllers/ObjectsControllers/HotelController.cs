@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
+using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.Services.Services.Expressions;
@@ -29,6 +31,29 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		[HttpPost("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IHotelWithLinks>(page, pageSize, filter);
+		
+		[HttpPost("WithLinks/GetPaging/Custom")]
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] HotelFilteringModel filter)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.CustomFilter(page, pageSize, 
+					filter.Name,
+					filter.CityId, 
+					filter.DistrictId,
+					filter.HousingTypeId,
+					filter.EquipmentTypes,
+					filter.AtLeastOneEquipmentType ?? false,
+					filter.ServiceTypes,
+					filter.AtLeastOneServiceType ?? false,
+					filter.Order);
+
+			return Ok(pages);
+		}
 
 
 		[HttpPost("{hotelId}/" + nameof(AddEquipmentTypeById))]

@@ -13,6 +13,17 @@ namespace JwtWebApi.Api.Services.Services
 
 	public interface IHotelService : IEntityProvider<IHotel>, IPagingWithLinksProvider<IHotelWithLinks>, IRatingService<Hotel>
 	{
+		public Task<PagingResult<IHotelWithLinks>> CustomFilter(int page,
+			int pageSize, 
+			string name, 
+			int? cityId, 
+			int? districtId,
+			int? housingTypeId,
+			int[] equipmentTypes,
+			bool equipmentTypesAtLeastOne,
+			int[] serviceTypes,
+			bool serviceTypesAtLeastOne,
+			OrderModel orderModel);
 	}
 
 	public interface IAttractionService : IEntityProvider<IAttraction>, IPagingWithLinksProvider<IAttractionWithLinks>, IRatingService<Attraction>
