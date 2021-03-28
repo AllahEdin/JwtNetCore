@@ -6,5 +6,6 @@
 		public const string RestaurantCode = "Restaurant";
 		public const string AttractionCode = "Attraction";
 		public const string RouteCode = "Route";
+		public const string EventCode = "Event";
 	}
 }

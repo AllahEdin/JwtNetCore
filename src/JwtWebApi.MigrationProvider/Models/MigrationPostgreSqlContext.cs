@@ -33,6 +33,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public virtual DbSet<DistrictCities> DistrictCities { get; set; }
         public virtual DbSet<Districts> Districts { get; set; }
         public virtual DbSet<EquipmentTypes> EquipmentTypes { get; set; }
+        public virtual DbSet<Events> Events { get; set; }
         public virtual DbSet<HotelEquipmentTypes> HotelEquipmentTypes { get; set; }
         public virtual DbSet<HotelServiceTypes> HotelServiceTypes { get; set; }
         public virtual DbSet<Hotels> Hotels { get; set; }
@@ -383,6 +384,47 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsRequired()
                     .HasMaxLength(255)
                     .HasDefaultValueSql("''::character varying");
+            });
+
+            modelBuilder.Entity<Events>(entity =>
+            {
+                entity.ToTable("Events", "places");
+
+                entity.HasIndex(e => e.CityId, "IX_Events_CityId");
+
+                entity.HasIndex(e => e.DistrictId, "IX_Events_DistrictId");
+
+                entity.Property(e => e.Address)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.EndDate).HasColumnType("date");
+
+                entity.Property(e => e.Latitude)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Longitude)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Path)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Phone).HasMaxLength(255);
+
+                entity.Property(e => e.Preview)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.StartDate).HasColumnType("date");
+
+                entity.Property(e => e.Url).HasMaxLength(255);
             });
 
             modelBuilder.Entity<HotelEquipmentTypes>(entity =>

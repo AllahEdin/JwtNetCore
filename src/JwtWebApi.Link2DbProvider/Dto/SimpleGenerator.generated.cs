@@ -39,6 +39,7 @@ namespace JwtWebApi.Link2DbProvider
 		public ITable<District>               Districts               { get { return this.GetTable<District>(); } }
 		public ITable<DistrictCity>           DistrictCities          { get { return this.GetTable<DistrictCity>(); } }
 		public ITable<EquipmentType>          EquipmentTypes          { get { return this.GetTable<EquipmentType>(); } }
+		public ITable<Event>                  Events                  { get { return this.GetTable<Event>(); } }
 		public ITable<Hotel>                  Hotels                  { get { return this.GetTable<Hotel>(); } }
 		public ITable<HotelEquipmentType>     HotelEquipmentTypes     { get { return this.GetTable<HotelEquipmentType>(); } }
 		public ITable<HotelServiceType>       HotelServiceTypes       { get { return this.GetTable<HotelServiceType>(); } }
@@ -225,6 +226,28 @@ namespace JwtWebApi.Link2DbProvider
 	{
 		[PrimaryKey, Identity] public int    Id   { get; set; } // integer
 		[Column,     NotNull ] public string Name { get; set; } // character varying(255)
+	}
+
+	[Table(Schema="places", Name="Events")]
+	public partial class Event : JwtWebApi.DataProviders.Common.DataObjects.IEntity,JwtWebApi.DataProviders.Common.DataObjects.INamed,JwtWebApi.DataProviders.Common.DataObjects.IHasRating
+	{
+		[PrimaryKey, Identity   ] public int      Id          { get; set; } // integer
+		[Column,     NotNull    ] public string   Name        { get; set; } // character varying(255)
+		[Column,     NotNull    ] public string   Preview     { get; set; } // character varying(255)
+		[Column,        Nullable] public string   Description { get; set; } // text
+		[Column,     NotNull    ] public int      CityId      { get; set; } // integer
+		[Column,     NotNull    ] public int      DistrictId  { get; set; } // integer
+		[Column,     NotNull    ] public string   Address     { get; set; } // character varying(255)
+		[Column,     NotNull    ] public string   Latitude    { get; set; } // character varying(255)
+		[Column,     NotNull    ] public string   Longitude   { get; set; } // character varying(255)
+		[Column,     NotNull    ] public string   Path        { get; set; } // character varying(255)
+		[Column,     NotNull    ] public int      Discount    { get; set; } // integer
+		[Column,     NotNull    ] public int      Weight      { get; set; } // integer
+		[Column,     NotNull    ] public DateTime StartDate   { get; set; } // date
+		[Column,     NotNull    ] public DateTime EndDate     { get; set; } // date
+		[Column,        Nullable] public string   Phone       { get; set; } // character varying(255)
+		[Column,        Nullable] public string   Url         { get; set; } // character varying(255)
+		[Column,     NotNull    ] public float    Rating      { get; set; } // real
 	}
 
 	[Table(Schema="places", Name="Hotels")]

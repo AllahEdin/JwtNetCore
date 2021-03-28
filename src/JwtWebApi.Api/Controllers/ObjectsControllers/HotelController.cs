@@ -24,6 +24,12 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			_hotelServiceTypesService = hotelServiceTypesService;
 		}
 
+		public override Task<IActionResult> Post(HotelModel model)
+		{
+			model.Rating = 0;
+			return base.Post(model);
+		}
+
 		[HttpGet("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
 			=> base.GetPaging<IHotelWithLinks>(page, pageSize, null);

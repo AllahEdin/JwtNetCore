@@ -71,4 +71,9 @@ namespace JwtWebApi.Api.Services.Services
 
 		public Task<string> RecalculateLength(int routeId);
 	}
+
+	public interface IEventService : IEntityProvider<IEvent>, IRatingService<Event>
+	{
+
+	}
 }
