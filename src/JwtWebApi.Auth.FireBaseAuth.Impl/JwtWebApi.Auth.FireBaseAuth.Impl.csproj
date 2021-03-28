@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.0.0" />
+    <PackageReference Include="FirebaseAdmin" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.DataProviders.Common\JwtWebApi.DataProviders.Common.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Link2DbProvider\JwtWebApi.Link2DbProvider.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Services\JwtWebApi.Services.csproj" />
+  </ItemGroup>
+
+</Project>

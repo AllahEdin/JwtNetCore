@@ -50,6 +50,13 @@ namespace JwtWebApi
 				.As<IGoogleSecretKeyProvider>()
 				.SingleInstance();
 
+			builder.RegisterType<GoogleCredentialSecretProvider>()
+				.As<IGoogleCredentialSecretProvider>()
+				.SingleInstance();
+
+
+
+
 			builder.RegisterType<ToDictDataUpdate>()
 				.As<IMigrationDataUpdate>()
 				.SingleInstance();

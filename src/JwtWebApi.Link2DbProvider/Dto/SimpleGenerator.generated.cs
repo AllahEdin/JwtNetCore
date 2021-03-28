@@ -117,6 +117,8 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,        Nullable] public DateTimeOffset? RegistrationDate { get; set; } // timestamp (6) with time zone
 		[Column,        Nullable] public bool?           IsBanned         { get; set; } // boolean
 		[Column,        Nullable] public string          Avatar           { get; set; } // character varying(255)
+		[Column,        Nullable] public string          FireBaseId       { get; set; } // character varying(255)
+		[Column,        Nullable] public string          VkId             { get; set; } // character varying(255)
 	}
 
 	[Table(Schema="aspnet", Name="AspNetUserRoles")]

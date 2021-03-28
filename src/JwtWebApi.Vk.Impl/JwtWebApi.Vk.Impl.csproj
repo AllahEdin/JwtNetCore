@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="VkNet" Version="1.61.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.Common\JwtWebApi.Common.csproj" />
+    <ProjectReference Include="..\JwtWebApi.DataProviders.Common\JwtWebApi.DataProviders.Common.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Link2DbProvider\JwtWebApi.Link2DbProvider.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Services\JwtWebApi.Services.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -11,6 +11,7 @@ services:
       - TravelDbConnectionString
       - JWTKey
       - GoogleSecret
+      - GoogleCredential
     volumes:
       - /usr/app/dev/fs:/usr/share/fs
     networks:
@@ -26,4 +27,6 @@ secrets:
       file: /usr/app/dev/JWTKey
    GoogleSecret:
       file: /usr/app/dev/GoogleSecret
+   GoogleCredential:
+      file: /usr/app/dev/GoogleCredential
       
