@@ -669,21 +669,26 @@ namespace JwtWebApi.Api.Controllers
 			{
 				var user= 
 					provider.GetTable<AspNetUser>()
-					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false) && !(t.IsBanned ?? false));
+					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false) && !(t.IsBanned ?? false) && (string.IsNullOrEmpty(t.FireBaseId)));
 				
 				if (user == null)
 				{
 					return (false, "", "", "");
 				}
 
-				var userRole =
-					provider
+				var userRoles =
+					await provider
 						.GetTable<AspNetUserRole>()
-						.FirstOrDefault(t => t.AspNetUserId == user.Id) ?? await SetDefaultRoleToUser(user.Id);
+						.Where(t => t.AspNetUserId == user.Id)
+						.ToArrayAsync();
 
-				var role =
+				if (userRoles.Length <= 0)
+					userRoles = 
+						userRoles.Union(new[] {await SetDefaultRoleToUser(user.Id)}).ToArray();
+
+				var roles =
 					provider.GetTable<AspNetRole>()
-						.FirstOrDefault(t => t.Id == userRole.RoleId) ?? throw new InvalidOperationException("Нарушена целостность бд");
+						.Where(t => userRoles.Select(s => s.RoleId).Contains(t.Id));
 
 				switch (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password))
 				{
@@ -697,7 +702,14 @@ namespace JwtWebApi.Api.Controllers
 						throw new ArgumentOutOfRangeException();
 				}
 
-				return (true, user.UserName, user.Id ,role.RoleName);
+				if (roles.Any(r => r.RoleName == "admin"))
+				{
+					return (true, user.UserName, user.Id, roles.First(w => w.RoleName == "admin").RoleName);
+				}
+				else
+				{
+					return (true, user.UserName, user.Id, roles.First().RoleName);
+				}
 			}
 		}
 

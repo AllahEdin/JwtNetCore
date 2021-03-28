@@ -142,6 +142,8 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsRequired()
                     .HasMaxLength(255);
 
+                entity.Property(e => e.FireBaseId).HasMaxLength(255);
+
                 entity.Property(e => e.PasswordHash).HasMaxLength(255);
 
                 entity.Property(e => e.RegistrationDate).HasColumnType("timestamp with time zone");

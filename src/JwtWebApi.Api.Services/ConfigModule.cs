@@ -158,6 +158,8 @@ namespace JwtWebApi.Api.Services
 			builder.RegisterType<DictionaryRowService>()
 				.As<IDictionaryRowService>()
 				.SingleInstance();
+
+			
 		}
 	}
 }

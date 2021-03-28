@@ -13,6 +13,7 @@ namespace JwtWebApi.Services
 			builder.RegisterType<JwtGenerator>()
 				.As<IJwtGenerator>()
 				.SingleInstance();
+
 		}
 	}
 }

@@ -27,6 +27,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtWebApi.Api.Services", "J
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlGen", "SqlGen\SqlGen.csproj", "{393582A4-D32C-495D-8197-E000145BD96F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtWebApi.Auth.FireBaseAuth.Impl", "JwtWebApi.Auth.FireBaseAuth.Impl\JwtWebApi.Auth.FireBaseAuth.Impl.csproj", "{1F96C1B8-D3AD-4FE8-ACB5-869E093567AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtWebApi.Vk.Impl", "JwtWebApi.Vk.Impl\JwtWebApi.Vk.Impl.csproj", "{80C2B34F-9610-4277-9EDB-3298C8C6CE2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +85,14 @@ Global
 		{393582A4-D32C-495D-8197-E000145BD96F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{393582A4-D32C-495D-8197-E000145BD96F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{393582A4-D32C-495D-8197-E000145BD96F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F96C1B8-D3AD-4FE8-ACB5-869E093567AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F96C1B8-D3AD-4FE8-ACB5-869E093567AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F96C1B8-D3AD-4FE8-ACB5-869E093567AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F96C1B8-D3AD-4FE8-ACB5-869E093567AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80C2B34F-9610-4277-9EDB-3298C8C6CE2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80C2B34F-9610-4277-9EDB-3298C8C6CE2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80C2B34F-9610-4277-9EDB-3298C8C6CE2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80C2B34F-9610-4277-9EDB-3298C8C6CE2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

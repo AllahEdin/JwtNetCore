@@ -23,6 +23,8 @@
     <ProjectReference Include="..\JwtWebApi.Email\JwtWebApi.Email.csproj" />
     <ProjectReference Include="..\JwtWebApi.MigrationProvider\JwtWebApi.MigrationProvider.csproj" />
     <ProjectReference Include="..\JwtWebApi.Services\JwtWebApi.Services.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Auth.FireBaseAuth.Impl\JwtWebApi.Auth.FireBaseAuth.Impl.csproj" />
+    <ProjectReference Include="..\JwtWebApi.Vk.Impl\JwtWebApi.Vk.Impl.csproj" />
   </ItemGroup>
 
 </Project>
