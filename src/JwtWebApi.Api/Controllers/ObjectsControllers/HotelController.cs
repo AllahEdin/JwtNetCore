@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
+using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.Services.Services.Expressions;
@@ -29,11 +31,34 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		[HttpPost("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IHotelWithLinks>(page, pageSize, filter);
+		
+		[HttpPost("WithLinks/GetPaging/Custom")]
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] HotelFilteringModel filter)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.CustomFilter(page, pageSize, 
+					filter.Name,
+					filter.CityId, 
+					filter.DistrictId,
+					filter.HousingTypeId,
+					filter.EquipmentTypes,
+					filter.AtLeastOneEquipmentType ?? false,
+					filter.ServiceTypes,
+					filter.AtLeastOneServiceType ?? false,
+					filter.Order);
+
+			return Ok(pages);
+		}
 
 
-		[HttpPost("{hotelId}/" + nameof(AddEquipmentTypesByIds))]
+		[HttpPost("{hotelId}/" + nameof(AddEquipmentTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddEquipmentTypesByIds(int hotelId, int[] equipmentTypeIds)
+		public async Task<IActionResult> AddEquipmentTypeById(int hotelId, int[] equipmentTypeIds)
 		{
 			if (hotelId <= 0)
 			{
@@ -58,9 +83,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == equipmentTypeIds.Length);
 		}
 
-		[HttpDelete("{hotelId}/" + nameof(DeleteEquipmentTypesByIds))]
+		[HttpDelete("{hotelId}/" + nameof(DeleteEquipmentTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteEquipmentTypesByIds(int hotelId, int[] equipmentTypeIds)
+		public async Task<IActionResult> DeleteEquipmentTypeById(int hotelId, int[] equipmentTypeIds)
 		{
 			if (hotelId <= 0)
 			{
@@ -80,9 +105,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == equipmentTypeIds.Length);
 		}
 
-		[HttpPost("{hotelId}/" + nameof(AddServiceTypesByIds))]
+		[HttpPost("{hotelId}/" + nameof(AddServiceTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddServiceTypesByIds(int hotelId, int[] serviceTypeIds)
+		public async Task<IActionResult> AddServiceTypeById(int hotelId, int[] serviceTypeIds)
 		{
 			if (hotelId <= 0)
 			{
@@ -107,9 +132,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == serviceTypeIds.Length);
 		}
 
-		[HttpDelete("{hotelId}/" + nameof(DeleteServiceTypesByIds))]
+		[HttpDelete("{hotelId}/" + nameof(DeleteServiceTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteServiceTypesByIds(int hotelId, int[] serviceTypeIds)
+		public async Task<IActionResult> DeleteServiceTypeById(int hotelId, int[] serviceTypeIds)
 		{
 			if (hotelId <= 0)
 			{

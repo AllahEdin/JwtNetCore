@@ -2,6 +2,7 @@
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
+using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.Services.Services.Expressions;
@@ -14,8 +15,6 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 	{
 		private readonly IRestaurantCuisineTypesService _restaurantCuisineTypesService;
 		private readonly IRestaurantDenyTypesService _restaurantDenyTypesService;
-
-
 
 		public RestaurantController(IRestaurantCuisineTypesService restaurantCuisineTypesService,
 			IRestaurantDenyTypesService restaurantDenyTypesService,
@@ -32,11 +31,34 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		[HttpPost("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
 			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, filter);
+		
+		[HttpPost("WithLinks/GetPaging/Custom")]
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] RestaurantFilteringModel filter)
+		{
+			if (!this.IsValidModel(out var error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.CustomFilter(page, pageSize, 
+					filter.Name,
+					filter.CityId, 
+					filter.DistrictId,
+					filter.CateringTypeId,
+					filter.CuisineTypeIds,
+					filter.AtLeastOneCuisineType ?? false,
+					filter.DenyTypeIds,
+					filter.AtLeastOneDenyType ?? false,
+					filter.Order);
+
+			return Ok(pages);
+		}
 
 
-		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypesByIds))]
+		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddCuisineTypesByIds(int restaurantId, int[] cuisineTypeIds)
+		public async Task<IActionResult> AddCuisineTypeById(int restaurantId, int[] cuisineTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -61,9 +83,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == cuisineTypeIds.Length);
 		}
 
-		[HttpDelete("{restaurantId}/" + nameof(DeleteCuisineTypesByIds))]
+		[HttpDelete("{restaurantId}/" + nameof(DeleteCuisineTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteCuisineTypesByIds(int restaurantId, int[] cuisineTypeIds)
+		public async Task<IActionResult> DeleteCuisineTypeById(int restaurantId, int[] cuisineTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -83,9 +105,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == cuisineTypeIds.Length);
 		}
 
-		[HttpPost("{restaurantId}/" + nameof(AddDenyTypesByIds))]
+		[HttpPost("{restaurantId}/" + nameof(AddDenyTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> AddDenyTypesByIds(int restaurantId, int[] denyTypeIds)
+		public async Task<IActionResult> AddDenyTypeById(int restaurantId, int[] denyTypeIds)
 		{
 			if (restaurantId <= 0)
 			{
@@ -110,9 +132,9 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(count == denyTypeIds.Length);
 		}
 
-		[HttpDelete("{restaurantId}/" + nameof(DeleteDenyTypesByIds))]
+		[HttpDelete("{restaurantId}/" + nameof(DeleteDenyTypeById))]
 		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> DeleteDenyTypesByIds(int restaurantId, int[] denyTypeIds)
+		public async Task<IActionResult> DeleteDenyTypeById(int restaurantId, int[] denyTypeIds)
 		{
 			if (restaurantId <= 0)
 			{

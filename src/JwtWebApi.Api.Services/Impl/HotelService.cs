@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -15,6 +16,7 @@ namespace JwtWebApi.Api.Services.Impl
 {
 	internal class HotelService : EntityProviderBase<IHotel, Hotel>, IHotelService
 	{
+		private readonly IContextProviderFactory _contextProviderFactory;
 		private readonly IHotelEquipmentTypesService _hotelEquipmentTypesService;
 		private readonly IHotelServiceTypesService _hotelServiceTypesService;
 		private string _objectCode;
@@ -25,8 +27,8 @@ namespace JwtWebApi.Api.Services.Impl
 		{
 			_hotelEquipmentTypesService = hotelEquipmentTypesService;
 			_hotelServiceTypesService = hotelServiceTypesService;
+			_contextProviderFactory = contextProviderFactory;
 		}
-
 
 		protected override async Task<IHotel> Update(IContextProvider provider, IHotel model)
 		{
@@ -151,5 +153,116 @@ namespace JwtWebApi.Api.Services.Impl
 			=> true;
 
 		string IRatingService<Hotel>.ObjectCode => PlaceTypesConfig.HotelCode;
+
+		public async Task<PagingResult<IHotelWithLinks>> CustomFilter(int page, int pageSize, string name, int? cityId, int? districtId, int? housingTypeId,
+			int[] equipmentTypes, bool equipmentTypesAtLeastOne, int[] serviceTypes, bool serviceTypesAtLeastOne,
+			OrderModel orderModel) {
+			using (var cp = _contextProviderFactory.Create())
+			{
+				var hotels =
+					cp.GetTable<Hotel>();
+
+				if (cityId != null)
+				{
+					hotels =
+						hotels.Where(w => w.CityId == cityId);
+				}
+
+				if (housingTypeId != null) {
+					hotels =
+						hotels.Where(w => w.HousingTypeId == housingTypeId);
+				}
+
+				if (!string.IsNullOrEmpty(name))
+				{
+					hotels =
+						hotels.Where(w => w.Name.ToLower().Contains(name.ToLower(), StringComparison.OrdinalIgnoreCase));
+				}
+
+				if (districtId != null)
+				{
+					hotels =
+						hotels.Where(w => w.DistrictId == districtId);
+				}
+
+				if (equipmentTypes?.Any() ?? false)
+				{
+					var attrSubjIds =
+						cp.GetTable<RouteSubjectName>()
+							.ToArray()
+							.GroupBy(atts => atts.RouteId)
+							.Where(w =>
+								equipmentTypesAtLeastOne
+									? equipmentTypes.Any(a => w.Select(s => s.SubjectNameId).Contains(a))
+									: equipmentTypes.All(a => w.Select(s => s.SubjectNameId).Contains(a)))
+							.Select(s => s.Key);
+
+					hotels =
+						hotels.Where(w => attrSubjIds.Contains(w.Id));
+				}
+				
+				if (serviceTypes?.Any() ?? false)
+				{
+					var attrSubjIds =
+						cp.GetTable<RouteSubjectName>()
+							.ToArray()
+							.GroupBy(atts => atts.RouteId)
+							.Where(w =>
+								serviceTypesAtLeastOne
+									? serviceTypes.Any(a => w.Select(s => s.SubjectNameId).Contains(a))
+									: serviceTypes.All(a => w.Select(s => s.SubjectNameId).Contains(a)))
+							.Select(s => s.Key);
+
+					hotels =
+						hotels.Where(w => attrSubjIds.Contains(w.Id));
+				}
+
+				IReadOnlyCollection<Hotel> hotelsFinal =
+					await hotels.GetFilteredTable(new SearchModel()
+						{
+							Order = orderModel
+						}, cp)
+						.Skip((page - 1) * pageSize)
+						.Take(pageSize)
+						.ToArrayAsync();
+
+				var paging =
+					new PagingResult<IHotel>()
+					{
+						Total = hotels.Count(),
+						Items = !hotelsFinal.Any()
+							? new IHotel[0]
+							: DtoMapper.Map<IHotel[]>(hotelsFinal),
+					};
+				
+				var res =
+					await GetPagingWithLinksInternal(paging);
+
+				return res;
+			}
+		}
+		
+		private async Task<PagingResult<IHotelWithLinks>> GetPagingWithLinksInternal(PagingResult<IHotel> paging)
+		{
+			var equipmentTypes =
+				await GetLink<HotelEquipmentType>(paging.Items,
+					opt => paging.Items.Select(t => t.Id).Contains(opt.HotelId));
+
+			var serviceTypes =
+				await GetLink<HotelServiceType>(paging.Items,
+					opt => paging.Items.Select(t => t.Id).Contains(opt.HotelId));
+
+
+			return new PagingResult<IHotelWithLinks>()
+			{
+				Total = paging.Total,
+				Items = paging.Items.Select(t => new HotelWithLinks()
+				{
+					Hotel = t,
+					EquipmentTypes = equipmentTypes.Where(w => w.HotelId == t.Id).Select(s => s.EquipmentTypeId).ToArray(),
+					ServiceTypes = serviceTypes.Where(w => w.HotelId == t.Id).Select(s => s.ServiceTypeId).ToArray(),
+				}).ToArray()
+			};
+		}
 	}
 }
