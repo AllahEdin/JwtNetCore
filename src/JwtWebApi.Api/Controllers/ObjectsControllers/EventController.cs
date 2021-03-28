@@ -39,6 +39,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 					filter.DistrictId,
 					filter.StartDateFilter,
 					filter.EndDateFilter,
+					filter.DateFilter,
 					filter.Order);
 
 			return Ok(pages);

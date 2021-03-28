@@ -78,8 +78,9 @@ namespace JwtWebApi.Api.Services.Services
 		Task<PagingResult<IEvent>> CustomFilter(int page, int pageSize,
 			int? cityId, 
 			int? districtId, 
-			IFromToFilter<DateTime> filterStartDateFilter,
-			IFromToFilter<DateTime> filterEndDateFilter,
+			IFromToFilter<DateTime> startDateFilter,
+			IFromToFilter<DateTime> endDateFilter,
+			IFromToFilter<DateTime> dateFilter,
 			OrderModel orderModel);
 	}
 }

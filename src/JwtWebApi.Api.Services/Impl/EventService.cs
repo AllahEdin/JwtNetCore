@@ -90,6 +90,7 @@ namespace JwtWebApi.Api.Services.Impl
 			int? districtId,
 			IFromToFilter<DateTime> startDateFilter,
 			IFromToFilter<DateTime> endDateFilter,
+			IFromToFilter<DateTime> dateFilter,
 			OrderModel orderModel)
 		{
 			using (var cp = _contextProviderFactory.Create())
@@ -117,6 +118,14 @@ namespace JwtWebApi.Api.Services.Impl
 				{
 					events =
 						events.Where(w => w.EndDate >= endDateFilter.From && w.EndDate <= endDateFilter.To);
+				}
+
+				if (dateFilter != null)
+				{
+					events =
+						events.Where(w => (w.StartDate >= dateFilter.From && w.StartDate <= dateFilter.To) ||
+						                  (w.EndDate >= dateFilter.From && w.EndDate <= dateFilter.To) ||
+						                  (w.StartDate <= dateFilter.From && w.EndDate >= dateFilter.To));
 				}
 
 				IReadOnlyCollection<Event> eventsFinal =
