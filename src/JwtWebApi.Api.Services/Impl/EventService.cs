@@ -140,5 +140,27 @@ namespace JwtWebApi.Api.Services.Impl
 				return paging;
 			}
 		}
+
+		public async Task<PagingResult<IEventWithLinks>> GetPagingWithLinks(int page, int pageSize, SearchModel filter)
+		{
+			var paging =
+				await Get(page, pageSize, filter);
+
+			return await
+				GetPagingWithLinksInternal(paging);
+		}
+
+		private async Task<PagingResult<IEventWithLinks>> GetPagingWithLinksInternal(PagingResult<IEvent> paging)
+		{
+			
+			return new PagingResult<IEventWithLinks>()
+			{
+				Total = paging.Total,
+				Items = paging.Items.Select(t => new EventWithLinks()
+				{
+					Event = t
+				}).ToArray()
+			};
+		}
 	}
 }

@@ -48,6 +48,11 @@ namespace JwtWebApi.Api.Services.Dto
 		public IEnumerable<int> ServiceTypes { get; set; }
 	}
 
+	public interface IEventWithLinks
+	{
+		public IEvent Event { get; set; }
+	}
+
 
 	public interface IRestaurant : IEntity
 	{
