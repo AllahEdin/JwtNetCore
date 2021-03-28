@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JwtWebApi.Api.Common.Dto;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Extensions;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Services.Impl
 {
@@ -80,7 +84,61 @@ namespace JwtWebApi.Api.Services.Impl
 			=> true;
 
 		string IRatingService<Event>.ObjectCode => PlaceTypesConfig.EventCode;
-		
-	
+
+		public async Task<PagingResult<IEvent>> CustomFilter(int page, int pageSize,
+			int? cityId,
+			int? districtId,
+			IFromToFilter<DateTime> startDateFilter,
+			IFromToFilter<DateTime> endDateFilter,
+			OrderModel orderModel)
+		{
+			using (var cp = _contextProviderFactory.Create())
+			{
+				var events =
+					cp.GetTable<Event>();
+
+				if (cityId != null)
+				{
+					events = events.Where(w => w.CityId == cityId);
+				}
+
+				if (districtId != null)
+				{
+					events = events.Where(w => w.DistrictId == districtId);
+				}
+
+				if (startDateFilter != null)
+				{
+					events =
+						events.Where(w => w.StartDate >= startDateFilter.From && w.StartDate <= startDateFilter.To);
+				}
+
+				if (endDateFilter != null)
+				{
+					events =
+						events.Where(w => w.EndDate >= endDateFilter.From && w.EndDate <= endDateFilter.To);
+				}
+
+				IReadOnlyCollection<Event> eventsFinal =
+					await events.GetFilteredTable(new SearchModel()
+					{
+						Order = orderModel
+					}, cp)
+						.Skip((page - 1) * pageSize)
+						.Take(pageSize)
+						.ToArrayAsync();
+
+				var paging =
+					new PagingResult<IEvent>()
+					{
+						Total = events.Count(),
+						Items = !eventsFinal.Any()
+							? new IEvent[0]
+							: DtoMapper.Map<IEvent[]>(eventsFinal),
+					};
+				
+				return paging;
+			}
+		}
 	}
 }
