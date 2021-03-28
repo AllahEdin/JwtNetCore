@@ -15,5 +15,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public string SecurityStamp { get; set; }
         public DateTime? RegistrationDate { get; set; }
         public bool? IsBanned { get; set; }
+        public string Avatar { get; set; }
     }
 }
