@@ -73,7 +73,7 @@ namespace JwtWebApi.Api.Services.Services
 		public Task<string> RecalculateLength(int routeId);
 	}
 
-	public interface IEventService : IEntityProvider<IEvent>, IRatingService<Event>
+	public interface IEventService : IEntityProvider<IEvent>,IPagingWithLinksProvider<IEventWithLinks>, IRatingService<Event>
 	{
 		Task<PagingResult<IEvent>> CustomFilter(int page, int pageSize,
 			int? cityId, 

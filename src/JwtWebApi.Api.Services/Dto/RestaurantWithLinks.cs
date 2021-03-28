@@ -16,6 +16,11 @@ namespace JwtWebApi.Api.Services.Dto
 		public IEnumerable<int> ServiceTypes { get; set; }
 	}
 
+	internal class EventWithLinks : IEventWithLinks
+	{
+		public IEvent Event { get; set; }
+	}
+
 	internal class AttractionWithLinks : IAttractionWithLinks
 	{
 		public IAttraction Attraction { get; set; }

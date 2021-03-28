@@ -5,6 +5,7 @@ using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JwtWebApi.Api.Controllers.ObjectsControllers
@@ -15,6 +16,14 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		public EventController(IEventService service) : base(service)
 		{
 		}
+
+		[HttpGet("WithLinks/GetPaging")]
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
+			=> base.GetPaging<IEventWithLinks>(page, pageSize, null);
+
+		[HttpPost("WithLinks/GetPaging")]
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
+			=> base.GetPaging<IEventWithLinks>(page, pageSize, filter);
 
 		[HttpPost("WithLinks/GetPaging/Custom")]
 		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] EventFilteringModel filter)
