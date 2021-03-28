@@ -17,5 +17,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public bool? IsBanned { get; set; }
         public string Avatar { get; set; }
         public string FireBaseId { get; set; }
+        public string VkId { get; set; }
     }
 }

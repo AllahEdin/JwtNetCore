@@ -153,6 +153,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.UserName)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.VkId).HasMaxLength(255);
             });
 
             modelBuilder.Entity<AttractionPlaceTypes>(entity =>

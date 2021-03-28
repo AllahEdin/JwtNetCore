@@ -28,5 +28,5 @@ secrets:
    GoogleSecret:
       file: /usr/app/dev/GoogleSecret
    GoogleCredential:
-      file: /usr/app/PROD/GoogleCredential
+      file: /usr/app/dev/GoogleCredential
       
