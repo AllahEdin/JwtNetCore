@@ -170,6 +170,7 @@ namespace JwtWebApi.Api.Controllers
 					PlaceId = model.PlaceId,
 					UserId = this.GetUserId(),
 					CreateDate = DateTime.Now,
+					UpdateDate = DateTime.Now,
 					Id = 0
 				};
 

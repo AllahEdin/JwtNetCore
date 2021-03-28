@@ -28,6 +28,8 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Discount { get; set; }
         public int Weight { get; set; }
         public float Rating { get; set; }
+        public string Phone { get; set; }
+        public string Url { get; set; }
 
         public virtual ICollection<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual ICollection<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }

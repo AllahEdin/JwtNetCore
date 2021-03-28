@@ -54,7 +54,8 @@ namespace JwtWebApi.Api.Services.Impl
 						{
 							IsVisible = isVisible ?? t.IsVisible,
 							Text = needUpdateText ? text : t.Text,
-							Rate = rate ?? t.Rate
+							Rate = rate ?? t.Rate,
+							UpdateDate = DateTime.Now
 						});
 
 

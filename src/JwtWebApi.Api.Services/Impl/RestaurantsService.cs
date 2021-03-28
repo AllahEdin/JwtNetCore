@@ -64,8 +64,11 @@ namespace JwtWebApi.Api.Services.Impl
 						Longitude = string.IsNullOrEmpty(model.Longitude) ? rest.Longitude : model.Longitude,
 						Path = string.IsNullOrEmpty(model.Path) ? rest.Path : model.Path,
 						Preview = string.IsNullOrEmpty(model.Preview) ? rest.Preview : model.Preview,
+						Url = string.IsNullOrEmpty(model.Url) ? rest.Url : model.Url,
+						Phone = string.IsNullOrEmpty(model.Phone) ? rest.Phone : model.Phone,
 						Discount = model.Discount > -1 ? model.Discount : rest.Discount,
 						Weight = model.Weight > 0 ? model.Weight : rest.Weight,
+						
 					});
 
 			return model;

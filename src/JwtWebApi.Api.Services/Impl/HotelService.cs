@@ -63,9 +63,11 @@ namespace JwtWebApi.Api.Services.Impl
 						Longitude = string.IsNullOrEmpty(model.Longitude) ? hotel.Longitude : model.Longitude,
 						Path = string.IsNullOrEmpty(model.Path) ? hotel.Path : model.Path,
 						Preview = string.IsNullOrEmpty(model.Preview) ? hotel.Preview : model.Preview,
+						Phone = string.IsNullOrEmpty(model.Phone) ? hotel.Phone : model.Phone,
+						Url = string.IsNullOrEmpty(model.Url) ? hotel.Url : model.Url,
 						ClassType = (model.ClassType > 0 && model.ClassType <= 5) ? model.ClassType : hotel.ClassType,
 						HousingTypeId = model.HousingTypeId > 0 ? model.HousingTypeId : hotel.HousingTypeId,
-						Weight = model.Weight > 0 ? model.Weight : hotel.Weight
+						Weight = model.Weight > 0 ? model.Weight : hotel.Weight,
 					});
 
 			return model;

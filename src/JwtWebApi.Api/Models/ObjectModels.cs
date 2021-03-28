@@ -19,6 +19,9 @@ namespace JwtWebApi.Api.Models
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
 		public int Weight { get; set; }
+		public float Rating { get; set; }
+		public string Phone { get; set; }
+		public string Url { get; set; }
 	}
 
 	public class HotelModel : IHotel
@@ -38,6 +41,9 @@ namespace JwtWebApi.Api.Models
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
 		public int Weight { get; set; }
+		public float Rating { get; set; }
+		public string Phone { get; set; }
+		public string Url { get; set; }
 	}
 
 	public class AttractionModel : IAttraction
@@ -56,6 +62,7 @@ namespace JwtWebApi.Api.Models
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
 		public int Weight { get; set; }
+		public float Rating { get; set; }
 	}
 
 	public class RouteModel : IRoute
@@ -72,6 +79,7 @@ namespace JwtWebApi.Api.Models
 		public int CityId { get; set; }
 		public int Weight { get; set; }
 		public string Description { get; set; }
+		public float Rating { get; set; }
 		public bool Visible { get; set; }
 		public string OwnerId { get; set; }
 	}

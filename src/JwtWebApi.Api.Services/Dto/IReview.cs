@@ -12,5 +12,6 @@ namespace JwtWebApi.Api.Services.Dto
 		public int PlaceId { get; set; }
 		public bool IsVisible { get; set; }
 		public DateTime? CreateDate { get; set; }
+		public DateTime? UpdateDate { get; set; }
 	}
 }

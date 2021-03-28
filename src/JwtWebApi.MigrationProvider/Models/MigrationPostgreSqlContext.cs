@@ -467,6 +467,8 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsRequired()
                     .HasMaxLength(255);
 
+                entity.Property(e => e.Phone).HasMaxLength(255);
+
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
@@ -619,6 +621,8 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsRequired()
                     .HasMaxLength(255);
 
+                entity.Property(e => e.Phone).HasMaxLength(255);
+
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
@@ -638,6 +642,8 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.PlaceType)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("date");
 
                 entity.Property(e => e.UserId)
                     .IsRequired()
