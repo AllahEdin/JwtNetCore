@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Dto;
 using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Services.Dto;
@@ -70,5 +71,15 @@ namespace JwtWebApi.Api.Services.Services
 			OrderModel orderModel);
 
 		public Task<string> RecalculateLength(int routeId);
+	}
+
+	public interface IEventService : IEntityProvider<IEvent>, IRatingService<Event>
+	{
+		Task<PagingResult<IEvent>> CustomFilter(int page, int pageSize,
+			int? cityId, 
+			int? districtId, 
+			IFromToFilter<DateTime> filterStartDateFilter,
+			IFromToFilter<DateTime> filterEndDateFilter,
+			OrderModel orderModel);
 	}
 }

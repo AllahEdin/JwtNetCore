@@ -24,6 +24,12 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			_restaurantDenyTypesService = restaurantDenyTypesService;
 		}
 
+		public override Task<IActionResult> Post(RestaurantModel model)
+		{
+			model.Rating = 0;
+			return base.Post(model);
+		}
+
 		[HttpGet("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
 			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, null);

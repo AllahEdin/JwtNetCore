@@ -224,20 +224,69 @@ namespace JwtWebApi.Api.Controllers
 		}
 
 		[HttpDelete()]
-		[Authorize(Roles = "admin")]
 		public async Task<IActionResult> Delete(FileType type, string path, string fileName)
 		{
+			bool isAdmin =
+				this.GetUserRole() == "admin";
+
+			if (type != FileType.Avatar && !isAdmin)
+			{
+				return BadRequest();
+			}
+
+			if (type == FileType.Avatar)
+			{
+				if (!isAdmin)
+				{
+					fileName = this.GetUserId();
+					if (string.IsNullOrWhiteSpace(fileName))
+					{
+						return BadRequest();
+					}
+				}
+				else
+				{
+					using (var contextProvider = _contextProviderFactory.Create())
+					{
+						var user =
+							contextProvider
+								.GetTable<AspNetUser>()
+								.FirstOrDefault(w => w.Id == fileName);
+
+						if (user == null)
+						{
+							return BadRequest();
+						}
+					}
+				}
+
+				path = fileName;
+			}
+
 			var fullPath = GetPath(type, path);
 
 			fullPath =
 				Path.Combine(fullPath, fileName);
 
-			if (!System.IO.File.Exists(fullPath))
+			if (System.IO.File.Exists(fullPath))
 			{
-				return BadRequest();
+				System.IO.File.Delete(fullPath);
 			}
 
-			System.IO.File.Delete(fullPath);
+			if (type == FileType.Avatar)
+			{
+				using (var contextProvider = _contextProviderFactory.Create())
+				{
+					var res =
+						await contextProvider
+							.GetTable<AspNetUser>()
+							.Where(w => w.Id == fileName)
+							.UpdateAsync(user => new AspNetUser()
+							{
+								Avatar = null
+							});
+				}
+			}
 
 			return Ok();
 		}

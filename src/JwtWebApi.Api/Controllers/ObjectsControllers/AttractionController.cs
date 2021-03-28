@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
-using JwtWebApi.Api.Common.Services;
 using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;

@@ -146,6 +146,10 @@ namespace JwtWebApi.Api.Services
 				.As<IReviewService>()
 				.SingleInstance();
 
+			builder.RegisterType<EventService>()
+				.As<IEventService>()
+				.SingleInstance();
+
 
 			builder.RegisterType<DictionaryService>()
 				.As<IDictionaryService>()

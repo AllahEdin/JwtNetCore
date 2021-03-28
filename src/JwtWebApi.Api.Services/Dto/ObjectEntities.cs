@@ -64,6 +64,11 @@ namespace JwtWebApi.Api.Services.Dto
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
 		public int Weight { get; set; }
+
+		public float Rating { get; set; }
+
+		public string Phone { get; set; } 
+		public string Url { get; set; }
 	}
 
 	public interface IHotel : IEntity
@@ -82,6 +87,11 @@ namespace JwtWebApi.Api.Services.Dto
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
 		public int Weight { get; set; }
+
+		public float Rating { get; set; }
+
+		public string Phone { get; set; }
+		public string Url { get; set; }
 	}
 
 	public interface IAttraction : IEntity
@@ -99,6 +109,8 @@ namespace JwtWebApi.Api.Services.Dto
 		public int DistrictId { get; set; }
 		public int Discount { get; set; }
 		public int Weight { get; set; }
+
+		public float Rating { get; set; }
 	}
 
 	public interface IRoute : IEntity
@@ -115,7 +127,31 @@ namespace JwtWebApi.Api.Services.Dto
 		 public int Weight { get; set; }
 		 public string Description { get; set; }
 
-		 public bool Visible { get; set; }
+		 public float Rating { get; set; }
+
+		public bool Visible { get; set; }
 		 public string OwnerId { get; set; }
 	}
+
+	public interface IEvent : IEntity
+	{
+		public int Id { get; set; } 
+		public string Name { get; set; } 
+		public string Preview { get; set; } 
+		public string Description { get; set; } 
+		public int CityId { get; set; } 
+		public int DistrictId { get; set; }
+		public string Address { get; set; }
+		public string Latitude { get; set; }
+		public string Longitude { get; set; }
+		public string Path { get; set; } 
+		public int Discount { get; set; }
+		public int Weight { get; set; } 
+		public DateTime StartDate { get; set; } 
+		public DateTime EndDate { get; set; } 
+		public string Phone { get; set; }
+		public string Url { get; set; }
+		public float Rating { get; set; }
+	}
+
 }

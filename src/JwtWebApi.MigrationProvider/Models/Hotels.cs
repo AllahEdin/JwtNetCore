@@ -29,6 +29,8 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Discount { get; set; }
         public int Weight { get; set; }
         public float Rating { get; set; }
+        public string Phone { get; set; }
+        public string Url { get; set; }
 
         public virtual ICollection<HotelEquipmentTypes> HotelEquipmentTypes { get; set; }
         public virtual ICollection<HotelServiceTypes> HotelServiceTypes { get; set; }

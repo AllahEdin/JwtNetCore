@@ -19,6 +19,7 @@ namespace JwtWebApi.Api.Controllers
 		private readonly IAttractionService _attractionService;
 		private readonly IRouteService _routeService;
 		private readonly IHotelService _hotelService;
+		private readonly IEventService _eventService;
 		private readonly IContextProviderFactory _factory;
 
 		public ReviewController(IReviewService service, 
@@ -26,13 +27,15 @@ namespace JwtWebApi.Api.Controllers
 			IAttractionService attractionService,
 			IRouteService routeService,
 			IHotelService hotelService,
-			IContextProviderFactory factory) : base(service)
+			IContextProviderFactory factory,
+			IEventService eventService) : base(service)
 		{
 			_restaurantService = restaurantService;
 			_attractionService = attractionService;
 			_routeService = routeService;
 			_hotelService = hotelService;
 			_factory = factory;
+			_eventService = eventService;
 		}
 
 
@@ -117,6 +120,11 @@ namespace JwtWebApi.Api.Controllers
 		public Task<IActionResult> AddToRoute([FromBody] AddReviewModel model)
 			=> AddToObject(PlaceTypesConfig.RouteCode, model);
 
+		[HttpPost(nameof(AddToEvent))]
+		[Authorize]
+		public Task<IActionResult> AddToEvent([FromBody] AddReviewModel model)
+			=> AddToObject(PlaceTypesConfig.EventCode, model);
+
 
 
 
@@ -140,6 +148,11 @@ namespace JwtWebApi.Api.Controllers
 		[Authorize]
 		public Task<IActionResult> UpdateToRoute([FromBody] UpdateReviewModel model)
 			=> UpdateIn(PlaceTypesConfig.RouteCode, model);
+
+		[HttpPut(nameof(UpdateToEvent))]
+		[Authorize]
+		public Task<IActionResult> UpdateToEvent([FromBody] UpdateReviewModel model)
+			=> UpdateIn(PlaceTypesConfig.EventCode, model);
 
 
 
@@ -170,6 +183,7 @@ namespace JwtWebApi.Api.Controllers
 					PlaceId = model.PlaceId,
 					UserId = this.GetUserId(),
 					CreateDate = DateTime.Now,
+					UpdateDate = DateTime.Now,
 					Id = 0
 				};
 
@@ -289,6 +303,9 @@ namespace JwtWebApi.Api.Controllers
 						case PlaceTypesConfig.RouteCode:
 							await _routeService.Recalculate(cp, id);
 							return true;
+						case PlaceTypesConfig.EventCode:
+							await _eventService.Recalculate(cp, id);
+							return true;
 						case PlaceTypesConfig.AttractionCode:
 							await _attractionService.Recalculate(cp, id);
 							return true;
@@ -317,6 +334,9 @@ namespace JwtWebApi.Api.Controllers
 						return true;
 					case PlaceTypesConfig.RouteCode:
 						await _routeService.Get(id);
+						return true;
+					case PlaceTypesConfig.EventCode:
+						await _eventService.Get(id);
 						return true;
 					case PlaceTypesConfig.AttractionCode:
 						await _attractionService.Get(id);

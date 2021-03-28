@@ -3,15 +3,17 @@ using System;
 using JwtWebApi.MigrationProvider.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace JwtWebApi.MigrationProvider.Migrations
 {
     [DbContext(typeof(MigrationPostgreSqlContext))]
-    partial class MigrationPostgreSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20210328061620_postgresqlMigration_Table_ReviewUpdateDate_RestHotelPhoneUrl")]
+    partial class postgresqlMigration_Table_ReviewUpdateDate_RestHotelPhoneUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -448,84 +450,6 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .IsUnique();
 
                     b.ToTable("EquipmentTypes", "places");
-                });
-
-            modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.Events", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<int>("CityId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Discount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("DistrictId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Latitude")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Longitude")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Preview")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<float>("Rating")
-                        .HasColumnType("real");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<int>("Weight")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex(new[] { "CityId" }, "IX_Events_CityId");
-
-                    b.HasIndex(new[] { "DistrictId" }, "IX_Events_DistrictId");
-
-                    b.ToTable("Events", "places");
                 });
 
             modelBuilder.Entity("JwtWebApi.MigrationProvider.Models.HotelEquipmentTypes", b =>
