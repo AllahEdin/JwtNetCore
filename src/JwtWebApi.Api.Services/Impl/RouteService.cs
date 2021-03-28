@@ -105,6 +105,7 @@ namespace JwtWebApi.Api.Services.Impl
 						Animals = model.Animals,
 						Time = model.Time > 0 ? model.Time : t.Time,
 						Weight = model.Weight > 0 ? model.Weight : t.Weight,
+						Visible = model.Visible,
 						Description = string.IsNullOrEmpty(model.Description) ? t.Description : model.Description
 					});
 
@@ -301,12 +302,16 @@ namespace JwtWebApi.Api.Services.Impl
 				ra.OrderBy(o => o.Order).ThenBy(o => o.Id).Where(w => w.RouteId == routeId)
 					.Select(s => s.AttractionId);
 
+			int additionDurationMinutes = 0;
+
 			foreach (var attractionId in withAttr)
 			{
 				var attr =
 					await _attractionService.Get(attractionId);
 				
 				list.Add((double.Parse(attr.Latitude, CultureInfo.InvariantCulture), double.Parse(attr.Longitude, CultureInfo.InvariantCulture)));
+
+				additionDurationMinutes += attr.Duration;
 			}
 
 			using (var client = new HttpClient(new HttpClientHandler()))
@@ -334,6 +339,8 @@ namespace JwtWebApi.Api.Services.Impl
 
 				int distance =  Convert.ToInt32(result.Distance / 1000);
 
+
+
 				using (var cp = ContextProviderFactory.Create())
 				{
 
@@ -343,8 +350,8 @@ namespace JwtWebApi.Api.Services.Impl
 						{
 							Length = distance,
 							Time = (distance <= 2)
-							? Convert.ToInt32(result.Distance * 60 / 5000)
-							: Convert.ToInt32(TimeSpan.FromSeconds(Convert.ToInt32(result.Duration)).TotalMinutes)
+							? Convert.ToInt32(result.Distance * 60 / 5000) + additionDurationMinutes
+							: Convert.ToInt32(TimeSpan.FromSeconds(Convert.ToInt32(result.Duration)).TotalMinutes) + additionDurationMinutes
 						});
 				}
 

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
@@ -12,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JwtWebApi.Api.Controllers.ObjectsControllers
 {
-	public class RouteController : AuthorizeAdminApiControllerBase<IRoute, RouteModel, IRouteService>
+	public class RouteController : ApiControllerBase<IRoute, RouteModel, IRouteService>
 	{
 		private readonly IRoutePeopleTypeService _routePeopleTypeService;
 		private readonly IRouteAgeTypeService _routeAgeTypeService;
@@ -32,6 +34,118 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			_routeSubjectNameService = routeSubjectNameService;
 			_routeSubjectTypeService = routeSubjectTypeService;
 			_routeAttractionService = routeAttractionService;
+		}
+
+		#region CommonApi
+
+		[HttpGet("{id}")]
+		public Task<IActionResult> GetById(int id)
+			=> base.Get(id);
+
+		[HttpGet("")]
+		public Task<IActionResult> GetPaging([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize)
+			=> base.Get(page, pageSize);
+
+		[HttpPost(nameof(GetPagingFiltered))]
+		public Task<IActionResult> GetPagingFiltered([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize, [FromBody] SearchModel filterUnit)
+			=> base.GetFiltered(filterUnit, page, pageSize);
+
+
+		[HttpPost("")]
+		public virtual async Task<IActionResult> Post([FromBody] RouteModel model)
+		{
+			bool isAdmin =
+				this.GetUserRole() == "admin";
+
+			RouteModel dto =
+				new RouteModel()
+				{
+					Name = model.Name,
+					DistrictId = model.DistrictId,
+					Animals = model.Animals,
+					CityId = model.CityId,
+					Description = model.Description,
+					Path = model.Path,
+					OwnerId = this.GetUserId(),
+					Id = 0,
+					Visible = isAdmin,
+					Weight = model.Weight,
+					Time = model.Time,
+					Length = model.Length,
+				};
+
+			var res =
+				await Add(dto);
+
+			return Ok(res);
+		}
+
+		[HttpPut("")]
+		public virtual async Task<IActionResult> Put([FromBody] RouteModel model)
+		{
+			if (model.Id <= 0)
+			{
+				return BadRequest();
+			}
+
+			bool isAdmin =
+				this.GetUserRole() == "admin";
+
+			if (isAdmin)
+			{
+				var res =
+					await Update(model);
+
+				return Ok(res);
+			}
+			else
+			{
+				var exists =
+					await Service.Get(model.Id);
+
+				bool own =
+					!string.IsNullOrEmpty(exists.OwnerId) && this.GetUserId() == exists.OwnerId;
+
+				if (own)
+				{
+					var res =
+						await Update(model);
+
+					return Ok(res);
+				}
+			}
+
+			return BadRequest();
+		}
+
+		[HttpDelete(nameof(DeleteById))]
+		[Authorize(Roles = "admin")]
+		public Task<IActionResult> DeleteById(int id)
+			=> base.Delete(id);
+
+		#endregion
+
+		[HttpGet("ByAuthor/{id}")]
+		public async Task<IActionResult> GetByAuthor(int page, int pageSize, string id)
+		{
+			var res =
+				await Service.Get(page, pageSize, new SearchModel()
+				{
+					Filter = new BinaryFilterUnit()
+					{
+						Unit1 = new ParameterFilterUnit()
+						{
+							PropertyName = "OwnerId"
+						},
+						Unit2 = new ConstFilterUnit()
+						{
+							Value = id
+						},
+						OperatorType = OperatorType.Equals 
+					}
+				});
+
+			return Ok(res);
 		}
 
 
@@ -104,7 +218,6 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 		#endregion
 
-
 		#region AgeType
 
 		[Authorize(Roles = "admin")]
@@ -127,7 +240,6 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 				_routeAgeTypeService);
 
 		#endregion
-
 
 		#region SubjectName
 
@@ -153,7 +265,6 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 		#endregion
 
-
 		#region SubjectType
 
 
@@ -177,7 +288,6 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 				_routeSubjectTypeService);
 
 		#endregion
-
 
 		#region Attrcations
 
