@@ -15,6 +15,8 @@ namespace JwtWebApi.Api.Models.ComplexFilteringModels
 		public DateFromToFilter StartDateFilter { get; set; }
 
 		public DateFromToFilter EndDateFilter { get; set; }
+
+		public DateFromToFilter DateFilter { get; set; }
 	}
 
 	public class DateFromToFilter : IFromToFilter<DateTime>
