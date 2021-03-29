@@ -28,6 +28,13 @@ namespace JwtWebApi.Api.Controllers
             _logger = logger;
         }
 
+
+        [HttpGet(nameof(GetIp))]
+        public async Task<IActionResult> GetIp()
+        {
+	        return Ok(Request.Headers.FirstOrDefault(x => x.Key == "X-Real-IP").Value);
+        }
+
         [HttpGet(nameof(GetAdmin))]
         [Authorize(Roles = "admin")]
         public IEnumerable<WeatherForecast> GetAdmin()
