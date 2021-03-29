@@ -85,7 +85,7 @@ namespace JwtWebApi.Api.Services.Impl
 
 		string IRatingService<Event>.ObjectCode => PlaceTypesConfig.EventCode;
 
-		public async Task<PagingResult<IEvent>> CustomFilter(int page, int pageSize,
+		public async Task<PagingResult<IEventWithLinks>> CustomFilter(int page, int pageSize,
 			int? cityId,
 			int? districtId,
 			IFromToFilter<DateTime> startDateFilter,
@@ -146,7 +146,10 @@ namespace JwtWebApi.Api.Services.Impl
 							: DtoMapper.Map<IEvent[]>(eventsFinal),
 					};
 				
-				return paging;
+				var res =
+					await GetPagingWithLinksInternal(paging);
+
+				return res;
 			}
 		}
 

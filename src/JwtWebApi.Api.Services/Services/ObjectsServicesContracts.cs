@@ -75,7 +75,7 @@ namespace JwtWebApi.Api.Services.Services
 
 	public interface IEventService : IEntityProvider<IEvent>,IPagingWithLinksProvider<IEventWithLinks>, IRatingService<Event>
 	{
-		Task<PagingResult<IEvent>> CustomFilter(int page, int pageSize,
+		Task<PagingResult<IEventWithLinks>> CustomFilter(int page, int pageSize,
 			int? cityId, 
 			int? districtId, 
 			IFromToFilter<DateTime> startDateFilter,
