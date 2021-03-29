@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
+using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
@@ -47,14 +48,34 @@ namespace JwtWebApi.Api.Controllers.LinkControllers
 
 	public class RouteAttractionController : AuthorizeAdminApiControllerBase<IRouteAttraction, RouteAttractionModel, IRouteAttractionService>
 	{
-		public RouteAttractionController(IRouteAttractionService service) : base(service)
+		private IRouteService _routeService;
+
+		public RouteAttractionController(IRouteAttractionService service, IRouteService routeService) : base(service)
 		{
+			_routeService = routeService;
 		}
 
 		[HttpPut(nameof(UpdateOrder))]
-		[Authorize(Roles = "admin")]
+		[Authorize]
 		public async Task<IActionResult> UpdateOrder(int attractionId, int routeId, int order)
 		{
+			bool isAdmin =
+				this.GetUserRole() == "admin";
+
+			if (!isAdmin)
+			{
+				var exists =
+					await _routeService.Get(routeId);
+
+				bool own =
+					!string.IsNullOrEmpty(exists.OwnerId) && this.GetUserId() == exists.OwnerId;
+
+				if (!own)
+				{
+					return BadRequest("User doesn't own the route");
+				}
+			}
+
 			var res =
 				await Service.UpdateByIds(attractionId, routeId, order);
 
