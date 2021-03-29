@@ -118,9 +118,22 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpDelete(nameof(DeleteById))]
-		[Authorize(Roles = "admin")]
-		public Task<IActionResult> DeleteById(int id)
-			=> base.Delete(id);
+		[Authorize()]
+		public async Task<IActionResult> DeleteById(int id)
+		{
+			var can =
+				await CanPerformOperation(id);
+
+			if (!can)
+			{
+				return BadRequest("User doesn't own route");
+			}
+
+			var res =
+				await base.Delete(id);
+
+			return Ok(res);
+		}
 
 		#endregion
 
@@ -185,9 +198,17 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpPut(nameof(RecalculateDistance))]
-		[Authorize(Roles = "admin")]
+		[Authorize()]
 		public async Task<IActionResult> RecalculateDistance(int routeId)
 		{
+			var can =
+				await CanPerformOperation(routeId);
+
+			if (!can)
+			{
+				return BadRequest("User doesn't own route");
+			}
+
 			var res =
 				await Service.RecalculateLength(routeId);
 
@@ -290,31 +311,61 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 		#region Attrcations
 
-		[Authorize(Roles = "admin")]
+		[Authorize]
 		[HttpPost("{routeId}/" + nameof(AddAttractionById))]
-		public Task<IActionResult> AddAttractionById(int routeId, int[] attractionIds)
-			=> AddLink<IRouteAttractionService, IRouteAttraction>(routeId, attractionIds,
-				_routeAttractionService, (objId, linkId) =>
-					new RouteAttractionModel()
-					{
-						Id = 0,
-						RouteId = objId,
-						AttractionId = linkId,
-					});
+		public async Task<IActionResult> AddAttractionById(int routeId, int[] attractionIds)
+		{
+			var can =
+				await CanPerformOperation(routeId);
+
+			var res =
+				await AddLink<IRouteAttractionService, IRouteAttraction>(routeId, attractionIds,
+					_routeAttractionService, (objId, linkId) =>
+						new RouteAttractionModel()
+						{
+							Id = 0,
+							RouteId = objId,
+							AttractionId = linkId,
+						});
+
+			return Ok(res);
+		}
 
 
-		[Authorize(Roles = "admin")]
+
+		[Authorize]
 		[HttpDelete("{routeId}/" + nameof(DeleteAttractionById))]
-		public Task<IActionResult> DeleteAttractionById(int routeId, int[] attractionIds)
-			=> DeleteLink(routeId, attractionIds,
-				_routeAttractionService);
+		public async Task<IActionResult> DeleteAttractionById(int routeId, int[] attractionIds)
+		{
+			var can =
+				await CanPerformOperation(routeId);
+
+			if (!can)
+			{
+				return BadRequest("User doesn't own route");
+			}
+
+			var res =
+				await DeleteLink(routeId, attractionIds,
+					_routeAttractionService);
+
+			return Ok(res);
+		} 
 
 		#endregion
 
 		[HttpDelete()]
-		[Authorize(Roles = "admin")]
+		[Authorize()]
 		public async Task<IActionResult> Delete(int routeId)
 		{
+			var can =
+				await CanPerformOperation(routeId);
+
+			if (!can)
+			{
+				return BadRequest("User doesn't own route");
+			}
+
 			if (routeId <= 0)
 			{
 				return BadRequest();
@@ -326,6 +377,26 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			return Ok(res);
 		}
 
+
+		private async Task<bool> CanPerformOperation(int id)
+		{
+			bool isAdmin =
+				this.GetUserRole() == "admin";
+
+			if (isAdmin)
+			{
+				return true;
+			}
+
+			var exists =
+				await Service.Get(id);
+
+			bool own =
+				!string.IsNullOrEmpty(exists.OwnerId) && this.GetUserId() == exists.OwnerId;
+
+			return own;
+
+		}
 
 	}
 }

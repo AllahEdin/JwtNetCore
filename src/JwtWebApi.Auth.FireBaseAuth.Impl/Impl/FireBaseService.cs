@@ -71,11 +71,35 @@ namespace JwtWebApi.Auth.FireBaseAuth.Impl.Impl
 				switch (value.Sign_in_provider)
 				{
 					case "apple.com":
-					case "facebook.com":
 					{
 						if (string.IsNullOrWhiteSpace(model.DataModel.Email))
 						{
-							throw new InvalidOperationException("Email is empty");
+							if (value.Identities.TryGetValue("apple.com", out var ids))
+							{
+								if (ids != null && ids.Any())
+								{
+									email = ids.First();
+								}
+							}
+						}
+						else
+						{
+							email = model.DataModel.Email;
+						}
+
+						break;
+					}
+				case "facebook.com":
+					{
+						if (string.IsNullOrWhiteSpace(model.DataModel.Email))
+						{
+							if (value.Identities.TryGetValue("facebook.com", out var ids))
+							{
+								if (ids != null && ids.Any())
+								{
+									email = ids.First();
+								}
+							}
 						}
 						else
 						{
