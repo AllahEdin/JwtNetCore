@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FirebaseAdmin.Auth;
@@ -6,108 +7,123 @@ using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
 using JwtWebApi.Services.Dto;
 using JwtWebApi.Services.Services;
+using Newtonsoft.Json;
 
 namespace JwtWebApi.Auth.FireBaseAuth.Impl.Impl
 {
 	internal class FireBaseService : IFireBaseService
 	{
+		private class ClaimsValue
+		{
+			public Dictionary<string, IEnumerable<string>> Identities { get; set; }
+
+			public string Sign_in_provider { get; set; }
+		}
+
 		private readonly IJwtGenerator _jwtGenerator;
 		private readonly IContextProviderFactory _contextProviderFactory;
+		private readonly IUserService _userService;
 
-		public FireBaseService(IJwtGenerator jwtGenerator,
-			IContextProviderFactory contextProviderFactory)
+			public FireBaseService(IJwtGenerator jwtGenerator,
+			IContextProviderFactory contextProviderFactory,
+			IUserService userService)
 		{
 			_jwtGenerator = jwtGenerator;
 			_contextProviderFactory = contextProviderFactory;
+			_userService = userService;
 		}
 
-		public async Task<string> Login(IFireBaseLoginModel model)
-		{
-			FirebaseToken decodedToken = await FirebaseAuth.DefaultInstance
-				.VerifyIdTokenAsync(model.IdToken);
-			string uid = decodedToken.Uid;
-
-			switch (decodedToken.Claims["sign_in_provider"].ToString())
+			public async Task<string> Login(IFireBaseLoginModel model)
 			{
-				case "facebook.com":
+				FirebaseToken decodedToken = await FirebaseAuth.DefaultInstance
+					.VerifyIdTokenAsync(model.IdToken);
+				string uid = decodedToken.Uid;
+
+
+				if (!decodedToken.Claims.TryGetValue("firebase", out var claimsobj))
 				{
-					
-					using (var cp = _contextProviderFactory.Create())
+					throw new InvalidOperationException("No such claim with key 'firebase'");
+				}
+
+				if (claimsobj == null)
+				{
+					throw new InvalidOperationException("No such claim with key 'firebase'");
+				}
+
+				var claims =
+					claimsobj.ToString();
+
+
+				ClaimsValue value = null;
+				try
+				{
+					value =
+						JsonConvert.DeserializeObject<ClaimsValue>(claims);
+
+				}
+				catch (Exception e)
+				{
+					throw;
+				}
+
+				var email = "";
+
+				switch (value.Sign_in_provider)
+				{
+					case "apple.com":
+					case "facebook.com":
 					{
-						var exists =
-							cp.GetTable<AspNetUser>()
-								.Where(w => w.Email == model.DataModel.Email || w.FireBaseId == uid);
-
-						if (!exists.Any())
+						if (string.IsNullOrWhiteSpace(model.DataModel.Email))
 						{
-							string usrId = Guid.NewGuid().ToString();
-
-							var usr =
-								new AspNetUser()
-								{
-									Email = model.DataModel.Email,
-									IsBanned = false,
-									UserName = model.DataModel.UserName,
-									EmailConfirmed = true,
-									SecurityStamp = Guid.NewGuid().ToString(),
-									RegistrationDate = DateTimeOffset.Now,
-									FireBaseId = uid,
-									Id = usrId,
-								};
-
-							var res =
-								await cp.InsertNonEntityAsync(usr);
-
-							AspNetRole role;
-
-
-							role =
-								cp
-									.GetTable<AspNetRole>()
-									.FirstOrDefault(t => t.RoleName == "user");
-
-							if (role == null)
-							{
-								throw new InvalidOperationException();
-							}
-
-							var userRole =
-								new AspNetUserRole()
-								{
-									AspNetUserId = usrId,
-									RoleId = role.Id,
-								};
-
-
-							AspNetUserRole createdUserRole =
-								await cp.InsertNonEntityAsync(userRole);
-
-							return await _jwtGenerator.Generate(usr.UserName, role.RoleName, usrId);
-						}
-						else if (exists.Count() > 1)
-						{
-							throw new InvalidOperationException();
+							throw new InvalidOperationException("Email is empty");
 						}
 						else
 						{
-							var usr =
-								exists.First();
-
-							if (usr.IsBanned ?? false)
-							{
-								throw new UnauthorizedAccessException();
-							}
-
-							return
-								await _jwtGenerator.Generate(usr.UserName, "user", usr.Id);
+							email = model.DataModel.Email;
 						}
+
+						break;
 					}
+					case "google.com":
+					{
+						if (string.IsNullOrWhiteSpace(model.DataModel.Email))
+						{
+							if (value.Identities.TryGetValue("email", out var emails))
+							{
+								if (emails != null && emails.Any())
+								{
+									email = emails.First();
+								}
+							}
+						}
+						else
+						{
+							email = model.DataModel.Email;
+						}
+
+						break;
+					}
+					default:
+						throw new ArgumentOutOfRangeException();
 				}
-				default:
-					throw new ArgumentOutOfRangeException();
+
+				var userName =
+					string.IsNullOrWhiteSpace(model.DataModel.UserName)
+						? $"{value.Sign_in_provider}_User_{Guid.NewGuid()}"
+						: model.DataModel.UserName;
+
+				if (string.IsNullOrWhiteSpace(email))
+				{
+					throw new InvalidOperationException("Email is empty");
+				}
+
+				var fireBaseId = uid;
+				return
+					await _userService.GetOrAddUser(userName, email, fireBaseId);
+
 			}
 
-		}
+
 	}
 }
 

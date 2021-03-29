@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using JwtWebApi.Api.Services.Impl;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.Services.Services;
 
 namespace JwtWebApi.Api.Services
 {
@@ -148,6 +149,10 @@ namespace JwtWebApi.Api.Services
 
 			builder.RegisterType<EventService>()
 				.As<IEventService>()
+				.SingleInstance();
+
+			builder.RegisterType<UserService>()
+				.As<IUserService>()
 				.SingleInstance();
 
 

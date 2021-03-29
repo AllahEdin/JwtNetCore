@@ -11,12 +11,11 @@ namespace JwtWebApi.Vk.Impl
 		{
 			base.Load(builder);
 
-			builder.RegisterType<VKService>()
-				.As<IVKService>()
-				.SingleInstance();
+			
 
 			builder.RegisterType<VKService>()
 				.As<IInitializeModule>()
+				.As<IVKService>()
 				.SingleInstance();
 
 		}
