@@ -12,5 +12,6 @@ namespace JwtWebApi.Api.Models
 		public bool IsBanned { get; set; } // boolean
 		public string RoleName { get; set; }
 		public string Avatar { get; set; }
+		public string Platform { get; set; }
 	}
 }
