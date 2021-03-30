@@ -134,6 +134,9 @@ namespace JwtWebApi.MigrationProvider.Models
             {
                 entity.ToTable("AspNetUsers", "aspnet");
 
+                entity.HasIndex(e => e.Email, "UX_AspNetUsers_Email")
+                    .IsUnique();
+
                 entity.Property(e => e.Id).HasMaxLength(128);
 
                 entity.Property(e => e.Avatar).HasMaxLength(255);
