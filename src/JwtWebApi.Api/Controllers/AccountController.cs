@@ -106,7 +106,8 @@ namespace JwtWebApi.Api.Controllers
 					EmailConfirmed = usr.EmailConfirmed ?? false,
 					UserName = usr.UserName,
 					RoleName = this.GetUserRole(),
-					Avatar = usr.Avatar
+					Avatar = usr.Avatar,
+					Platform = usr.Platform
 				});
 			}
 		}
@@ -145,7 +146,8 @@ namespace JwtWebApi.Api.Controllers
 							RegistrationDate = t.Usr.RegistrationDate ?? DateTimeOffset.Now,
 							UserName = t.Usr.UserName,
 							RoleName = t.Role,
-							Avatar = t.Usr.Avatar
+							Avatar = t.Usr.Avatar,
+							Platform = t.Usr.Platform
 						}).ToArray(),
 						Total = contextProvider.GetTable<AspNetUser>().Count()
 					};

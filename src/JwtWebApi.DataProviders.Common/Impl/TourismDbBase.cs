@@ -10,7 +10,7 @@ using LinqToDB.Data;
 
 namespace JwtWebApi.DataProviders.Common.Impl
 {
-    internal abstract class TourismDbBase : DataConnection, IContextProvider, IDisposable
+    internal abstract class TourismDbBase : DataConnection, IContextProvider
     {
 
 	    protected TourismDbBase(

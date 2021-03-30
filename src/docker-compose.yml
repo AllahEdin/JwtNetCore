@@ -12,6 +12,7 @@ services:
       - JWTKey
       - GoogleSecret
       - GoogleCredential
+      - VkSecret
     volumes:
       - /usr/app/dev/fs:/usr/share/fs
     networks:
@@ -29,4 +30,6 @@ secrets:
       file: /usr/app/dev/GoogleSecret
    GoogleCredential:
       file: /usr/app/dev/GoogleCredential
+   VkSecret:
+      file: /usr/app/dev/VkSecret
       

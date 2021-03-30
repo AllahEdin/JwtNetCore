@@ -149,6 +149,8 @@ namespace JwtWebApi.MigrationProvider.Models
 
                 entity.Property(e => e.PasswordHash).HasMaxLength(255);
 
+                entity.Property(e => e.Platform).HasMaxLength(255);
+
                 entity.Property(e => e.RegistrationDate).HasColumnType("timestamp with time zone");
 
                 entity.Property(e => e.SecurityStamp).HasMaxLength(255);

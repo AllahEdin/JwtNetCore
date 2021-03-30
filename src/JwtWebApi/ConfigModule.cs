@@ -54,6 +54,10 @@ namespace JwtWebApi
 				.As<IGoogleCredentialSecretProvider>()
 				.SingleInstance();
 
+			builder.RegisterType<VkSecretProvider>()
+				.As<IVkSecretProvider>()
+				.SingleInstance();
+
 
 
 

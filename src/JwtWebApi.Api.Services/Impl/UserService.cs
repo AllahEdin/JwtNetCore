@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
@@ -21,7 +21,36 @@ namespace JwtWebApi.Api.Services.Impl
 			_jwtGenerator = jwtGenerator;
 		}
 
-		public async Task<string> GetOrAddUser(string userName, string email, string fireBaseId)
+		public async Task<string> GetOrAddFireBaseUser(string userName, string email, string fireBaseId, string platform)
+		{
+			if (string.IsNullOrWhiteSpace(userName) ||
+			    string.IsNullOrWhiteSpace(email) ||
+			    string.IsNullOrWhiteSpace(fireBaseId) ||
+			    string.IsNullOrWhiteSpace(platform))
+			{
+				throw new InvalidOperationException("Missing parameter");
+			}
+
+			return await
+				GetOrAddUser(userName, email, user => (user.Email == email || user.FireBaseId == fireBaseId),
+					user => user.FireBaseId = fireBaseId, platform);
+		}
+
+		public async Task<string> GetOrAddVkUser(string userName, string email, string vkId)
+		{
+			if (string.IsNullOrWhiteSpace(userName) ||
+			    string.IsNullOrWhiteSpace(email) ||
+			    string.IsNullOrWhiteSpace(vkId))
+			{
+				throw new InvalidOperationException("Missing parameter");
+			}
+
+			return await
+				GetOrAddUser(userName, email, user => (user.Email == email || user.VkId == vkId),
+					user => user.VkId = vkId, "vk.com");
+		}
+
+		private async Task<string> GetOrAddUser(string userName, string email, Expression<Func<AspNetUser, bool>> existsExpression, Action<AspNetUser> addExternalIdAction, string platform)
 		{
 			if (string.IsNullOrWhiteSpace(email))
 			{
@@ -32,11 +61,11 @@ namespace JwtWebApi.Api.Services.Impl
 			{
 				var exists =
 					cp.GetTable<AspNetUser>()
-						.Where(w => w.Email == email || w.FireBaseId == fireBaseId);
+						.Where(existsExpression);
 
 				if (!exists.Any())
 				{
-					if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(fireBaseId))
+					if (string.IsNullOrWhiteSpace(userName))
 					{
 						throw new InvalidOperationException();
 					}
@@ -52,9 +81,11 @@ namespace JwtWebApi.Api.Services.Impl
 							EmailConfirmed = true,
 							SecurityStamp = Guid.NewGuid().ToString(),
 							RegistrationDate = DateTimeOffset.Now,
-							FireBaseId = fireBaseId,
+							Platform = platform,
 							Id = usrId,
 						};
+
+					addExternalIdAction(usr);
 
 					var res =
 						await cp.InsertNonEntityAsync(usr);
@@ -76,6 +107,18 @@ namespace JwtWebApi.Api.Services.Impl
 					if (usr.IsBanned ?? false)
 					{
 						throw new UnauthorizedAccessException();
+					}
+
+					if (string.IsNullOrWhiteSpace(usr.Platform) || usr.Platform != platform)
+					{
+						var updateRes =
+							await
+								cp.GetTable<AspNetUser>()
+									.Where(w => w.Id == usr.Id)
+									.UpdateAsync(user => new AspNetUser()
+									{
+										Platform = platform
+									});
 					}
 
 					var usrRole =
@@ -136,5 +179,7 @@ namespace JwtWebApi.Api.Services.Impl
 
 			return role;
 		}
+
+	
 	}
 }

@@ -20,17 +20,19 @@ namespace JwtWebApi.Api.Services.Impl
 		private readonly IAttractionSubjectsService _attractionSubjectsService;
 		private readonly IAttractionPlaceTypeService _attractionPlaceTypeService;
 		private readonly IRouteAttractionService _routeAttractionService;
-		private string _objectCode;
+		private readonly IReviewService _reviewService;
 
 		public AttractionService(IContextProviderFactory contextProviderFactory, 
 			IAttractionSubjectsService attractionSubjectsService, 
 			IRouteAttractionService routeAttractionService, 
-			IAttractionPlaceTypeService attractionPlaceTypeService) : base(contextProviderFactory)
+			IAttractionPlaceTypeService attractionPlaceTypeService,
+			IReviewService reviewService) : base(contextProviderFactory)
 		{
 			_contextProviderFactory = contextProviderFactory;
 			_attractionSubjectsService = attractionSubjectsService;
 			_routeAttractionService = routeAttractionService;
 			_attractionPlaceTypeService = attractionPlaceTypeService;
+			_reviewService = reviewService;
 		}
 
 		protected override async Task<IAttraction> Update(IContextProvider provider, IAttraction model)
@@ -249,6 +251,8 @@ namespace JwtWebApi.Api.Services.Impl
 			}
 
 			await base.Delete(id);
+
+			await _reviewService.DeleteByObject(PlaceTypesConfig.AttractionCode, id);
 
 			return true;
 		}

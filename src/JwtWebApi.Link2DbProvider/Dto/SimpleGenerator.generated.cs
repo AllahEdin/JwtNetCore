@@ -119,6 +119,7 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,        Nullable] public string          Avatar           { get; set; } // character varying(255)
 		[Column,        Nullable] public string          FireBaseId       { get; set; } // character varying(255)
 		[Column,        Nullable] public string          VkId             { get; set; } // character varying(255)
+		[Column,        Nullable] public string          Platform         { get; set; } // character varying(255)
 	}
 
 	[Table(Schema="aspnet", Name="AspNetUserRoles")]
@@ -386,8 +387,8 @@ namespace JwtWebApi.Link2DbProvider
 		[Column,     NotNull    ] public int    Weight      { get; set; } // integer
 		[Column,        Nullable] public string Description { get; set; } // text
 		[Column,     NotNull    ] public float  Rating      { get; set; } // real
-		[Column,     NotNull    ] public bool   Visible     { get; set; } // boolean
 		[Column,        Nullable] public string OwnerId     { get; set; } // character varying(255)
+		[Column,     NotNull    ] public bool   Visible     { get; set; } // boolean
 	}
 
 	[Table(Schema="places", Name="RouteAgeTypes")]

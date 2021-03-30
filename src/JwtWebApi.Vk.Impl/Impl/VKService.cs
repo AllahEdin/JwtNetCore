@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using JwtWebApi.Common.Services;
-using JwtWebApi.DataProviders.Common.Services;
-using JwtWebApi.Link2DbProvider;
 using JwtWebApi.Services.Dto;
 using JwtWebApi.Services.Services;
 using VkNet;
@@ -15,13 +12,14 @@ namespace JwtWebApi.Vk.Impl.Impl
 	public class VKService : IVKService, IInitializeModule
 	{
 		private VkApi _api;
-		private readonly IContextProviderFactory _contextProviderFactory;
-		private readonly IJwtGenerator _jwtGenerator;
+		private readonly IVkSecretProvider _vkSecretProvider;
+		private readonly IUserService _userService;
 
-		public VKService(IContextProviderFactory contextProviderFactory, IJwtGenerator jwtGenerator)
+		public VKService( IVkSecretProvider vkSecretProvider,
+			IUserService userService)
 		{
-			_contextProviderFactory = contextProviderFactory;
-			_jwtGenerator = jwtGenerator;
+			_vkSecretProvider = vkSecretProvider;
+			_userService = userService;
 		}
 
 		public async Task<string> Login(IVkLoginModel model, string ip)
@@ -44,75 +42,12 @@ namespace JwtWebApi.Vk.Impl.Impl
 				throw new InvalidOperationException();
 			}
 
-			using (var cp = _contextProviderFactory.Create())
-			{
-				var exists =
-					cp.GetTable<AspNetUser>()
-						.Where(w => w.Email == model.Email || w.VkId == checkTokenResult.UserId.ToString());
+			string email = model.Email;
+			string userName = model.UserName;
+			string vkId = checkTokenResult.UserId.ToString();
 
-				if (!exists.Any())
-				{
-					string usrId = Guid.NewGuid().ToString();
-
-					var usr =
-						new AspNetUser()
-						{
-							Email = model.Email,
-							IsBanned = false,
-							UserName = model.UserName,
-							EmailConfirmed = true,
-							SecurityStamp = Guid.NewGuid().ToString(),
-							RegistrationDate = DateTimeOffset.Now,
-							VkId = model.UserId,
-							Id = usrId,
-						};
-
-					var res =
-						await cp.InsertNonEntityAsync(usr);
-
-					AspNetRole role;
-
-
-					role =
-						cp
-							.GetTable<AspNetRole>()
-							.FirstOrDefault(t => t.RoleName == "user");
-
-					if (role == null)
-					{
-						throw new InvalidOperationException();
-					}
-
-					var userRole =
-						new AspNetUserRole()
-						{
-							AspNetUserId = usrId,
-							RoleId = role.Id,
-						};
-
-					AspNetUserRole createdUserRole =
-						await cp.InsertNonEntityAsync(userRole);
-
-					return await _jwtGenerator.Generate(usr.UserName, role.RoleName, usrId);
-				}
-				else if (exists.Count() > 1)
-				{
-					throw new InvalidOperationException();
-				}
-				else
-				{
-					var usr =
-						exists.First();
-
-					if (usr.IsBanned ?? false)
-					{
-						throw new UnauthorizedAccessException();
-					}
-
-					return
-						await _jwtGenerator.Generate(usr.UserName, "user", usr.Id);
-				}
-			}
+			return await
+				_userService.GetOrAddVkUser(userName, email, vkId);
 		}
 
 		public int Order { get; }
@@ -121,11 +56,14 @@ namespace JwtWebApi.Vk.Impl.Impl
 		{
 			_api = new VkApi();
 
+			var vkSecret =
+				await _vkSecretProvider.GetSecret();
+
 			await _api.AuthorizeAsync(new ApiAuthParams()
 			{
-				ClientSecret = "xtPZas7Ab9IYuFOuVk8M",
-				AccessToken = "633b1781633b1781633b178188634c0e6a6633b633b1781035b1a9a4f468d4b2abcd48f",
-				ApplicationId = 7805419,
+				ClientSecret = vkSecret.ClientSecret,
+				AccessToken = vkSecret.AccessToken, 
+				ApplicationId = vkSecret.ApplicationId,
 				Settings = Settings.All
 			});
 		}
