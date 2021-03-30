@@ -89,7 +89,7 @@ namespace JwtWebApi.Auth.FireBaseAuth.Impl.Impl
 
 						break;
 					}
-				case "facebook.com":
+					case "facebook.com":
 					{
 						if (string.IsNullOrWhiteSpace(model.DataModel.Email))
 						{
@@ -117,6 +117,17 @@ namespace JwtWebApi.Auth.FireBaseAuth.Impl.Impl
 								if (emails != null && emails.Any())
 								{
 									email = emails.First();
+								}
+							}
+
+							if (string.IsNullOrWhiteSpace(email))
+							{
+								if (value.Identities.TryGetValue("google.com", out var ids))
+								{
+									if (ids != null && ids.Any())
+									{
+										email = ids.First();
+									}
 								}
 							}
 						}
