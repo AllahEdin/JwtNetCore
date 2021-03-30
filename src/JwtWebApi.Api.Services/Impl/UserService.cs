@@ -21,42 +21,45 @@ namespace JwtWebApi.Api.Services.Impl
 			_jwtGenerator = jwtGenerator;
 		}
 
-		public async Task<string> GetOrAddFireBaseUser(string userName, string email, string fireBaseId, string platform)
+		public async Task<string> GetOrAddFireBaseUser(string userName, string fireBaseId, string platform, string platformId)
 		{
 			if (string.IsNullOrWhiteSpace(userName) ||
-			    string.IsNullOrWhiteSpace(email) ||
 			    string.IsNullOrWhiteSpace(fireBaseId) ||
-			    string.IsNullOrWhiteSpace(platform))
+			    string.IsNullOrWhiteSpace(platform) ||
+			    string.IsNullOrWhiteSpace(platformId))
+
 			{
 				throw new InvalidOperationException("Missing parameter");
 			}
 
 			return await
-				GetOrAddUser(userName, email, user => (user.Email == email || user.FireBaseId == fireBaseId),
-					user => user.FireBaseId = fireBaseId, platform);
+				GetOrAddUser(userName,platformId,  user => (user.FireBaseId == fireBaseId),
+					user =>
+					{
+						user.FireBaseId = fireBaseId;
+						user.Email = platformId;
+					}, platform);
 		}
 
-		public async Task<string> GetOrAddVkUser(string userName, string email, string vkId)
+		public async Task<string> GetOrAddVkUser(string userName, string vkId)
 		{
 			if (string.IsNullOrWhiteSpace(userName) ||
-			    string.IsNullOrWhiteSpace(email) ||
 			    string.IsNullOrWhiteSpace(vkId))
 			{
 				throw new InvalidOperationException("Missing parameter");
 			}
 
 			return await
-				GetOrAddUser(userName, email, user => (user.Email == email || user.VkId == vkId),
-					user => user.VkId = vkId, "vk.com");
+				GetOrAddUser(userName,vkId, user => (user.VkId == vkId),
+					user =>
+					{
+						user.VkId = vkId;
+						user.Email = vkId;
+					}, "vk.com");
 		}
 
-		private async Task<string> GetOrAddUser(string userName, string email, Expression<Func<AspNetUser, bool>> existsExpression, Action<AspNetUser> addExternalIdAction, string platform)
+		private async Task<string> GetOrAddUser(string userName,string email, Expression<Func<AspNetUser, bool>> existsExpression, Action<AspNetUser> addExternalIdAndEmailAction, string platform)
 		{
-			if (string.IsNullOrWhiteSpace(email))
-			{
-				throw new InvalidOperationException();
-			}
-
 			using (var cp = _contextProviderFactory.Create())
 			{
 				var exists =
@@ -75,7 +78,6 @@ namespace JwtWebApi.Api.Services.Impl
 					var usr =
 						new AspNetUser()
 						{
-							Email = email,
 							IsBanned = false,
 							UserName = userName,
 							EmailConfirmed = true,
@@ -85,7 +87,7 @@ namespace JwtWebApi.Api.Services.Impl
 							Id = usrId,
 						};
 
-					addExternalIdAction(usr);
+					addExternalIdAndEmailAction(usr);
 
 					var res =
 						await cp.InsertNonEntityAsync(usr);
@@ -101,9 +103,9 @@ namespace JwtWebApi.Api.Services.Impl
 				}
 				else
 				{
-					var usr =
-						exists.First();
-
+					AspNetUser usr =
+						usr = exists.First();
+					
 					if (usr.IsBanned ?? false)
 					{
 						throw new UnauthorizedAccessException();
@@ -118,6 +120,18 @@ namespace JwtWebApi.Api.Services.Impl
 									.UpdateAsync(user => new AspNetUser()
 									{
 										Platform = platform
+									});
+					}
+
+					if (string.IsNullOrWhiteSpace(usr.Email) || usr.Email != email)
+					{
+						var updateRes =
+							await
+								cp.GetTable<AspNetUser>()
+									.Where(w => w.Id == usr.Id)
+									.UpdateAsync(user => new AspNetUser()
+									{
+										Email = email
 									});
 					}
 

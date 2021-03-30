@@ -430,8 +430,6 @@ namespace JwtWebApi.Api.Controllers
 		[AllowAnonymous]
 		public async Task<IActionResult> Register([FromBody] RegistrationModel model)
 		{
-			
-
 			AspNetUser user;
 
 			using (var contextProvider = _contextProviderFactory.Create())
@@ -671,6 +669,7 @@ namespace JwtWebApi.Api.Controllers
 			{
 				var user= 
 					provider.GetTable<AspNetUser>()
+						.Where(w => string.IsNullOrEmpty(w.Platform))
 					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false) && !(t.IsBanned ?? false) && (string.IsNullOrEmpty(t.FireBaseId)));
 				
 				if (user == null)

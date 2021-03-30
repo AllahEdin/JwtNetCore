@@ -42,12 +42,11 @@ namespace JwtWebApi.Vk.Impl.Impl
 				throw new InvalidOperationException();
 			}
 
-			string email = model.Email;
 			string userName = model.UserName;
 			string vkId = checkTokenResult.UserId.ToString();
 
 			return await
-				_userService.GetOrAddVkUser(userName, email, vkId);
+				_userService.GetOrAddVkUser(userName, vkId);
 		}
 
 		public int Order { get; }
