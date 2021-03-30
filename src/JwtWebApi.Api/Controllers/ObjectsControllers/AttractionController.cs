@@ -118,19 +118,5 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 				_attractionPlaceTypeService);
 
 
-		[HttpDelete()]
-		[Authorize(Roles = "admin")]
-		public async Task<IActionResult> Delete(int attractionId)
-		{
-			if (attractionId <= 0)
-			{
-				return BadRequest();
-			}
-
-			var res =
-				await Service.Delete(attractionId);
-
-			return Ok(res);
-		}
 	}
 }

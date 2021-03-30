@@ -18,5 +18,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Avatar { get; set; }
         public string FireBaseId { get; set; }
         public string VkId { get; set; }
+        public string Platform { get; set; }
     }
 }

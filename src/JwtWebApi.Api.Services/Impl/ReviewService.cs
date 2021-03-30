@@ -63,6 +63,19 @@ namespace JwtWebApi.Api.Services.Impl
 			}
 		}
 
+		public async Task<int> DeleteByObject(string objectCode, int objectId)
+		{
+			using (var provider = ContextProviderFactory.Create())
+			{
+				var toDelete =
+					provider.GetTable<Review>()
+						.Where(w => w.PlaceType == objectCode && w.PlaceId == objectId);
 
+				var res =
+					await toDelete.DeleteAsync();
+
+				return res;
+			}
+		}
 	}
 }

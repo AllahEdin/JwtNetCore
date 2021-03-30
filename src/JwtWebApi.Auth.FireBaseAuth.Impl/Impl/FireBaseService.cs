@@ -154,7 +154,7 @@ namespace JwtWebApi.Auth.FireBaseAuth.Impl.Impl
 
 				var fireBaseId = uid;
 				return
-					await _userService.GetOrAddUser(userName, email, fireBaseId);
+					await _userService.GetOrAddFireBaseUser(userName, email, fireBaseId, value.Sign_in_provider);
 
 			}
 
