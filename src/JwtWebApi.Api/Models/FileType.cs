@@ -13,6 +13,8 @@ namespace JwtWebApi.Api.Models
 		[EnumMember(Value = "Picture")]
 		Picture,
 		[EnumMember(Value = "Avatar")]
-		Avatar
+		Avatar,
+		[EnumMember(Value = "Icon")]
+		Icon
 	}
 }

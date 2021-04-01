@@ -5,16 +5,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
 using LinqToDB;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace JwtWebApi.Api.Controllers
 {
@@ -26,6 +23,7 @@ namespace JwtWebApi.Api.Controllers
 		private const string AUDIO_BASE = "audio/";
 		private const string PICTURES_BASE = "pictures/";
 		private const string AVATAR_BASE = "avatar/";
+		private const string ICON_BASE = "icon/";
 
 		private const int BUFFER_SIZE = 1024 * 1024;
 
@@ -301,6 +299,9 @@ namespace JwtWebApi.Api.Controllers
 					throw new InvalidOperationException();
 				case FileType.Audio:
 					fullPath += $"{AUDIO_BASE}{path}";
+					break;
+				case FileType.Icon:
+					fullPath += $"{ICON_BASE}{path}";
 					break;
 				case FileType.Picture:
 					fullPath += $"{PICTURES_BASE}{path}";
