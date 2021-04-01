@@ -55,9 +55,13 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			else
 			{
 				filter.Order ??= dateFilter;
-				var group = new GroupFilterUnit()
-					{OperatorType = OperatorType.And, Units = new[] {filter.Filter, onlyNewFilter}};
-				filter.Filter = group;
+				if (filter.Filter == null) {
+					filter.Filter = onlyNewFilter;
+				}
+				else {
+					var group = new GroupFilterUnit {OperatorType = OperatorType.And, Units = new[] {filter.Filter, onlyNewFilter}};
+					filter.Filter = group;
+				}
 			}
 
 			return base.GetPaging<IEventWithLinks>(page, pageSize, filter);
