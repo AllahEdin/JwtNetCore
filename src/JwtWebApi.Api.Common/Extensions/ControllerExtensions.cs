@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -68,5 +69,24 @@ namespace JwtWebApi.Api.Common.Extensions
 
 			return claim.First().Value;
 		}
+
+		public static IActionResult BadRequestCustom(this Controller controller, BadRequestError error)
+		{
+			return controller.BadRequest(error.ToString());
+		}
+	}
+
+	public enum BadRequestError
+	{
+		None, // Ошибка не классифицирована на стороне бэка 
+		IncorrectPasswordLength, 
+		InvalidPassword, // Пароль не совпадает с хэшем
+		UserNotFound, // Пользователь с переданными параметрами не найден 
+		MoreThanOneUserFound, // Найдено более 1 пользователя с переданными параметрами (что-то критичное)
+		UserIdMissing, // Не передан id пользователя
+		UserAlreadyExists, // Пользователь уже существует
+		UserSignedUpButEmailError, // Пользователь зарегистрирован, но во время отправки письма произошла ошибка
+		EmailError, //Во время отправки письма произошла ошибка
+		EmailIsNotConfirmed, //Почта не подтверждена
 	}
 }

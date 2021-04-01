@@ -4,9 +4,9 @@ namespace JwtWebApi.Services.Services
 {
 	public interface IUserService
 	{
-		Task<string> GetOrAddFireBaseUser(string userName, string email, string fireBaseId, string platform);
+		Task<string> GetOrAddFireBaseUser(string userName, string fireBaseId, string platform,string platformId);
 
-		Task<string> GetOrAddVkUser(string userName, string email, string vkId);
+		Task<string> GetOrAddVkUser(string userName, string vkId);
 
 	}
 }

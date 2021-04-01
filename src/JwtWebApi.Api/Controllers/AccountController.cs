@@ -175,7 +175,8 @@ namespace JwtWebApi.Api.Controllers
 					.Where(t => t.Id == user && t.SecurityStamp == signature)
 					.UpdateAsync(netUser => new AspNetUser()
 					{
-						EmailConfirmed = true
+						EmailConfirmed = true,
+						SecurityStamp = Guid.NewGuid().ToString()
 					});
 
 				return Ok();
@@ -197,12 +198,12 @@ namespace JwtWebApi.Api.Controllers
 
 				if (!found.Any())
 				{
-					return BadRequest();
+					return this.BadRequestCustom(BadRequestError.UserNotFound);
 				}
 
 				if (found.Count() > 1)
 				{
-					return BadRequest();
+					return this.BadRequestCustom(BadRequestError.MoreThanOneUserFound);
 				}
 
 				var user =
@@ -241,7 +242,7 @@ namespace JwtWebApi.Api.Controllers
 
 			if (!ident.success)
 			{
-				return BadRequest();
+				return this.BadRequestCustom(ident.error);
 			}
 
 			var encodedJwt =
@@ -259,7 +260,7 @@ namespace JwtWebApi.Api.Controllers
 			{
 				if (string.IsNullOrWhiteSpace(model.UserId))
 				{
-					return BadRequest();
+					return this.BadRequestCustom(BadRequestError.UserIdMissing);
 				}
 			}
 			else
@@ -275,12 +276,12 @@ namespace JwtWebApi.Api.Controllers
 
 				if (!found.Any())
 				{
-					return BadRequest("");
+					return this.BadRequestCustom(BadRequestError.UserNotFound);
 				}
 
 				if (found.Count() > 1)
 				{
-					return BadRequest("");
+					return this.BadRequestCustom(BadRequestError.MoreThanOneUserFound);
 				}
 
 				var res =
@@ -430,16 +431,19 @@ namespace JwtWebApi.Api.Controllers
 		[AllowAnonymous]
 		public async Task<IActionResult> Register([FromBody] RegistrationModel model)
 		{
-			
-
 			AspNetUser user;
 
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
 				if (contextProvider.GetTable<AspNetUser>().Any(t => t.Email == model.Email))
 				{
-					return BadRequest("Пользователь уже существует");
+					return this.BadRequestCustom(BadRequestError.UserAlreadyExists);
 				}
+			}
+
+			if (model.Password.Length < 6)
+			{
+				return this.BadRequestCustom(BadRequestError.IncorrectPasswordLength);
 			}
 
 			var usr =
@@ -469,7 +473,14 @@ namespace JwtWebApi.Api.Controllers
 			var role =
 				await SetDefaultRoleToUser(usr.Id);
 
-			await _emailService.SendMessage($"https://app-novgorod.herokuapp.com/confirm?u={user.Id}&s={usr.SecurityStamp}", user.Email);
+			try
+			{
+				await _emailService.SendMessage($"https://app-novgorod.herokuapp.com/confirm?u={user.Id}&s={usr.SecurityStamp}", user.Email);
+			}
+			catch (Exception e)
+			{
+				return this.BadRequestCustom(BadRequestError.UserSignedUpButEmailError);
+			}
 
 			//$"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={user.Id}&signature={usr.SecurityStamp}"
 			return Ok(model);
@@ -487,21 +498,20 @@ namespace JwtWebApi.Api.Controllers
 
 				if (usrs.Count() > 1)
 				{
-					throw new InvalidOperationException("Нарушена структура бд!!");
+					return this.BadRequestCustom(BadRequestError.MoreThanOneUserFound);
 				}
 
 				if (!usrs.Any())
 				{
-					return BadRequest("Пользователя с такой почтой не существует");
+					return this.BadRequestCustom(BadRequestError.UserNotFound);
 				}
-
 
 				var usr =
 					usrs.Single();
 
 				if (usr.EmailConfirmed ?? false)
 				{
-					return Ok(false);
+					return this.BadRequestCustom(BadRequestError.EmailIsNotConfirmed);
 				}
 
 				var count =
@@ -516,9 +526,15 @@ namespace JwtWebApi.Api.Controllers
 				var updatedUsr =
 					contextProvider.GetTable<AspNetUser>().First(t => t.Email == email);
 
+				try
+				{
+					await _emailService.SendMessage($"https://app-novgorod.herokuapp.com/confirm?u={updatedUsr.Id}&s={updatedUsr.SecurityStamp}", updatedUsr.Email);
+				}
+				catch (Exception e)
+				{
+					return this.BadRequestCustom(BadRequestError.EmailError);
+				}
 
-				await _emailService.SendMessage($"https://app-novgorod.herokuapp.com/confirm?u={updatedUsr.Id}&s={updatedUsr.SecurityStamp}", updatedUsr.Email);
-				//$"https://dev.app-novgorod.travel/api/Account/ConfirmEmail?user={updatedUsr.Id}&signature={updatedUsr.SecurityStamp}" 
 				return Ok();
 			}
 
@@ -538,12 +554,12 @@ namespace JwtWebApi.Api.Controllers
 
 				if (users.Count() > 1)
 				{
-					throw new InvalidOperationException("Нарушена структура бд!!");
+					return this.BadRequestCustom(BadRequestError.MoreThanOneUserFound);
 				}
 
 				if (!users.Any())
 				{
-					return BadRequest("Пользователя с такой почтой не существует");
+					return this.BadRequestCustom(BadRequestError.UserNotFound);
 				}
 
 				var usr =
@@ -565,7 +581,15 @@ namespace JwtWebApi.Api.Controllers
 					throw new InvalidOperationException("Не удалось обновить SecurityStamp");
 				}
 
-				await _emailService.SendMessage($"https://app-novgorod.herokuapp.com/recover?userId={usr.Id}&signature={stamp}", email);
+				try
+				{
+					await _emailService.SendMessage(
+						$"https://app-novgorod.herokuapp.com/recover?userId={usr.Id}&signature={stamp}", email);
+				}
+				catch (Exception e)
+				{
+					return this.BadRequestCustom(BadRequestError.EmailError);
+				}
 
 				return Ok();
 			}
@@ -579,27 +603,32 @@ namespace JwtWebApi.Api.Controllers
 		{
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
-				var usrs =
-					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false));
-
-				if (usrs.Count() > 1)
+				if (model.NewPassword.Length < 6)
 				{
-					throw new InvalidOperationException("Нарушена структура бд!!");
+					return this.BadRequestCustom(BadRequestError.IncorrectPasswordLength);
 				}
 
-				if (!usrs.Any())
+				var users =
+					contextProvider.GetTable<AspNetUser>().Where(t => t.Email == model.Email && !(t.IsBanned ?? false) && (t.EmailConfirmed ?? false));
+
+				if (users.Count() > 1)
 				{
-					return BadRequest("Пользователя с такой почтой не существует");
+					return this.BadRequestCustom(BadRequestError.MoreThanOneUserFound);
+				}
+
+				if (!users.Any())
+				{
+					return this.BadRequestCustom(BadRequestError.UserNotFound);
 				}
 
 				var usr =
-					usrs.Single();
+					users.Single();
 
 
 				switch (_passwordHasher.VerifyHashedPassword(usr, usr.PasswordHash, model.OldPassword))
 				{
 					case PasswordVerificationResult.Failed:
-						return Ok(false);
+						return this.BadRequestCustom(BadRequestError.InvalidPassword);
 					case PasswordVerificationResult.Success:
 						break;
 					case PasswordVerificationResult.SuccessRehashNeeded:
@@ -665,17 +694,18 @@ namespace JwtWebApi.Api.Controllers
 			}
 		}
 
-		private async Task<(bool success, string name, string id, string role)> GetIdentity(string email, string password)
+		private async Task<(bool success, BadRequestError error, string name, string id, string role)> GetIdentity(string email, string password)
 		{
 			using (var provider = _contextProviderFactory.Create())
 			{
 				var user= 
 					provider.GetTable<AspNetUser>()
+						.Where(w => string.IsNullOrEmpty(w.Platform))
 					.FirstOrDefault(t => t.Email == email && (t.EmailConfirmed ?? false) && !(t.IsBanned ?? false) && (string.IsNullOrEmpty(t.FireBaseId)));
 				
 				if (user == null)
 				{
-					return (false, "", "", "");
+					return (false,BadRequestError.UserNotFound, "", "", "");
 				}
 
 				var userRoles =
@@ -695,7 +725,7 @@ namespace JwtWebApi.Api.Controllers
 				switch (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password))
 				{
 					case PasswordVerificationResult.Failed:
-						return (false, "", "", "");
+						return (false,BadRequestError.InvalidPassword, "", "", "");
 					case PasswordVerificationResult.Success:
 						break;
 					case PasswordVerificationResult.SuccessRehashNeeded:
@@ -706,11 +736,11 @@ namespace JwtWebApi.Api.Controllers
 
 				if (roles.Any(r => r.RoleName == "admin"))
 				{
-					return (true, user.UserName, user.Id, roles.First(w => w.RoleName == "admin").RoleName);
+					return (true,BadRequestError.None, user.UserName, user.Id, roles.First(w => w.RoleName == "admin").RoleName);
 				}
 				else
 				{
-					return (true, user.UserName, user.Id, roles.First().RoleName);
+					return (true,BadRequestError.None, user.UserName, user.Id, roles.First().RoleName);
 				}
 			}
 		}
