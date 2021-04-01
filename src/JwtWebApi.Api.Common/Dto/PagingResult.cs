@@ -10,4 +10,5 @@ namespace JwtWebApi.Api.Common.Dto
 
 		public int Total { get; set; }
 	}
+
 }
