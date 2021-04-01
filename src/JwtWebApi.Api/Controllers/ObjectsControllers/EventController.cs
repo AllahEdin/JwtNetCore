@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
@@ -17,8 +18,14 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			{
 				ByDistance = false,
 				PropertyName = "StartDate",
-				IsDes = true,
+				IsDes = false,
 			};
+
+		private BinaryFilterUnit onlyNewFilter = new BinaryFilterUnit {
+			OperatorType = OperatorType.GraterThan,
+			Unit1 = new ParameterFilterUnit {PropertyName = "StartDate"},
+			Unit2 = new ConstFilterUnit {Value = DateTime.Today}
+		};
 
 		public EventController(IEventService service) : base(service)
 		{
@@ -28,7 +35,8 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
 			=> base.GetPaging<IEventWithLinks>(page, pageSize, new SearchModel()
 			{
-				Order = dateFilter
+				Order = dateFilter,
+				Filter = onlyNewFilter 
 			});
 
 		[HttpPost("WithLinks/GetPaging")]
@@ -40,12 +48,16 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 				filter =
 					new SearchModel()
 					{
-						Order = dateFilter
+						Order = dateFilter,
+						Filter = onlyNewFilter
 					};
 			}
 			else
 			{
 				filter.Order ??= dateFilter;
+				var group = new GroupFilterUnit()
+					{OperatorType = OperatorType.And, Units = new[] {filter.Filter, onlyNewFilter}};
+				filter.Filter = group;
 			}
 
 			return base.GetPaging<IEventWithLinks>(page, pageSize, filter);
