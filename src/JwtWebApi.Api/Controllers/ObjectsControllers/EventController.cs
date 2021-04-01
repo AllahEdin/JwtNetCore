@@ -17,7 +17,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			{
 				ByDistance = false,
 				PropertyName = "StartDate",
-				IsDes = false,
+				IsDes = true,
 			};
 
 		public EventController(IEventService service) : base(service)
