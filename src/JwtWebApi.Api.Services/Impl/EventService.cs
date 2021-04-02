@@ -91,7 +91,7 @@ namespace JwtWebApi.Api.Services.Impl
 			IFromToFilter<DateTime> startDateFilter,
 			IFromToFilter<DateTime> endDateFilter,
 			IFromToFilter<DateTime> dateFilter,
-			OrderModel orderModel)
+			SearchModel search)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -129,10 +129,7 @@ namespace JwtWebApi.Api.Services.Impl
 				}
 
 				IReadOnlyCollection<Event> eventsFinal =
-					await events.GetFilteredTable(new SearchModel()
-					{
-						Order = orderModel
-					}, cp)
+					await events.GetFilteredTable(search, cp)
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();
