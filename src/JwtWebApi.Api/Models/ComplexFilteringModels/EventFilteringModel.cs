@@ -6,7 +6,6 @@ namespace JwtWebApi.Api.Models.ComplexFilteringModels
 {
 	public class EventFilteringModel
 	{
-		public OrderModel Order { get; set; }
 
 		public int? CityId { get; set; }
 

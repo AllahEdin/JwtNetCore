@@ -81,6 +81,6 @@ namespace JwtWebApi.Api.Services.Services
 			IFromToFilter<DateTime> startDateFilter,
 			IFromToFilter<DateTime> endDateFilter,
 			IFromToFilter<DateTime> dateFilter,
-			OrderModel orderModel);
+			SearchModel search);
 	}
 }

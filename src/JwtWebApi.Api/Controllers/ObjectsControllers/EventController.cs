@@ -83,7 +83,11 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 					filter.StartDateFilter,
 					filter.EndDateFilter,
 					filter.DateFilter,
-					dateFilter);
+					new SearchModel()
+					{
+						Order = dateFilter,
+						Filter = onlyNewFilter
+					});
 
 			return Ok(pages);
 		}
