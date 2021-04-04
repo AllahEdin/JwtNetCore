@@ -8,8 +8,10 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
+using JwtWebApi.Api.Services.Services;
 using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Link2DbProvider;
+using JwtWebApi.Services.Services.Expressions;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,10 +33,13 @@ namespace JwtWebApi.Api.Controllers
 			new ConcurrentDictionary<string, string>();
 
 		private readonly IContextProviderFactory _contextProviderFactory;
+		private readonly IRouteService _routeService;
 
-		public FileStorageController(IContextProviderFactory contextProviderFactory)
+		public FileStorageController(IContextProviderFactory contextProviderFactory,
+			IRouteService routeService)
 		{
 			_contextProviderFactory = contextProviderFactory;
+			_routeService = routeService;
 		}
 
 		[HttpGet]
@@ -104,9 +109,23 @@ namespace JwtWebApi.Api.Controllers
 			bool isAdmin =
 				this.GetUserRole() == "admin";
 
-			if (type != FileType.Avatar && !isAdmin)
+			if (type != FileType.Avatar && type != FileType.Picture && !isAdmin)
 			{
 				return BadRequest();
+			}
+
+			if (type == FileType.Picture)
+			{
+				if (!isAdmin)
+				{
+					var res =
+						await IsRouteOwner(path);
+
+					if (!res.success)
+					{
+						return this.BadRequestCustom(res.error);
+					}
+				}
 			}
 
 			if (type == FileType.Avatar)
@@ -227,9 +246,23 @@ namespace JwtWebApi.Api.Controllers
 			bool isAdmin =
 				this.GetUserRole() == "admin";
 
-			if (type != FileType.Avatar && !isAdmin)
+			if (type != FileType.Avatar && type != FileType.Picture && !isAdmin)
 			{
 				return BadRequest();
+			}
+
+			if (type == FileType.Picture)
+			{
+				if (!isAdmin)
+				{
+					var res =
+						await IsRouteOwner(path);
+
+					if (!res.success)
+					{
+						return this.BadRequestCustom(res.error);
+					}
+				}
 			}
 
 			if (type == FileType.Avatar)
@@ -287,6 +320,65 @@ namespace JwtWebApi.Api.Controllers
 			}
 
 			return Ok();
+		}
+
+		private async Task<(bool success, BadRequestError error)> IsRouteOwner(string path)
+		{
+			var userId =
+				this.GetUserId();
+
+			if (string.IsNullOrWhiteSpace(userId))
+			{
+				return (false, BadRequestError.UserNotFound);
+			}
+
+			BinaryFilterUnit pathFilter =
+				new BinaryFilterUnit()
+				{
+					OperatorType = OperatorType.Equals,
+					Unit1 = new ParameterFilterUnit()
+					{
+						PropertyName = "Path",
+					},
+					Unit2 = new ConstFilterUnit()
+					{
+						Value = path
+					}
+				};
+
+			BinaryFilterUnit userIdFilter =
+				new BinaryFilterUnit()
+				{
+					OperatorType = OperatorType.Equals,
+					Unit1 = new ParameterFilterUnit()
+					{
+						PropertyName = "OwnerId",
+					},
+					Unit2 = new ConstFilterUnit()
+					{
+						Value = userId
+					}
+				};
+
+			BinaryFilterUnit filter =
+				new BinaryFilterUnit()
+				{
+					OperatorType = OperatorType.And,
+					Unit1 = pathFilter,
+					Unit2 = userIdFilter,
+				};
+
+			var routes =
+				await
+					_routeService.Get(1, 1, new SearchModel()
+					{
+						Filter = filter,
+					});
+
+			return
+				routes.Items.Count == 1
+					? (true, BadRequestError.None)
+					: (false, BadRequestError.UserNotFound);
 		}
 
 		private string GetPath(FileType type, string path)
