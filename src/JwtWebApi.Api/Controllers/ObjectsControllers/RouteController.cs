@@ -126,7 +126,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 			if (!can)
 			{
-				return BadRequest("User doesn't own route");
+				return this.BadRequestCustom(BadRequestError.UserNotOwner);
 			}
 
 			var res =
@@ -206,7 +206,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 			if (!can)
 			{
-				return BadRequest("User doesn't own route");
+				return this.BadRequestCustom(BadRequestError.UserNotOwner);
 			}
 
 			var res =
@@ -342,7 +342,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 			if (!can)
 			{
-				return BadRequest("User doesn't own route");
+				return this.BadRequestCustom(BadRequestError.UserNotOwner);
 			}
 
 			var res =
@@ -363,7 +363,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 			if (!can)
 			{
-				return BadRequest("User doesn't own route");
+				return this.BadRequestCustom(BadRequestError.UserNotOwner);
 			}
 
 			if (routeId <= 0)
