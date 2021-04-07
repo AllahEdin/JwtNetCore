@@ -88,5 +88,6 @@ namespace JwtWebApi.Api.Common.Extensions
 		UserSignedUpButEmailError, // Пользователь зарегистрирован, но во время отправки письма произошла ошибка
 		EmailError, //Во время отправки письма произошла ошибка
 		EmailIsNotConfirmed, //Почта не подтверждена
+		UserNotOwner //Пользователь не может редактировать этот объект
 	}
 }
