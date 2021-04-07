@@ -72,7 +72,7 @@ namespace JwtWebApi.Api.Controllers.LinkControllers
 
 				if (!own)
 				{
-					return BadRequest("User doesn't own the route");
+					return this.BadRequestCustom(BadRequestError.UserNotOwner);
 				}
 			}
 

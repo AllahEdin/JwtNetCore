@@ -264,12 +264,12 @@ namespace JwtWebApi.Api.Services.Impl
 
 		public async Task<string> RecalculateLength(int routeId)
 		{
-			string profile = "driving";
+			const string profile = "driving";
 		
-			List<(double lat, double longt)> list =
+			var list =
 				new List<(double lat, double longt)>();
 
-			SearchModel s =
+			var searchModel =
 				new SearchModel()
 				{
 					Filter = new BinaryFilterUnit()
@@ -287,7 +287,7 @@ namespace JwtWebApi.Api.Services.Impl
 				};
 
 			var paging =
-				await Get(1, 1, s);
+				await Get(1, 1, searchModel);
 
 			if (paging.Total != 1)
 			{
@@ -300,9 +300,9 @@ namespace JwtWebApi.Api.Services.Impl
 
 			var withAttr =
 				ra.OrderBy(o => o.Order).ThenBy(o => o.Id).Where(w => w.RouteId == routeId)
-					.Select(s => s.AttractionId);
+					.Select(s => s.AttractionId).ToList();
 
-			int additionDurationMinutes = 0;
+			var additionDurationMinutes = 0;
 
 			foreach (var attractionId in withAttr)
 			{
@@ -314,49 +314,55 @@ namespace JwtWebApi.Api.Services.Impl
 				additionDurationMinutes += attr.Duration;
 			}
 
-			using (var client = new HttpClient(new HttpClientHandler()))
-			{
-				client.BaseAddress = new Uri("http://router.project-osrm.org/");
+			RouteUnit resultUnit;
+			string returnValue;
+
+			if (withAttr.Count < 2) {
+				resultUnit = new RouteUnit {Distance = 0, Duration = 0};
+				returnValue = "No traveling";
+			}
+			else {
+				using var client = new HttpClient(new HttpClientHandler())
+					{BaseAddress = new Uri("http://router.project-osrm.org/")};
+
+				var points = list.Select(s =>
+					$"{s.longt.ToString(CultureInfo.InvariantCulture)},{s.lat.ToString(CultureInfo.InvariantCulture)}");
 				var res =
 					await client.GetAsync(
-						$"route/v1/{profile}/{string.Join(';', list.Select(s => $"{s.longt.ToString(CultureInfo.InvariantCulture)},{s.lat.ToString(CultureInfo.InvariantCulture)}"))}?alternatives=false&steps=false&overview=false&annotations=false");
+						$"route/v1/{profile}/{string.Join(';', points)}?alternatives=false&steps=false&overview=false&annotations=false");
 
 				var resp =
 					JsonConvert.DeserializeObject<RouteResponse>(await res.Content.ReadAsStringAsync());
 
-				if (resp.Code != "Ok")
-				{
+				if (resp.Code != "Ok") {
 					throw new InvalidOperationException(resp.Code);
 				}
 
-				var result =
+				resultUnit =
 					resp.Routes.FirstOrDefault();
 
-				if (result == null)
-				{
+				if (resultUnit == null) {
 					throw new InvalidOperationException(resp.Code);
 				}
 
-				int distance =  Convert.ToInt32(result.Distance / 1000);
-
-
-
-				using (var cp = ContextProviderFactory.Create())
-				{
-
-					await cp.GetTable<Route>()
-						.Where(w => w.Id == routeId)
-						.UpdateAsync(route => new Route()
-						{
-							Length = distance,
-							Time = (distance <= 2)
-							? Convert.ToInt32(result.Distance * 60 / 5000) + additionDurationMinutes
-							: Convert.ToInt32(TimeSpan.FromSeconds(Convert.ToInt32(result.Duration)).TotalMinutes) + additionDurationMinutes
-						});
-				}
-
-				return await res.Content.ReadAsStringAsync();
+				returnValue = await res.Content.ReadAsStringAsync();
 			}
+			
+			var distance =  Convert.ToInt32(resultUnit.Distance / 1000);
+
+			using var cp = ContextProviderFactory.Create();
+			
+			await cp.GetTable<Route>()
+				.Where(w => w.Id == routeId)
+				.UpdateAsync(route => new Route()
+				{
+					Length = distance,
+					Time = (distance <= 2)
+						? Convert.ToInt32(resultUnit.Distance * 60 / 5000) + additionDurationMinutes
+						: Convert.ToInt32(TimeSpan.FromSeconds(Convert.ToInt32(resultUnit.Duration)).TotalMinutes) + additionDurationMinutes
+				});
+
+			return returnValue;
 		}
 
 		public override async Task<bool> Delete(int id)

@@ -20,7 +20,9 @@ namespace JwtWebApi.Api.Services.Services
 						.Where(w => w.PlaceType == ObjectCode && w.PlaceId == id));
 
 			var rate =
-				ratings.Sum(s => s.Rate) / ratings.Length;
+				ratings.Length <= 0
+					? 0
+					: ratings.Sum(s => s.Rate) / ratings.Length;
 
 			await cp.GetTable<TObject>()
 				.Where(w => w.Id == id)
