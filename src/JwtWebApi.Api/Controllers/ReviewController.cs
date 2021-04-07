@@ -264,23 +264,50 @@ namespace JwtWebApi.Api.Controllers
 				return error;
 			}
 
+			var exists =
+				await Service.Get(id);
+
+			string placeType = "";
+			int placeId = 0;
+
+			if (exists != null)
+			{
+				placeId = exists.PlaceId;
+				placeType = exists.PlaceType;
+			}
+
+			if (placeId <= 0)
+			{
+				throw new InvalidOperationException("Не удалось пересчитать рейтинг");
+			}
+
+
 			if (this.GetUserRole() == "admin")
 			{
 				bool isSuccess = await Service.Delete(id);
+
+				if (isSuccess)
+				{
+					await RecalculateRating(placeType, placeId);
+				}
+
 				return Ok(isSuccess);
 			}
 			else
 			{
-
-				var exists =
-					await Service.Get(id);
-
 				if (this.GetUserId() == exists.UserId)
 				{
 					bool isSuccess = await Service.Delete(id);
+
+					if (isSuccess)
+					{
+						await RecalculateRating(placeType, placeId);
+					}
+
 					return Ok(isSuccess);
 				}
 			}
+
 
 			return BadRequest();
 		}
