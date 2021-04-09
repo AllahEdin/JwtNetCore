@@ -11,6 +11,111 @@ namespace JwtWebApi.Api.Common.Extensions
 {
 	public static class QueryableExtensions
 	{
+		public static Expression Mult(Expression a, Expression b)
+		{
+			return Expression.Multiply(a, b);
+		}
+
+		public static Expression Div(Expression a, Expression b)
+		{
+			return Expression.Divide(a, b);
+		}
+
+		public static Expression Add(Expression a, Expression b)
+		{
+			return Expression.Add(a, b);
+		}
+
+		public static IQueryable<TDb> OrderBy2<TDb>(this IQueryable<TDb> source, OrderModel model)
+		{
+			var x = Expression.Parameter(source.ElementType, "x");
+
+			System.Linq.Expressions.LambdaExpression selector = null;
+
+			if ((model?.ByDistance ?? false))
+			{
+
+				var parseMethod = typeof(double).GetMethod("Parse", new[] {typeof(string)});
+				var dbParameterXstr = Expression.PropertyOrField(x, "Latitude");
+				var dbParameterX =
+					Expression.Call(parseMethod, dbParameterXstr);
+
+				var dbParameterYstr = Expression.PropertyOrField(x, "Longitude");
+				var dbParameterY =
+					Expression.Call(parseMethod, dbParameterYstr);
+
+				var xParameterLocal = Expression.Constant(model.X);
+
+				var yParameterLocal = Expression.Constant(model.Y);
+
+				var cosMethod = typeof(Math).GetMethod("Cos", new[] {typeof(double)});
+				var sinMethod = typeof(Math).GetMethod("Sin", new[] {typeof(double)});
+				var acosMethod = typeof(Math).GetMethod("Acos", new[] {typeof(double)});
+
+				Expression Sin(Expression target)
+				{
+					return Expression.Call(sinMethod, target);
+				}
+
+				Expression Cos(Expression target)
+				{
+					return Expression.Call(cosMethod, target);
+				}
+
+				Expression Acos(Expression target)
+				{
+					return Expression.Call(acosMethod, target);
+				}
+
+
+				var baseRadEx = Expression.Multiply(Expression.Constant(Math.PI),
+					Expression.Divide(xParameterLocal, Expression.Constant(180.0)));
+
+
+				var targetRadEx = Expression.Multiply(Expression.Constant(Math.PI),
+					Expression.Divide(dbParameterX, Expression.Constant(180.0)));
+
+				var thetaEx = Expression.Subtract(yParameterLocal, dbParameterY);
+
+				var thetaRadEx = Expression.Multiply(Expression.Constant(Math.PI),
+					Expression.Divide(thetaEx, Expression.Constant(180.0)));
+
+				var distEx =
+					Add(Mult(Sin(baseRadEx), Sin(thetaRadEx)),
+						Mult(Cos(thetaRadEx), Mult(Cos(baseRadEx), Cos(targetRadEx))));
+
+				var dist2Ex =
+					Acos(distEx);
+
+				var dist3Ex =
+					Div(Mult(dist2Ex, Expression.Constant(180.0)), Expression.Constant(Math.PI));
+
+				var distance =
+					Mult(dist3Ex, Expression.Constant(111.18957696));
+
+
+			    selector = Expression.Lambda(
+					distance,
+					x);
+			}
+			else
+			{
+				selector = Expression.Lambda(Expression.PropertyOrField(x, model.PropertyName), x);
+			}
+
+			return
+				source.Provider.CreateQuery<TDb>(
+					Expression.Call(typeof(Queryable), model.IsDes ? "OrderByDescending" : "OrderBy",
+						new Type[] { source.ElementType, selector.Body.Type },
+
+						source.Expression, selector
+
+					));
+
+		}
+
+
+
 		public static IQueryable<TDb> OrderBy<TDb>(this IQueryable<TDb> source, OrderModel model)
 		{
 
@@ -32,38 +137,17 @@ namespace JwtWebApi.Api.Common.Extensions
 					Expression.Call(parseMethod, dbParameterYstr);
 				var xParameterLocal = Expression.Constant(model.X);
 				var yParameterLocal = Expression.Constant(model.Y);
-				//var xParameter = Expression.Subtract(dbParameterX, xParameterLocal);
-				//var yParameter = Expression.Subtract(dbParameterY, yParameterLocal);
-				//var xSquared = Expression.Multiply(xParameter, xParameter);
-				//var ySquared = Expression.Multiply(yParameter, yParameter);
-				//var sum = Expression.Add(xSquared, ySquared);
-				//var sqrtMethod = typeof(Math).GetMethod("Sqrt", new[] { typeof(double) });
-				//var distance = Expression.Call(sqrtMethod, sum);
-				//selector = Expression.Lambda(
-				//	distance,
-				//	x);
+				var xParameter = Expression.Subtract(dbParameterX, xParameterLocal);
+				var yParameter = Expression.Subtract(dbParameterY, yParameterLocal);
+				var xSquared = Expression.Multiply(xParameter, xParameter);
+				var ySquared = Expression.Multiply(yParameter, yParameter);
+				var sum = Expression.Add(xSquared, ySquared);
+				var sqrtMethod = typeof(Math).GetMethod("Sqrt", new[] { typeof(double) });
+				var distance = Expression.Call(sqrtMethod, sum);
+				selector = Expression.Lambda(
+					distance,
+					x);
 
-				var meth =
-					typeof(CoordinatesDistanceExtensions).GetMethod("DistanceTo", new[] { typeof(double), typeof(double), typeof(double), typeof(double) });
-
-				var 
-				selector2 = Expression.Lambda<Func<TDb, double>>(Expression.Call(meth, xParameterLocal, yParameterLocal, dbParameterX, dbParameterY), x);
-
-				Func<TDb, double> a =
-					selector2.Compile();
-
-				return
-
-					arr.OrderBy(s => a(s)).AsQueryable();
-
-				//arr.AsQueryable()
-				//	.Provider.CreateQuery<TDb>(
-				//	Expression.Call(typeof(Queryable), model.IsDes ? "OrderByDescending" : "OrderBy",
-				//		new Type[] { source.ElementType, selector.Body.Type },
-
-				//		source.Expression, selector
-
-				//	));
 			}
 			else
 			{
@@ -138,66 +222,12 @@ namespace JwtWebApi.Api.Common.Extensions
 			var order =
 				filter?.Order != null
 					? where
-						.OrderBy(filter.Order)
+						.OrderBy2(filter.Order)
 					: where;
 
 			return order;
 		}
 	}
 
-	public class Coordinates
-	{
-		public double Latitude { get; private set; }
-		public double Longitude { get; private set; }
-
-		public Coordinates(double latitude, double longitude)
-		{
-			Latitude = latitude;
-			Longitude = longitude;
-		}
-	}
-	public static class CoordinatesDistanceExtensions
-	{
-		public static double DistanceTo(double lat1, double long1, double lat2, double long2)
-		{
-			return DistanceTo(new Coordinates(lat1,long1),new Coordinates(lat2, long2), UnitOfLength.Kilometers);
-		}
-
-		public static double DistanceTo(this Coordinates baseCoordinates, Coordinates targetCoordinates, UnitOfLength unitOfLength)
-		{
-			var baseRad = Math.PI * baseCoordinates.Latitude / 180;
-			var targetRad = Math.PI * targetCoordinates.Latitude / 180;
-			var theta = baseCoordinates.Longitude - targetCoordinates.Longitude;
-			var thetaRad = Math.PI * theta / 180;
-
-			double dist =
-				Math.Sin(baseRad) * Math.Sin(targetRad) + Math.Cos(baseRad) *
-				Math.Cos(targetRad) * Math.Cos(thetaRad);
-			dist = Math.Acos(dist);
-
-			dist = dist * 180 / Math.PI;
-			dist = dist * 60 * 1.1515;
-
-			return unitOfLength.ConvertFromMiles(dist);
-		}
-	}
-
-	public class UnitOfLength
-	{
-		public static UnitOfLength Kilometers = new UnitOfLength(1.609344);
-		public static UnitOfLength NauticalMiles = new UnitOfLength(0.8684);
-		public static UnitOfLength Miles = new UnitOfLength(1);
-
-		private readonly double _fromMilesFactor;
-
-		private UnitOfLength(double fromMilesFactor)
-		{
-			_fromMilesFactor = fromMilesFactor;
-		}
-
-		public double ConvertFromMiles(double input)
-		{
-			return input * _fromMilesFactor;
-		}
-	}
+	
 }

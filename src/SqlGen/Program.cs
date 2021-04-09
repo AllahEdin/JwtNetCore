@@ -98,17 +98,17 @@ namespace SqlGen
 
 		static void Main(string[] args)
 		{
-			//var arr =
-			//	_list.AsQueryable().OrderBy(new OrderModel()
-			//	{
-			//		X = 0,
-			//		Y = 0,
-			//		IsDes = false
-			//	})
-			//		.ToArray();
+			var arr =
+				_list.AsQueryable().OrderBy2(new OrderModel()
+				{
+					X = 0,
+					Y = 0,
+					IsDes = false
+				})
+					.ToArray();
 
-			
-			Console.Write(string.Join("\n", _list.Select(s => new Coordinates(48.672309, 15.695585)
+
+			Console.Write(string.Join("\n", _list.Select(s => new Coordinates(0.0, 0.0)
 				.DistanceTo(
 					new Coordinates(Double.Parse(s.Latitude),Double.Parse(s.Longitude) ),
 					UnitOfLength.Kilometers
@@ -140,6 +140,153 @@ namespace SqlGen
 
 	internal static class QE
 	{
+		public static Expression Mult(Expression a, Expression b)
+		{
+			return Expression.Multiply(a, b);
+		}
+
+		public static Expression Div(Expression a, Expression b)
+		{
+			return Expression.Divide(a, b);
+		}
+
+		public static Expression Add(Expression a, Expression b)
+		{
+			return Expression.Add(a, b);
+		}
+
+		public static IQueryable<TDb> OrderBy2<TDb>(this IQueryable<TDb> source, OrderModel model)
+		{
+			var x = Expression.Parameter(source.ElementType, "x");
+
+			var parseMethod = typeof(double).GetMethod("Parse", new[] { typeof(string) });
+			var dbParameterXstr = Expression.PropertyOrField(x, "Latitude");
+			var dbParameterX =
+				Expression.Call(parseMethod, dbParameterXstr);
+
+			var dbParameterYstr = Expression.PropertyOrField(x, "Longitude");
+			var dbParameterY =
+				Expression.Call(parseMethod, dbParameterYstr);
+
+			var xParameterLocal = Expression.Constant(model.X);
+
+			var yParameterLocal = Expression.Constant(model.Y);
+
+			var sqrtMethod = typeof(Math).GetMethod("Sqrt", new[] { typeof(double) });
+			var cosMethod = typeof(Math).GetMethod("Cos", new[] { typeof(double) });
+			var sinMethod = typeof(Math).GetMethod("Sin", new[] { typeof(double) });
+			var asinMethod = typeof(Math).GetMethod("Asin", new[] { typeof(double) });
+			var acosMethod = typeof(Math).GetMethod("Acos", new[] { typeof(double) });
+
+			Expression Sin(Expression target)
+			{
+				return Expression.Call(sinMethod, target);
+			}
+
+			Expression Cos(Expression target)
+			{
+				return Expression.Call(cosMethod, target);
+			}
+
+			Expression Asin(Expression target)
+			{
+				return Expression.Call(asinMethod, target);
+			}
+
+			Expression Acos(Expression target)
+			{
+				return Expression.Call(acosMethod, target);
+			}
+
+			Expression Sqrt(Expression target)
+			{
+				return Expression.Call(sqrtMethod, target);
+			}
+
+
+
+			var pParameter = Expression.Constant(1.017453292519943295);
+
+
+			/////////////////
+			//var baseRad = Math.PI * baseCoordinates.Latitude / 180;
+
+			var baseRadEx = Expression.Multiply(Expression.Constant(Math.PI),
+				Expression.Divide(xParameterLocal, Expression.Constant(180.0)));
+
+			//var targetRad = Math.PI * targetCoordinates.Latitude / 180;
+
+			var targetRadEx = Expression.Multiply(Expression.Constant(Math.PI),
+				Expression.Divide(dbParameterX, Expression.Constant(180.0)));
+
+			//var theta = baseCoordinates.Longitude - targetCoordinates.Longitude;
+
+			var thetaEx = Expression.Subtract(yParameterLocal, dbParameterY);
+
+			//var thetaRad = Math.PI * theta / 180;
+
+			var thetaRadEx = Expression.Multiply(Expression.Constant(Math.PI), Expression.Divide(thetaEx, Expression.Constant(180.0))) ;
+
+			//double dist =
+			//	Math.Sin(baseRad) * Math.Sin(targetRad) +
+			//	Math.Cos(baseRad) * Math.Cos(targetRad) * Math.Cos(thetaRad);
+
+			var distEx =
+				Add(Mult(Sin(baseRadEx), Sin(thetaRadEx)),
+					Mult(Cos(thetaRadEx), Mult(Cos(baseRadEx), Cos(targetRadEx))));
+
+			//dist = Math.Acos(dist);
+
+			var dist2Ex =
+				Acos(distEx);
+
+			//dist = dist * 180 / Math.PI;
+
+			var dist3Ex =
+				Div(Mult(dist2Ex, Expression.Constant(180.0)), Expression.Constant(Math.PI));
+
+			var distance =
+				Mult(dist3Ex, Expression.Constant(111.18957696));
+		
+			//dist = dist * 60 * 1.1515;
+
+			//return unitOfLength.ConvertFromMiles(dist);
+			/////////////////
+
+			var selector = Expression.Lambda(
+				distance,
+				x);
+
+			var distLambda = Expression.Lambda<Func<TDb, double>>(
+				distance, x);
+
+			Func<TDb, double> dist =
+				distLambda.Compile();
+
+			foreach (var s in source)
+			{
+				var exec =
+					dist(s);
+
+				if (s is LatLong ll)
+				{
+					Console.WriteLine($"{ll.Id} = {exec}");
+				}
+
+			}
+
+			return
+				source.Provider.CreateQuery<TDb>(
+					Expression.Call(typeof(Queryable), model.IsDes ? "OrderByDescending" : "OrderBy",
+						new Type[] { source.ElementType, selector.Body.Type },
+
+						source.Expression, selector
+
+					));
+
+		}
+
+
 		public static IQueryable<TDb> OrderBy<TDb>(this IQueryable<TDb> source, OrderModel model)
 		{
 			var x = Expression.Parameter(source.ElementType, "x");
@@ -193,13 +340,6 @@ namespace SqlGen
 			var asinSqrtRes = Expression.Call(asinMethod, sqrtRes);
 			var distance = Expression.Multiply(Expression.Constant(12742.0), asinSqrtRes);
 
-			//var xParameter = Expression.Subtract(dbParameterX, xParameterLocal);
-			//var yParameter = Expression.Subtract(dbParameterY, yParameterLocal);
-			//var xSquared = Expression.Multiply(xParameter, xParameter);
-			//var ySquared = Expression.Multiply(yParameter, yParameter);
-			//var sum = Expression.Add(xSquared, ySquared);
-
-			//var distance = Expression.Call(sqrtMethod, sum);
 			var selector = Expression.Lambda(
 				distance,
 				x);
