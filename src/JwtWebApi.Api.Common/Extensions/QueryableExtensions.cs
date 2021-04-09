@@ -11,6 +11,111 @@ namespace JwtWebApi.Api.Common.Extensions
 {
 	public static class QueryableExtensions
 	{
+		public static Expression Mult(Expression a, Expression b)
+		{
+			return Expression.Multiply(a, b);
+		}
+
+		public static Expression Div(Expression a, Expression b)
+		{
+			return Expression.Divide(a, b);
+		}
+
+		public static Expression Add(Expression a, Expression b)
+		{
+			return Expression.Add(a, b);
+		}
+
+		public static IQueryable<TDb> OrderBy2<TDb>(this IQueryable<TDb> source, OrderModel model)
+		{
+			var x = Expression.Parameter(source.ElementType, "x");
+
+			System.Linq.Expressions.LambdaExpression selector = null;
+
+			if ((model?.ByDistance ?? false))
+			{
+
+				var parseMethod = typeof(double).GetMethod("Parse", new[] {typeof(string)});
+				var dbParameterXstr = Expression.PropertyOrField(x, "Latitude");
+				var dbParameterX =
+					Expression.Call(parseMethod, dbParameterXstr);
+
+				var dbParameterYstr = Expression.PropertyOrField(x, "Longitude");
+				var dbParameterY =
+					Expression.Call(parseMethod, dbParameterYstr);
+
+				var xParameterLocal = Expression.Constant(model.X);
+
+				var yParameterLocal = Expression.Constant(model.Y);
+
+				var cosMethod = typeof(Math).GetMethod("Cos", new[] {typeof(double)});
+				var sinMethod = typeof(Math).GetMethod("Sin", new[] {typeof(double)});
+				var acosMethod = typeof(Math).GetMethod("Acos", new[] {typeof(double)});
+
+				Expression Sin(Expression target)
+				{
+					return Expression.Call(sinMethod, target);
+				}
+
+				Expression Cos(Expression target)
+				{
+					return Expression.Call(cosMethod, target);
+				}
+
+				Expression Acos(Expression target)
+				{
+					return Expression.Call(acosMethod, target);
+				}
+
+
+				var baseRadEx = Expression.Multiply(Expression.Constant(Math.PI),
+					Expression.Divide(xParameterLocal, Expression.Constant(180.0)));
+
+
+				var targetRadEx = Expression.Multiply(Expression.Constant(Math.PI),
+					Expression.Divide(dbParameterX, Expression.Constant(180.0)));
+
+				var thetaEx = Expression.Subtract(yParameterLocal, dbParameterY);
+
+				var thetaRadEx = Expression.Multiply(Expression.Constant(Math.PI),
+					Expression.Divide(thetaEx, Expression.Constant(180.0)));
+
+				var distEx =
+					Add(Mult(Sin(baseRadEx), Sin(thetaRadEx)),
+						Mult(Cos(thetaRadEx), Mult(Cos(baseRadEx), Cos(targetRadEx))));
+
+				var dist2Ex =
+					Acos(distEx);
+
+				var dist3Ex =
+					Div(Mult(dist2Ex, Expression.Constant(180.0)), Expression.Constant(Math.PI));
+
+				var distance =
+					Mult(dist3Ex, Expression.Constant(111.18957696));
+
+
+			    selector = Expression.Lambda(
+					distance,
+					x);
+			}
+			else
+			{
+				selector = Expression.Lambda(Expression.PropertyOrField(x, model.PropertyName), x);
+			}
+
+			return
+				source.Provider.CreateQuery<TDb>(
+					Expression.Call(typeof(Queryable), model.IsDes ? "OrderByDescending" : "OrderBy",
+						new Type[] { source.ElementType, selector.Body.Type },
+
+						source.Expression, selector
+
+					));
+
+		}
+
+
+
 		public static IQueryable<TDb> OrderBy<TDb>(this IQueryable<TDb> source, OrderModel model)
 		{
 
@@ -20,13 +125,16 @@ namespace JwtWebApi.Api.Common.Extensions
 
 			if ((model?.ByDistance ?? false))
 			{
+				var arr =
+					source.ToArray();
+
 				var parseMethod = typeof(double).GetMethod("Parse", new[] { typeof(string) });
 				var dbParameterXstr = Expression.PropertyOrField(x, "Latitude");
 				var dbParameterX =
 					Expression.Call(parseMethod, dbParameterXstr);
-					var dbParameterYstr = Expression.PropertyOrField(x, "Longitude");
-					var dbParameterY =
-						Expression.Call(parseMethod, dbParameterYstr);
+				var dbParameterYstr = Expression.PropertyOrField(x, "Longitude");
+				var dbParameterY =
+					Expression.Call(parseMethod, dbParameterYstr);
 				var xParameterLocal = Expression.Constant(model.X);
 				var yParameterLocal = Expression.Constant(model.Y);
 				var xParameter = Expression.Subtract(dbParameterX, xParameterLocal);
@@ -39,6 +147,7 @@ namespace JwtWebApi.Api.Common.Extensions
 				selector = Expression.Lambda(
 					distance,
 					x);
+
 			}
 			else
 			{
@@ -56,6 +165,7 @@ namespace JwtWebApi.Api.Common.Extensions
 						));
 
 		}
+
 
 		public static IQueryable<TDb> Where<TDb>(this IQueryable<TDb> source, string propertyName, string whatContains)
 
@@ -112,10 +222,12 @@ namespace JwtWebApi.Api.Common.Extensions
 			var order =
 				filter?.Order != null
 					? where
-						.OrderBy(filter.Order)
+						.OrderBy2(filter.Order)
 					: where;
 
 			return order;
 		}
 	}
+
+	
 }
