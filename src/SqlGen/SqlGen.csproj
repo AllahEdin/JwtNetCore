@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JwtWebApi.Services\JwtWebApi.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="LinkTable.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
