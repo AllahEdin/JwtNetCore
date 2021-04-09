@@ -26,6 +26,84 @@ namespace JwtWebApi.Api.Common.Extensions
 			return Expression.Add(a, b);
 		}
 
+		public static IQueryable<TDb> OrderBy3<TDb>(this IQueryable<TDb> source, OrderModel model)
+		{
+			var x = Expression.Parameter(source.ElementType, "x");
+
+			System.Linq.Expressions.LambdaExpression selector = null;
+
+			if ((model?.ByDistance ?? false))
+			{
+
+				var parseMethod = typeof(double).GetMethod("Parse", new[] {typeof(string)});
+				var dbParameterXstr = Expression.PropertyOrField(x, "Latitude");
+				var dbParameterX =
+					Expression.Call(parseMethod, dbParameterXstr);
+
+				var dbParameterYstr = Expression.PropertyOrField(x, "Longitude");
+				var dbParameterY =
+					Expression.Call(parseMethod, dbParameterYstr);
+
+				var xParameterLocal = Expression.Constant(model.X);
+
+				var yParameterLocal = Expression.Constant(model.Y);
+
+				var sqrtMethod = typeof(Math).GetMethod("Sqrt", new[] {typeof(double)});
+				var cosMethod = typeof(Math).GetMethod("Cos", new[] {typeof(double)});
+				var asinMethod = typeof(Math).GetMethod("Asin", new[] {typeof(double)});
+
+				var pParameter = Expression.Constant(0.017453292519943295);
+
+				var latSubst = Expression.Subtract(dbParameterX, xParameterLocal);
+				var latSubstP = Expression.Multiply(latSubst, pParameter);
+				var cosLatSubstP = Expression.Call(cosMethod, latSubstP);
+				var cosLatSubstPdiv2 = Expression.Divide(cosLatSubstP, Expression.Constant(2.0));
+
+				var locLatP = Expression.Multiply(xParameterLocal, pParameter);
+				var cosLocLatP = Expression.Call(cosMethod, locLatP);
+
+				var dbLatP = Expression.Multiply(dbParameterX, pParameter);
+				var cosDbLatP = Expression.Call(cosMethod, dbLatP);
+
+				var longSubst = Expression.Subtract(dbParameterY, yParameterLocal);
+				var longSubstP = Expression.Multiply(longSubst, pParameter);
+				var cosLongSubstP = Expression.Call(cosMethod, longSubstP);
+				var oneSubstCosLongSubstP = Expression.Subtract(Expression.Constant(1.0), cosLongSubstP);
+				var oneSubstCosLongSubstPdiv2 = Expression.Divide(oneSubstCosLongSubstP, Expression.Constant(2.0));
+
+				var mult12 =
+					Expression.Multiply(cosLocLatP, cosDbLatP);
+				var mult123 = Expression.Multiply(mult12, oneSubstCosLongSubstPdiv2);
+
+				var res =
+					Expression.Subtract(Expression.Constant(0.5), cosLatSubstPdiv2);
+				var res2 =
+					Expression.Add(res, mult123);
+
+				var sqrtRes = Expression.Call(sqrtMethod, res2);
+				var asinSqrtRes = Expression.Call(asinMethod, sqrtRes);
+				var distance = Expression.Multiply(Expression.Constant(12742.0), asinSqrtRes);
+
+				selector = Expression.Lambda(
+					distance,
+					x);
+			}
+			else
+			{
+				selector = Expression.Lambda(Expression.PropertyOrField(x, model.PropertyName), x);
+			}
+
+			return
+				source.Provider.CreateQuery<TDb>(
+					Expression.Call(typeof(Queryable), model.IsDes ? "OrderByDescending" : "OrderBy",
+						new Type[] { source.ElementType, selector.Body.Type },
+
+						source.Expression, selector
+
+					));
+		}
+
+
 		public static IQueryable<TDb> OrderBy2<TDb>(this IQueryable<TDb> source, OrderModel model)
 		{
 			var x = Expression.Parameter(source.ElementType, "x");
@@ -222,7 +300,7 @@ namespace JwtWebApi.Api.Common.Extensions
 			var order =
 				filter?.Order != null
 					? where
-						.OrderBy2(filter.Order)
+						.OrderBy3(filter.Order)
 					: where;
 
 			return order;

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using JwtWebApi.Services.Services.Expressions;
+using ParameterExpression = System.Linq.Expressions.ParameterExpression;
 
 namespace SqlGen
 {
@@ -90,9 +91,7 @@ namespace SqlGen
 		private static LatLong[] _list =
 			new LatLong[]
 			{
-				new LatLong("15,1", "10,2"),
-				new LatLong("12,1", "10,2"),
-				new LatLong("14,1", "10,2"),
+				new LatLong("57,990089", "30,042281"),
 			};
 	
 
@@ -101,16 +100,46 @@ namespace SqlGen
 			var arr =
 				_list.AsQueryable().OrderBy2(new OrderModel()
 				{
-					X = 0,
-					Y = 0,
+					X = 53.201675,
+					Y = 50.106352,
 					IsDes = false
 				})
 					.ToArray();
 
+			var arr2 =
+				_list.AsQueryable().OrderBy(new OrderModel()
+					{
+						X = 53.201675,
+						Y = 50.106352,
+						IsDes = false
+					})
+					.ToArray();
 
-			Console.Write(string.Join("\n", _list.Select(s => new Coordinates(0.0, 0.0)
+			var arr3 =
+				_list.Select(s =>
+						{
+							var dist =
+								QE.Calc(new latlong()
+								{
+									latitude = 53.201675,
+									longitude = 50.106352
+								}, new latlong()
+								{
+									longitude = Double.Parse(s.Longitude),
+									latitude = Double.Parse(s.Latitude),
+								});
+
+							Console.WriteLine("Without expr =" + dist);
+
+							return dist;
+						}
+					)
+					.ToArray();
+
+
+			Console.Write(string.Join("\n", _list.Select(s => new Coordinates(53.201675, 50.106352)
 				.DistanceTo(
-					new Coordinates(Double.Parse(s.Latitude),Double.Parse(s.Longitude) ),
+					new Coordinates(Double.Parse(s.Latitude), Double.Parse(s.Longitude)),
 					UnitOfLength.Kilometers
 				).ToString() + " " + s.Id)));
 
@@ -136,7 +165,18 @@ namespace SqlGen
 		public string Latitude { get; set; }
 
 		public string Longitude { get; set; }
+
+		
 	}
+
+	internal class latlong
+	{
+		public double latitude { get; set; }
+
+		public double longitude { get; set; }
+	}
+
+
 
 	internal static class QE
 	{
@@ -308,18 +348,24 @@ namespace SqlGen
 			var cosMethod = typeof(Math).GetMethod("Cos", new[] { typeof(double) });
 			var asinMethod = typeof(Math).GetMethod("Asin", new[] { typeof(double) });
 
-			var pParameter = Expression.Constant(1.017453292519943295);
+			var pParameter = Expression.Constant(0.017453292519943295);
 
 			var latSubst = Expression.Subtract(dbParameterX, xParameterLocal);
 			var latSubstP = Expression.Multiply(latSubst, pParameter);
 			var cosLatSubstP = Expression.Call(cosMethod, latSubstP);
 			var cosLatSubstPdiv2 = Expression.Divide(cosLatSubstP, Expression.Constant(2.0));
 
+			Out<TDb>(source, cosLatSubstPdiv2, x, "stage 1");
+
 			var locLatP = Expression.Multiply(xParameterLocal, pParameter);
 			var cosLocLatP = Expression.Call(cosMethod, locLatP);
 
+			Out<TDb>(source, cosLocLatP, x, "stage 2");
+
 			var dbLatP = Expression.Multiply(dbParameterX, pParameter);
 			var cosDbLatP = Expression.Call(cosMethod, dbLatP);
+
+			Out<TDb>(source, cosDbLatP, x, "stage 3");
 
 			var longSubst = Expression.Subtract(dbParameterY, yParameterLocal);
 			var longSubstP = Expression.Multiply(longSubst, pParameter);
@@ -327,40 +373,32 @@ namespace SqlGen
 			var oneSubstCosLongSubstP = Expression.Subtract(Expression.Constant(1.0), cosLongSubstP);
 			var oneSubstCosLongSubstPdiv2 = Expression.Divide(oneSubstCosLongSubstP, Expression.Constant(2.0));
 
+			Out<TDb>(source, oneSubstCosLongSubstPdiv2, x, "stage 4");
+
 			var mult12 =
 				Expression.Multiply(cosLocLatP, cosDbLatP);
 			var mult123 = Expression.Multiply(mult12, oneSubstCosLongSubstPdiv2);
 
 			var res =
-				Expression.Add(cosLatSubstPdiv2, mult123);
+				Expression.Subtract(Expression.Constant(0.5), cosLatSubstPdiv2);
 			var res2 =
-				Expression.Subtract(Expression.Constant(0.5), res);
+				Expression.Add(res, mult123);
+			
+
+			Out<TDb>(source, res2, x, "stage 5");
 
 			var sqrtRes = Expression.Call(sqrtMethod, res2);
 			var asinSqrtRes = Expression.Call(asinMethod, sqrtRes);
 			var distance = Expression.Multiply(Expression.Constant(12742.0), asinSqrtRes);
 
+			Out<TDb>(source, asinSqrtRes, x, "stage 6");
+
+
+			Out<TDb>(source, distance, x, "res");
+
 			var selector = Expression.Lambda(
 				distance,
 				x);
-
-			var distLambda = Expression.Lambda<Func<TDb, double>>(
-				cosLatSubstPdiv2, x);
-
-			Func<TDb, double> dist =
-				distLambda.Compile();
-
-			foreach (var s in source)
-			{
-				var exec =
-					dist(s);
-
-				if (s is LatLong ll)
-				{
-					Console.WriteLine($"{ll.Id} = {exec}");
-				}
-				
-			}
 
 			return
 				source.Provider.CreateQuery<TDb>(
@@ -370,6 +408,75 @@ namespace SqlGen
 						source.Expression, selector
 
 					));
+		}
+
+		public static double Calc(latlong first, latlong second)
+		{
+
+			double cos(double a)
+			{
+				return Math.Cos(a);
+			}
+
+			double asin(double a)
+			{
+				return Math.Asin(a);
+			}
+
+			double sqrt(double a)
+			{
+				return Math.Sqrt(a);
+			}
+
+			var p = 0.017453292519943295;
+
+			var firstStage =
+				cos((second.latitude - first.latitude) * p) / 2;
+
+			var secondStage =
+				cos(first.latitude * p);
+
+			var thirdStage =
+				cos(second.latitude * p);
+
+			var fourthStage =
+				(1 - cos((second.longitude - first.longitude) * p)) / 2;
+
+				var a = 0.5 -
+				        firstStage +
+				        secondStage *
+				        thirdStage *
+				        fourthStage;
+
+				var asinhui =
+					asin(sqrt(a));
+
+
+
+				Console.WriteLine($"1 = {firstStage} \n 2 = {secondStage} \n 3 = {thirdStage} \n 4 = {fourthStage} \n 5 = {a} \n 6 = {asinhui}");
+
+				return 12742 * asinhui;
+			
+		}
+
+		private static void Out<T>(IQueryable<T> source, Expression exp, ParameterExpression p, string stage)
+		{
+			var distLambda = Expression.Lambda<Func<T, double>>(
+				exp, p);
+
+			Func<T, double> dist =
+				distLambda.Compile();
+
+			foreach (var s in source)
+			{
+				var exec =
+					dist(s);
+
+				if (s is LatLong ll)
+				{
+					Console.WriteLine($"{stage} = {exec}");
+				}
+			}
 		}
 	}
 
