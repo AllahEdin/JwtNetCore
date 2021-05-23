@@ -1116,7 +1116,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.HasOne("JwtWebApi.MigrationProvider.Models.Restaurants", "Restaurant")
                         .WithMany("RestaurantCuisineTypes")
                         .HasForeignKey("RestaurantId")
-                        .HasConstraintName("FK_RestaurantCoisineTypes_RestaurantId")
+                        .HasConstraintName("FK_RestaurantCuisineTypes_RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

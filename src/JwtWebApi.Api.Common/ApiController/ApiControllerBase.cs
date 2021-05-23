@@ -33,7 +33,7 @@ namespace JwtWebApi.Api.Common.ApiController
 			{
 				return error;
 			}
-
+			
 			if (Service is IPagingWithLinksProvider<TEntityWithLinks> pagingWithLinks)
 			{
 				var pages =
@@ -43,6 +43,23 @@ namespace JwtWebApi.Api.Common.ApiController
 			}
 
 			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="model">Создаваемый объект. Обязательное для заполнения</param>
+		protected async Task<IActionResult> GetFiltered([Required][FromBody] SearchModel filter, int page, int pageSize)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			var pages =
+				await Service.Get(page, pageSize, filter);
+
+			return Ok(pages);
 		}
 
 		/// <summary>
@@ -82,24 +99,7 @@ namespace JwtWebApi.Api.Common.ApiController
 			
 			return Ok(pages);
 		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="model">Создаваемый объект. Обязательное для заполнения</param>
-		protected async Task<IActionResult> GetFiltered([Required] [FromBody] SearchModel filter, int page, int pageSize)
-		{
-			if (!this.IsValidModel(out IActionResult error))
-			{
-				return error;
-			}
-
-			var pages =
-				await Service.Get(page, pageSize, filter);
-
-			return Ok(pages);
-		}
-
+		
 		/// <summary>
 		/// Возвращает новый объект <paramref name="model"/>
 		/// </summary>

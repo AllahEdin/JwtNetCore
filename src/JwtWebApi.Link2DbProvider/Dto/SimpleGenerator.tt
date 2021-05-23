@@ -47,9 +47,9 @@
 
 	string serverPsqlName = "localhost";
 	string portPsqlName = "7777";
-	string dataBasePsqlName = "db_test_1";
-	string uidPsqlName = "test";
-	string passwordPsqlName = "test";
+	string dataBasePsqlName = "novgorod_db_prod";
+	string uidPsqlName = "novgorod_user_admin";
+	string passwordPsqlName = "oCheNslo12345ZhniYpa!!rol";
 
 	LoadPostgreSQLMetadata(serverPsqlName, portPsqlName, dataBasePsqlName, uidPsqlName, passwordPsqlName);
 
@@ -96,6 +96,11 @@
 		if (t.Columns.Values.Any(t => t.MemberName == "Rating"))
 		{
 			baseCl += ",JwtWebApi.DataProviders.Common.DataObjects.IHasRating";
+		}
+
+		if (t.Columns.Values.Any(t => t.MemberName == "Visible"))
+		{
+			baseCl += ",JwtWebApi.DataProviders.Common.DataObjects.IHasVisibleState";
 		}
 
 		t.BaseClass = baseCl;

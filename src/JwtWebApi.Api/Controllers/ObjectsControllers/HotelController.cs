@@ -5,6 +5,7 @@ using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,15 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 	{
 		private readonly IHotelEquipmentTypesService _hotelEquipmentTypesService;
 		private readonly IHotelServiceTypesService _hotelServiceTypesService;
+		private readonly IContextProviderFactory _contextProviderFactory;
 
 		public HotelController(IHotelService service,
 			IHotelEquipmentTypesService hotelEquipmentTypesService, 
-			IHotelServiceTypesService hotelServiceTypesService) : base(service)
+			IHotelServiceTypesService hotelServiceTypesService, IContextProviderFactory contextProviderFactory) : base(service)
 		{
 			_hotelEquipmentTypesService = hotelEquipmentTypesService;
 			_hotelServiceTypesService = hotelServiceTypesService;
+			_contextProviderFactory = contextProviderFactory;
 		}
 
 		public override Task<IActionResult> Post(HotelModel model)
@@ -31,20 +34,26 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpGet("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
-			=> base.GetPaging<IHotelWithLinks>(page, pageSize, null);
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible)
+			=> base.GetPaging<IHotelWithLinks>(page, pageSize, showInvisible ? null : new SearchModel().AddVisibleFilter());
 
 		[HttpPost("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
-			=> base.GetPaging<IHotelWithLinks>(page, pageSize, filter);
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize,bool showInvisible, [FromBody] SearchModel filter)
+			=> base.GetPaging<IHotelWithLinks>(page, pageSize, showInvisible ? filter : filter.AddVisibleFilter());
 		
 		[HttpPost("WithLinks/GetPaging/Custom")]
-		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] HotelFilteringModel filter)
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize,bool showInvisible, [FromBody] HotelFilteringModel filter)
 		{
 			if (!this.IsValidModel(out IActionResult error))
 			{
 				return error;
 			}
+
+			var searchModel =
+				showInvisible ? new SearchModel() : new SearchModel().AddVisibleFilter();
+
+			searchModel.Order =
+				filter.Order;
 
 			var pages =
 				await Service.CustomFilter(page, pageSize, 
@@ -56,9 +65,23 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 					filter.AtLeastOneEquipmentType ?? false,
 					filter.ServiceTypes,
 					filter.AtLeastOneServiceType ?? false,
-					filter.Order);
+					searchModel);
 
 			return Ok(pages);
+		}
+
+
+		[Authorize(Roles = "admin")]
+		[HttpPost("{hotelId}/" + nameof(SetVisible))]
+		public async Task<IActionResult> SetVisible(int hotelId, bool visible)
+		{
+			using (var cp = _contextProviderFactory.Create())
+			{
+				var res =
+					await Service.SetVisible(cp, hotelId, visible);
+
+				return Ok(res);
+			}
 		}
 
 

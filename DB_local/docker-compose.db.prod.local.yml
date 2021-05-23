@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  db:
+    image: cheekibreeki228/db_repo:prod
+    ports:
+      - 7777:5432
+    volumes:
+      - ./cache:/tmp/cache
+      - ./db_local:/var/lib/postgresql/data
+    networks:
+      - backend
+networks:
+  backend:
+    external:
+      name: dev

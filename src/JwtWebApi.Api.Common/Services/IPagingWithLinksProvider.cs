@@ -8,4 +8,8 @@ namespace JwtWebApi.Api.Common.Services
 	{
 		Task<PagingResult<T>> GetPagingWithLinks(int page, int pageSize, SearchModel filter);
 	}
+
+
+
+
 }

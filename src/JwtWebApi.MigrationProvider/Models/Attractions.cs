@@ -29,6 +29,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public int Discount { get; set; }
         public int Weight { get; set; }
         public float Rating { get; set; }
+        public bool? Visible { get; set; }
 
         public virtual ICollection<AttractionPlaceTypes> AttractionPlaceTypes { get; set; }
         public virtual ICollection<AttractionSubjects> AttractionSubjects { get; set; }

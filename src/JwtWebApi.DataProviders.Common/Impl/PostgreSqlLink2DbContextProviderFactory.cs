@@ -28,8 +28,14 @@ namespace JwtWebApi.DataProviders.Common.Impl
 		/// <inheritdoc />
 		public IContextProvider Create(string key = null)
 		{
-			return new PostgresSqlDbProvider(PostgreSqlLink2DbContextProviderFactory.ProviderName ?? "PostgreSQL", 
+			return new PostgresSqlDbProvider(PostgreSqlLink2DbContextProviderFactory.ProviderName ?? "PostgreSQL",
 				_connectionStringProvider.GetConnectionString());
+		}
+
+		public IContextProvider CreatePgByConnectionString(string connectionString)
+		{
+			return new PostgresSqlDbProvider(PostgreSqlLink2DbContextProviderFactory.ProviderName ?? "PostgreSQL",
+				connectionString);
 		}
 
 		/// <summary>

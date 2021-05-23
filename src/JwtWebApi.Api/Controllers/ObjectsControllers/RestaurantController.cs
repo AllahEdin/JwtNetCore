@@ -5,6 +5,7 @@ using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,15 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 	{
 		private readonly IRestaurantCuisineTypesService _restaurantCuisineTypesService;
 		private readonly IRestaurantDenyTypesService _restaurantDenyTypesService;
+		private readonly IContextProviderFactory _contextProviderFactory;
 
 		public RestaurantController(IRestaurantCuisineTypesService restaurantCuisineTypesService,
 			IRestaurantDenyTypesService restaurantDenyTypesService,
-			IRestaurantService service) : base(service)
+			IRestaurantService service, IContextProviderFactory contextProviderFactory) : base(service)
 		{
 			_restaurantCuisineTypesService = restaurantCuisineTypesService;
 			_restaurantDenyTypesService = restaurantDenyTypesService;
+			_contextProviderFactory = contextProviderFactory;
 		}
 
 		public override Task<IActionResult> Post(RestaurantModel model)
@@ -31,20 +34,26 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpGet("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
-			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, null);
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible)
+			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, showInvisible ? null : new SearchModel().AddVisibleFilter());
 
 		[HttpPost("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
-			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, filter);
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible, [FromBody] SearchModel filter)
+			=> base.GetPaging<IRestaurantWithLinks>(page, pageSize, showInvisible ? filter : filter.AddVisibleFilter());
 		
 		[HttpPost("WithLinks/GetPaging/Custom")]
-		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] RestaurantFilteringModel filter)
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize,bool showInvisible, [FromBody] RestaurantFilteringModel filter)
 		{
 			if (!this.IsValidModel(out var error))
 			{
 				return error;
 			}
+
+			var searchModel =
+				showInvisible ? new SearchModel() : new SearchModel().AddVisibleFilter();
+
+			searchModel.Order =
+				filter.Order;
 
 			var pages =
 				await Service.CustomFilter(page, pageSize, 
@@ -56,11 +65,24 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 					filter.AtLeastOneCuisineType ?? false,
 					filter.DenyTypeIds,
 					filter.AtLeastOneDenyType ?? false,
-					filter.Order);
+					searchModel);
 
 			return Ok(pages);
 		}
 
+
+		[Authorize(Roles = "admin")]
+		[HttpPost("{restaurantId}/" + nameof(SetVisible))]
+		public async Task<IActionResult> SetVisible(int restaurantId, bool visible)
+		{
+			using (var cp = _contextProviderFactory.Create())
+			{
+				var res =
+					await Service.SetVisible(cp, restaurantId, visible);
+
+				return Ok(res);
+			}
+		}
 
 		[HttpPost("{restaurantId}/" + nameof(AddCuisineTypeById))]
 		[Authorize(Roles = "admin")]

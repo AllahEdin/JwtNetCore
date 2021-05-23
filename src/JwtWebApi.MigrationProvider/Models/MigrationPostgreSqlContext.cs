@@ -62,7 +62,7 @@ namespace JwtWebApi.MigrationProvider.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseNpgsql("User ID=test;Password=test;Host=localhost;Port=7777;Database=db_test_1;Pooling=true;");
+                optionsBuilder.UseNpgsql("User ID=novgorod_user_admin;Password=oCheNslo12345ZhniYpa!!rol;Host=localhost;Port=7777;Database=novgorod_db_prod;Pooling=true;");
             }
         }
 
@@ -246,6 +246,10 @@ namespace JwtWebApi.MigrationProvider.Models
                     .IsRequired()
                     .HasMaxLength(255);
 
+                entity.Property(e => e.Visible)
+                    .IsRequired()
+                    .HasDefaultValueSql("true");
+
                 entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
 
@@ -357,14 +361,14 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
                 entity.HasOne(d => d.City)
-                    .WithMany(p => p.DistrictCitiesCity)
-                    .HasForeignKey(d => d.CityId)
-                    .HasConstraintName("FK_DistrictCities_CityId");
+	                .WithMany(p => p.DistrictCitiesCity)
+	                .HasForeignKey(d => d.CityId)
+	                .HasConstraintName("FK_DistrictCities_CityId");
 
                 entity.HasOne(d => d.District)
-                    .WithMany(p => p.DistrictCitiesDistrict)
-                    .HasForeignKey(d => d.DistrictId)
-                    .HasConstraintName("FK_DistrictCities_DistrictId");
+	                .WithMany(p => p.DistrictCitiesDistrict)
+	                .HasForeignKey(d => d.DistrictId)
+	                .HasConstraintName("FK_DistrictCities_DistrictId");
             });
 
             modelBuilder.Entity<Districts>(entity =>
@@ -434,6 +438,10 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.StartDate).HasColumnType("date");
 
                 entity.Property(e => e.Url).HasMaxLength(255);
+
+                entity.Property(e => e.Visible)
+                    .IsRequired()
+                    .HasDefaultValueSql("true");
             });
 
             modelBuilder.Entity<HotelEquipmentTypes>(entity =>
@@ -523,6 +531,10 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Visible)
+                    .IsRequired()
+                    .HasDefaultValueSql("true");
 
                 entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });
@@ -677,6 +689,10 @@ namespace JwtWebApi.MigrationProvider.Models
                 entity.Property(e => e.Preview)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.Visible)
+                    .IsRequired()
+                    .HasDefaultValueSql("true");
 
                 entity.Property(e => e.Weight).HasDefaultValueSql("1");
             });

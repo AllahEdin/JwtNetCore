@@ -22,6 +22,7 @@ namespace JwtWebApi.Api.Models
 		public float Rating { get; set; }
 		public string Phone { get; set; }
 		public string Url { get; set; }
+		public bool Visible { get; set; }
 	}
 
 	public class HotelModel : IHotel
@@ -44,6 +45,7 @@ namespace JwtWebApi.Api.Models
 		public float Rating { get; set; }
 		public string Phone { get; set; }
 		public string Url { get; set; }
+		public bool Visible { get; set; }
 	}
 
 	public class AttractionModel : IAttraction
@@ -63,6 +65,7 @@ namespace JwtWebApi.Api.Models
 		public int Discount { get; set; }
 		public int Weight { get; set; }
 		public float Rating { get; set; }
+		public bool Visible { get; set; }
 	}
 
 	public class RouteModel : IRoute
@@ -103,5 +106,6 @@ namespace JwtWebApi.Api.Models
 		public string Phone { get; set; }
 		public string Url { get; set; }
 		public float Rating { get; set; }
+		public bool Visible { get; set; }
 	}
 }

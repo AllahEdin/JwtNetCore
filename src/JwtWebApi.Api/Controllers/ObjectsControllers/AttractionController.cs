@@ -5,6 +5,7 @@ using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,30 +17,39 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		private readonly IAttractionSubjectsService _attractionSubjectsService;
 		private readonly IRouteAttractionService _routeAttractionService;
 		private readonly IAttractionPlaceTypeService _attractionPlaceTypeService;
+		private readonly IContextProviderFactory _contextProviderFactory;
 
 		public AttractionController(IAttractionService service, IAttractionSubjectsService attractionSubjectsService,
-			IRouteAttractionService routeAttractionService, IAttractionPlaceTypeService attractionPlaceTypeService) : base(service)
+			IRouteAttractionService routeAttractionService, IAttractionPlaceTypeService attractionPlaceTypeService,
+			IContextProviderFactory contextProviderFactory) : base(service)
 		{
 			_attractionSubjectsService = attractionSubjectsService;
 			_routeAttractionService = routeAttractionService;
 			_attractionPlaceTypeService = attractionPlaceTypeService;
+			_contextProviderFactory = contextProviderFactory;
 		}
 
 		[HttpGet("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
-			=> base.GetPaging<IAttractionWithLinks>(page, pageSize, null);
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible)
+			=> base.GetPaging<IAttractionWithLinks>(page, pageSize, showInvisible ? null : new SearchModel().AddVisibleFilter());
 
 		[HttpPost("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
-			=> base.GetPaging<IAttractionWithLinks>(page, pageSize, filter);
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible, [FromBody] SearchModel filter)
+			=> base.GetPaging<IAttractionWithLinks>(page, pageSize, showInvisible ? filter : filter.AddVisibleFilter());
 
 		[HttpPost("WithLinks/GetPaging/Custom")]
-		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] AttractionFilteringModel filter)
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible, [FromBody] AttractionFilteringModel filter)
 		{
 			if (!this.IsValidModel(out IActionResult error))
 			{
 				return error;
 			}
+
+			var searchModel =
+				showInvisible ? new SearchModel() : new SearchModel().AddVisibleFilter();
+
+			searchModel.Order =
+				filter.Order;
 
 			var pages =
 				await Service.CustomFilter(page, pageSize, 
@@ -50,10 +60,25 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 					filter.AtLeastOneSubject ?? false,
 					filter.PlaceTypeIds,
 					filter.AtLeastOnePlaceType ?? false,
-					filter.Order);
+					searchModel
+				);
 
 			return Ok(pages);
 		}
+
+		[Authorize(Roles = "admin")]
+		[HttpPost("{attractionId}/" + nameof(SetVisible))]
+		public async Task<IActionResult> SetVisible(int attractionId, bool visible)
+		{
+			using (var cp =_contextProviderFactory.Create())
+			{
+				var res =
+					await Service.SetVisible(cp, attractionId, visible);
+
+				return Ok(res);
+			}
+		}
+
 
 		[Authorize(Roles = "admin")]
 		[HttpPost("{attractionId}/" + nameof(AddSubjectById))]

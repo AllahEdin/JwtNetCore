@@ -156,7 +156,7 @@ namespace JwtWebApi.Api.Services.Impl
 
 		public async Task<PagingResult<IHotelWithLinks>> CustomFilter(int page, int pageSize, string name, int? cityId, int? districtId, int? housingTypeId,
 			int[] equipmentTypes, bool equipmentTypesAtLeastOne, int[] serviceTypes, bool serviceTypesAtLeastOne,
-			OrderModel orderModel) {
+			SearchModel searchModel) {
 			using (var cp = _contextProviderFactory.Create())
 			{
 				var hotels =
@@ -218,10 +218,7 @@ namespace JwtWebApi.Api.Services.Impl
 				}
 
 				IReadOnlyCollection<Hotel> hotelsFinal =
-					await hotels.GetFilteredTable(new SearchModel()
-						{
-							Order = orderModel
-						}, cp)
+					await hotels.GetFilteredTable(searchModel, cp)
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();

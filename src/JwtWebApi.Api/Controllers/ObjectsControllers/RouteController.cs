@@ -1,86 +1,143 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
 using JwtWebApi.Api.Models.ComplexFilteringModels;
 using JwtWebApi.Api.Services.Dto;
 using JwtWebApi.Api.Services.Services;
+using JwtWebApi.DataProviders.Common.Services;
 using JwtWebApi.Services.Services.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JwtWebApi.Api.Controllers.ObjectsControllers
 {
-	public class RouteController : ApiControllerBase<IRoute, RouteModel, IRouteService>
+	public class RouteController : AuthorizeAdminApiControllerBase<IRoute, RouteModel, IRouteService>
 	{
 		private readonly IRoutePeopleTypeService _routePeopleTypeService;
 		private readonly IRouteAgeTypeService _routeAgeTypeService;
 		private readonly IRouteSubjectNameService _routeSubjectNameService;
 		private readonly IRouteSubjectTypeService _routeSubjectTypeService;
 		private readonly IRouteAttractionService _routeAttractionService;
+		private readonly IContextProviderFactory _contextProviderFactory;
 
 		public RouteController(IRouteService service, 
 			IRoutePeopleTypeService routePeopleTypeService, 
 			IRouteAgeTypeService routeAgeTypeService, 
 			IRouteSubjectNameService routeSubjectNameService, 
 			IRouteSubjectTypeService routeSubjectTypeService, 
-			IRouteAttractionService routeAttractionService) : base(service)
+			IRouteAttractionService routeAttractionService, IContextProviderFactory contextProviderFactory) : base(service)
 		{
 			_routePeopleTypeService = routePeopleTypeService;
 			_routeAgeTypeService = routeAgeTypeService;
 			_routeSubjectNameService = routeSubjectNameService;
 			_routeSubjectTypeService = routeSubjectTypeService;
 			_routeAttractionService = routeAttractionService;
+			_contextProviderFactory = contextProviderFactory;
 		}
 
-		#region CommonApi
 
-		[HttpGet("{id}")]
-		public Task<IActionResult> GetById(int id)
-			=> base.Get(id);
-
-		[HttpGet("")]
-		public Task<IActionResult> GetPaging([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize)
-			=> base.Get(page, pageSize);
-
-		[HttpPost(nameof(GetPagingFiltered))]
-		public Task<IActionResult> GetPagingFiltered([Range(1, Int32.MaxValue)] int page, [Range(1, Int32.MaxValue)] int pageSize, [FromBody] SearchModel filterUnit)
-			=> base.GetFiltered(filterUnit, page, pageSize);
-
-
-		[HttpPost("")]
-		public virtual async Task<IActionResult> Post([FromBody] RouteModel model)
+		[HttpGet("ByAuthor/{id}")]
+		public async Task<IActionResult> GetByAuthor(int page, int pageSize, string id, bool showInvisible)
 		{
-			bool isAdmin =
-				this.GetUserRole() == "admin";
-
-			RouteModel dto =
-				new RouteModel()
+			var searchModel =
+				new SearchModel()
 				{
-					Name = model.Name,
-					DistrictId = model.DistrictId,
-					Animals = model.Animals,
-					CityId = model.CityId,
-					Description = model.Description,
-					Path = model.Path,
-					OwnerId = this.GetUserId(),
-					Id = 0,
-					Visible = isAdmin,
-					Weight = model.Weight,
-					Time = model.Time,
-					Length = model.Length,
+					Filter = new BinaryFilterUnit()
+					{
+						Unit1 = new ParameterFilterUnit()
+						{
+							PropertyName = "OwnerId"
+						},
+						Unit2 = new ConstFilterUnit()
+						{
+							Value = id
+						},
+						OperatorType = OperatorType.Equals
+					}
 				};
 
+			searchModel =
+				showInvisible
+					? searchModel
+					: searchModel.AddVisibleFilter();
+
 			var res =
-				await Add(dto);
+				await Service.Get(page, pageSize, searchModel);
 
 			return Ok(res);
 		}
 
+
+		[HttpGet("WithLinks/GetPaging")]
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible)
+			=> base.GetPaging<IRouteWithLinks>(page, pageSize, showInvisible ? null : new SearchModel().AddVisibleFilter());
+
+
+		[HttpPost("WithLinks/GetPaging")]
+		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible, [FromBody] SearchModel filter)
+			=> base.GetPaging<IRouteWithLinks>(page, pageSize, showInvisible ? filter : filter.AddVisibleFilter());
+
+
+		[HttpPost("WithLinks/GetPaging/Custom")]
+		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize,bool showInvisible, [FromBody] RouteFilteringModel filter)
+		{
+			if (!this.IsValidModel(out IActionResult error))
+			{
+				return error;
+			}
+
+			var searchModel =
+				showInvisible ? new SearchModel() : new SearchModel().AddVisibleFilter();
+
+			searchModel.Order =
+				filter.Order;
+
+			var pages =
+				await Service.CustomFilter(page, pageSize, 
+					filter.Name,
+					filter.Animals, 
+					filter.PeopleTypeIds,
+					filter.AgeTypeIds,
+					filter.SubjectNameIds,
+					filter.AtLeastOneSubjectName ?? false,
+					filter.SubjectTypeIds,
+					filter.AtLeastOneSubjectType ?? false,
+					filter.CityId,
+					filter.DistrictId,
+					filter.DurationFilter, 
+					filter.LengthFilter, 
+					searchModel);
+
+			return Ok(pages);
+		}
+
+		[Authorize(Roles = "admin")]
+		[HttpPost("{routeId}/" + nameof(SetVisible))]
+		public async Task<IActionResult> SetVisible(int routeId, bool visible)
+		{
+			using (var cp = _contextProviderFactory.Create())
+			{
+				var res =
+					await Service.SetVisible(cp, routeId, visible);
+
+				return Ok(res);
+			}
+		}
+
+		public override Task<IActionResult> Post(RouteModel model)
+		{
+			bool isAdmin =
+				this.GetUserRole() == "admin";
+
+			model.Rating = 0;
+			model.OwnerId = this.GetUserId();
+			model.Visible = isAdmin;
+			return base.Post(model);
+		}
+
 		[HttpPut("")]
-		public virtual async Task<IActionResult> Put([FromBody] RouteModel model)
+		public override async Task<IActionResult> Put([FromBody] RouteModel model)
 		{
 			if (model.Id <= 0)
 			{
@@ -115,86 +172,6 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			}
 
 			return BadRequest();
-		}
-
-		[HttpDelete(nameof(DeleteById))]
-		[Authorize()]
-		public async Task<IActionResult> DeleteById(int id)
-		{
-			var can =
-				await CanPerformOperation(id);
-
-			if (!can)
-			{
-				return this.BadRequestCustom(BadRequestError.UserNotOwner);
-			}
-
-			var res =
-				await base.Delete(id);
-
-			return Ok(res);
-		}
-
-		#endregion
-
-		[HttpGet("ByAuthor/{id}")]
-		public async Task<IActionResult> GetByAuthor(int page, int pageSize, string id)
-		{
-			var res =
-				await Service.Get(page, pageSize, new SearchModel()
-				{
-					Filter = new BinaryFilterUnit()
-					{
-						Unit1 = new ParameterFilterUnit()
-						{
-							PropertyName = "OwnerId"
-						},
-						Unit2 = new ConstFilterUnit()
-						{
-							Value = id
-						},
-						OperatorType = OperatorType.Equals 
-					}
-				});
-
-			return Ok(res);
-		}
-
-
-		[HttpGet("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize)
-			=> base.GetPaging<IRouteWithLinks>(page, pageSize, null);
-
-		[HttpPost("WithLinks/GetPaging")]
-		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] SearchModel filter)
-			=> base.GetPaging<IRouteWithLinks>(page, pageSize, filter);
-
-
-		[HttpPost("WithLinks/GetPaging/Custom")]
-		public async Task<IActionResult> GetPagingWithLinks(int page, int pageSize, [FromBody] RouteFilteringModel filter)
-		{
-			if (!this.IsValidModel(out IActionResult error))
-			{
-				return error;
-			}
-
-			var pages =
-				await Service.CustomFilter(page, pageSize, 
-					filter.Name,
-					filter.Animals, 
-					filter.PeopleTypeIds,
-					filter.AgeTypeIds,
-					filter.SubjectNameIds,
-					filter.AtLeastOneSubjectName ?? false,
-					filter.SubjectTypeIds,
-					filter.AtLeastOneSubjectType ?? false,
-					filter.CityId,
-					filter.DistrictId,
-					filter.DurationFilter, 
-					filter.LengthFilter, 
-					filter.Order);
-
-			return Ok(pages);
 		}
 
 		[HttpPut(nameof(RecalculateDistance))]
@@ -350,9 +327,27 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 					_routeAttractionService);
 
 			return Ok(res);
-		} 
+		}
 
 		#endregion
+
+		[HttpDelete(nameof(DeleteById))]
+		[Authorize()]
+		public override async Task<IActionResult> DeleteById(int id)
+		{
+			var can =
+				await CanPerformOperation(id);
+
+			if (!can)
+			{
+				return this.BadRequestCustom(BadRequestError.UserNotOwner);
+			}
+
+			var res =
+				await base.Delete(id);
+
+			return Ok(res);
+		}
 
 		[HttpDelete()]
 		[Authorize()]

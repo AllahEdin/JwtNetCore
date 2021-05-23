@@ -8,7 +8,10 @@ using JwtWebApi.Services.Services.Expressions;
 
 namespace JwtWebApi.Api.Services.Services
 {
-	public interface IRestaurantService : IEntityProvider<IRestaurant>, IPagingWithLinksProvider<IRestaurantWithLinks>, IRatingService<Restaurant>
+	public interface IRestaurantService : IEntityProvider<IRestaurant>, 
+		IPagingWithLinksProvider<IRestaurantWithLinks>, 
+		IRatingService<Restaurant>, 
+		IVisualStateProvider<Restaurant>
 	{
 		public Task<PagingResult<IRestaurantWithLinks>> CustomFilter(int page,
 			int pageSize, 
@@ -20,10 +23,13 @@ namespace JwtWebApi.Api.Services.Services
 			bool atLeastOneCuisineType,
 			int[] denyTypeIds,
 			bool atLeastOneDenyType,
-			OrderModel orderModel);
+			SearchModel searchModel);
 	}
 
-	public interface IHotelService : IEntityProvider<IHotel>, IPagingWithLinksProvider<IHotelWithLinks>, IRatingService<Hotel>
+	public interface IHotelService : IEntityProvider<IHotel>, 
+		IPagingWithLinksProvider<IHotelWithLinks>, 
+		IRatingService<Hotel>,
+		IVisualStateProvider<Hotel>
 	{
 		public Task<PagingResult<IHotelWithLinks>> CustomFilter(int page,
 			int pageSize, 
@@ -35,10 +41,13 @@ namespace JwtWebApi.Api.Services.Services
 			bool equipmentTypesAtLeastOne,
 			int[] serviceTypes,
 			bool serviceTypesAtLeastOne,
-			OrderModel orderModel);
+			SearchModel searchModel);
 	}
 
-	public interface IAttractionService : IEntityProvider<IAttraction>, IPagingWithLinksProvider<IAttractionWithLinks>, IRatingService<Attraction>
+	public interface IAttractionService : IEntityProvider<IAttraction>, 
+		IPagingWithLinksProvider<IAttractionWithLinks>,
+		IRatingService<Attraction>, 
+		IVisualStateProvider<Attraction>
 	{
 		public Task<PagingResult<IAttractionWithLinks>> CustomFilter(int page,
 			int pageSize, 
@@ -49,10 +58,13 @@ namespace JwtWebApi.Api.Services.Services
 			bool subjectsAtLeastOne,
 			int[] placeTypeIds,
 			bool placeTypesAtLeastOne,
-			OrderModel orderModel);
+			SearchModel searchModel);
 	}
 
-	public interface IRouteService : IEntityProvider<IRoute>, IPagingWithLinksProvider<IRouteWithLinks>, IRatingService<Route>
+	public interface IRouteService : IEntityProvider<IRoute>, 
+		IPagingWithLinksProvider<IRouteWithLinks>, 
+		IRatingService<Route>, 
+		IVisualStateProvider<Route>
 	{
 		public Task<PagingResult<IRouteWithLinks>> CustomFilter(int page,
 			int pageSize,
@@ -68,12 +80,15 @@ namespace JwtWebApi.Api.Services.Services
 			int? districtId,
 			IFromToFilter<float> durationFilter,
 			IFromToFilter<float> lengthFilter,
-			OrderModel orderModel);
+			SearchModel searchModel);
 
 		public Task<string> RecalculateLength(int routeId);
 	}
 
-	public interface IEventService : IEntityProvider<IEvent>,IPagingWithLinksProvider<IEventWithLinks>, IRatingService<Event>
+	public interface IEventService : IEntityProvider<IEvent>,
+		IPagingWithLinksProvider<IEventWithLinks>, 
+		IRatingService<Event>, 
+		IVisualStateProvider<Event>
 	{
 		Task<PagingResult<IEventWithLinks>> CustomFilter(int page, int pageSize,
 			int? cityId, 

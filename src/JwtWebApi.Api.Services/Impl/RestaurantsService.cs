@@ -152,7 +152,7 @@ namespace JwtWebApi.Api.Services.Impl
 		public async Task<PagingResult<IRestaurantWithLinks>> CustomFilter(int page, int pageSize, string name,
 			int? cityId, int? districtId, int? cateringTypeId,
 			int[] cuisineTypeIds, bool atLeastOneCuisineType, int[] denyTypeIds, bool atLeastOneDenyType,
-			OrderModel orderModel) {
+			SearchModel searchModel) {
 			using (var cp = _contextProviderFactory.Create()) {
 				var rests =
 					cp.GetTable<Restaurant>();
@@ -208,9 +208,7 @@ namespace JwtWebApi.Api.Services.Impl
 				}
 
 				IReadOnlyCollection<Restaurant> restsFinal =
-					await rests.GetFilteredTable(new SearchModel() {
-							Order = orderModel
-						}, cp)
+					await rests.GetFilteredTable(searchModel, cp)
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();

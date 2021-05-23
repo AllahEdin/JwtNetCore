@@ -246,6 +246,12 @@ namespace JwtWebApi.MigrationProvider.Migrations
                     b.Property<float>("Rating")
                         .HasColumnType("real");
 
+                    b.Property<bool?>("Visible")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValueSql("true");
+
                     b.Property<int>("Weight")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -531,6 +537,12 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<bool?>("Visible")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValueSql("true");
+
                     b.Property<int>("Weight")
                         .HasColumnType("integer");
 
@@ -659,6 +671,12 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Url")
                         .HasColumnType("text");
+
+                    b.Property<bool?>("Visible")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValueSql("true");
 
                     b.Property<int>("Weight")
                         .ValueGeneratedOnAdd()
@@ -878,6 +896,12 @@ namespace JwtWebApi.MigrationProvider.Migrations
 
                     b.Property<string>("Url")
                         .HasColumnType("text");
+
+                    b.Property<bool?>("Visible")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValueSql("true");
 
                     b.Property<int>("Weight")
                         .ValueGeneratedOnAdd()

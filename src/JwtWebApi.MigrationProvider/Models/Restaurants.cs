@@ -30,6 +30,7 @@ namespace JwtWebApi.MigrationProvider.Models
         public float Rating { get; set; }
         public string Phone { get; set; }
         public string Url { get; set; }
+        public bool? Visible { get; set; }
 
         public virtual ICollection<RestaurantCuisineTypes> RestaurantCuisineTypes { get; set; }
         public virtual ICollection<RestaurantDenyTypes> RestaurantDenyTypes { get; set; }

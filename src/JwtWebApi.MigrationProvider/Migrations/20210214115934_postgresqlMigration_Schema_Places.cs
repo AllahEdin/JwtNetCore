@@ -297,7 +297,7 @@ namespace JwtWebApi.MigrationProvider.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RestaurantCoisineTypes_RestaurantId",
+                        name: "FK_RestaurantCuisineTypes_RestaurantId",
                         column: x => x.RestaurantId,
                         principalSchema: "places",
                         principalTable: "Restaurants",

@@ -74,6 +74,7 @@ namespace JwtWebApi.Api.Services.Dto
 
 		public string Phone { get; set; } 
 		public string Url { get; set; }
+		public bool Visible { get; set; }
 	}
 
 	public interface IHotel : IEntity
@@ -97,6 +98,7 @@ namespace JwtWebApi.Api.Services.Dto
 
 		public string Phone { get; set; }
 		public string Url { get; set; }
+		public bool Visible { get; set; }
 	}
 
 	public interface IAttraction : IEntity
@@ -116,6 +118,7 @@ namespace JwtWebApi.Api.Services.Dto
 		public int Weight { get; set; }
 
 		public float Rating { get; set; }
+		public bool Visible { get; set; }
 	}
 
 	public interface IRoute : IEntity
@@ -157,6 +160,8 @@ namespace JwtWebApi.Api.Services.Dto
 		public string Phone { get; set; }
 		public string Url { get; set; }
 		public float Rating { get; set; }
+
+		public bool Visible { get; set; }
 	}
 
 }

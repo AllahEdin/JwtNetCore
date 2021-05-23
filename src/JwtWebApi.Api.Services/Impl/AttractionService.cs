@@ -104,7 +104,7 @@ namespace JwtWebApi.Api.Services.Impl
 			bool subjectsAtLeastOne,
 			int[] placeTypeIds,
 			bool placeTypesAtLeastOne,
-			OrderModel orderModel)
+			SearchModel searchModel)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -169,10 +169,7 @@ namespace JwtWebApi.Api.Services.Impl
 
 			
 				IReadOnlyCollection<Attraction> attractions =
-					await attrs.GetFilteredTable(new SearchModel()
-						{
-							Order = orderModel
-						}, cp)
+					await attrs.GetFilteredTable(searchModel, cp)
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();

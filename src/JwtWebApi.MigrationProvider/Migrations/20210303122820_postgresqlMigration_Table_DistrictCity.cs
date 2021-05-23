@@ -41,14 +41,14 @@ namespace JwtWebApi.MigrationProvider.Migrations
                 schema: "places",
                 table: "DIstrictCities",
                 column: "CityId",
-                unique: true);
+                unique: false);
 
             migrationBuilder.CreateIndex(
                 name: "UIX_DistrictCities_DistrictId",
                 schema: "places",
                 table: "DIstrictCities",
                 column: "DistrictId",
-                unique: true);
+                unique: false);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

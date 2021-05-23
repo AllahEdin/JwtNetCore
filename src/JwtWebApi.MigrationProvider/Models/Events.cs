@@ -24,5 +24,6 @@ namespace JwtWebApi.MigrationProvider.Models
         public string Phone { get; set; }
         public string Url { get; set; }
         public float Rating { get; set; }
+        public bool? Visible { get; set; }
     }
 }

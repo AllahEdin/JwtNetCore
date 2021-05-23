@@ -44,7 +44,7 @@ namespace JwtWebApi.Api.Common.ApiController
 
 		[HttpDelete(nameof(DeleteById))]
 		[Authorize(Roles = "admin")]
-		public Task<IActionResult> DeleteById(int id)
+		public virtual Task<IActionResult> DeleteById(int id)
 			=> base.Delete(id);
 
 	}

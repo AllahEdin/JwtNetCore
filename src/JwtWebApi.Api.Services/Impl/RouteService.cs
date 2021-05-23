@@ -141,7 +141,8 @@ namespace JwtWebApi.Api.Services.Impl
 			int? cityId,
 			int? districtId,
 			IFromToFilter<float> durationFilter,
-			IFromToFilter<float> lengthFilter, OrderModel orderModel)
+			IFromToFilter<float> lengthFilter,
+			SearchModel searchModel)
 		{
 			using (var cp = _contextProviderFactory.Create())
 			{
@@ -237,10 +238,7 @@ namespace JwtWebApi.Api.Services.Impl
 				}
 
 				IReadOnlyCollection<Route> routesFinal =
-					await routes.GetFilteredTable(new SearchModel()
-						{
-							Order = orderModel
-						},cp )
+					await routes.GetFilteredTable(searchModel,cp )
 						.Skip((page - 1) * pageSize)
 						.Take(pageSize)
 						.ToArrayAsync();
