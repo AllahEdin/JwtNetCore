@@ -32,6 +32,16 @@ namespace JwtWebApi.Api.Common.Extensions
 			return false;
 		}
 
+		public static bool IsAuthorized(this Controller controller)
+		{
+			var claim =
+				controller.User.Claims.Where(t => t.Type == "LOCAL AUTHORITY")
+					.ToArray();
+
+			return claim.Length > 0;
+
+		}
+
 		public static string GetUserId(this Controller controller)
 		{
 			var claim =

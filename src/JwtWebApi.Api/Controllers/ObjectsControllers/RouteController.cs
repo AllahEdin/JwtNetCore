@@ -71,12 +71,18 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 
 		[HttpGet("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible)
-			=> base.GetPaging<IRouteWithLinks>(page, pageSize, showInvisible ? null : new SearchModel().AddVisibleFilter());
+			=> base.GetPaging<IRouteWithLinks>(page, pageSize, showInvisible ? null :
+				this.IsAuthorized()
+					? new SearchModel().AddVisibleOwnerFilter(this.GetUserId())
+					: new SearchModel().AddVisibleFilter());
 
 
 		[HttpPost("WithLinks/GetPaging")]
 		public Task<IActionResult> GetPagingWithLinks(int page, int pageSize, bool showInvisible, [FromBody] SearchModel filter)
-			=> base.GetPaging<IRouteWithLinks>(page, pageSize, showInvisible ? filter : filter.AddVisibleFilter());
+			=> base.GetPaging<IRouteWithLinks>(page, pageSize, showInvisible ? filter :
+				this.IsAuthorized()
+					? filter.AddVisibleOwnerFilter(this.GetUserId())
+					: filter.AddVisibleFilter());
 
 
 		[HttpPost("WithLinks/GetPaging/Custom")]
@@ -88,7 +94,10 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			}
 
 			var searchModel =
-				showInvisible ? new SearchModel() : new SearchModel().AddVisibleFilter();
+				showInvisible ? new SearchModel() :
+					this.IsAuthorized()
+						? new SearchModel().AddVisibleOwnerFilter(this.GetUserId())
+						: new SearchModel().AddVisibleFilter();
 
 			searchModel.Order =
 				filter.Order;
@@ -125,15 +134,33 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 			}
 		}
 
-		public override Task<IActionResult> Post(RouteModel model)
+		[HttpPost("")]
+		public override async Task<IActionResult> Post([FromBody] RouteModel model)
 		{
 			bool isAdmin =
 				this.GetUserRole() == "admin";
 
-			model.Rating = 0;
-			model.OwnerId = this.GetUserId();
-			model.Visible = isAdmin;
-			return base.Post(model);
+			RouteModel dto =
+				new RouteModel()
+				{
+					Name = model.Name,
+					DistrictId = model.DistrictId,
+					Animals = model.Animals,
+					CityId = model.CityId,
+					Description = model.Description,
+					Path = model.Path,
+					OwnerId = this.GetUserId(),
+					Id = 0,
+					Visible = false,
+					Weight = model.Weight,
+					Time = model.Time,
+					Length = model.Length,
+				};
+
+			var res =
+				await Add(dto);
+
+			return Ok(res);
 		}
 
 		[HttpPut("")]
