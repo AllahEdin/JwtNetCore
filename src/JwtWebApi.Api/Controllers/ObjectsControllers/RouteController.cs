@@ -57,10 +57,13 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 					}
 				};
 
-			searchModel =
-				showInvisible
-					? searchModel
-					: searchModel.AddVisibleFilter();
+			if (!this.IsAuthorized() || this.GetUserId() != id)
+			{
+				searchModel =
+					showInvisible
+						? searchModel
+						: searchModel.AddVisibleFilter();
+			}
 
 			var res =
 				await Service.Get(page, pageSize, searchModel);
@@ -135,7 +138,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpPost("")]
-		[AllowAnonymous]
+		[Authorize]
 		public override async Task<IActionResult> Post([FromBody] RouteModel model)
 		{
 			bool isAdmin =
