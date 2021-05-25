@@ -135,6 +135,7 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpPost("")]
+		[AllowAnonymous]
 		public override async Task<IActionResult> Post([FromBody] RouteModel model)
 		{
 			bool isAdmin =
