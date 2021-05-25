@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using JwtWebApi.Api.Common.ApiController;
 using JwtWebApi.Api.Common.Extensions;
 using JwtWebApi.Api.Models;
@@ -138,9 +139,14 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpPost("")]
-		[Authorize]
+		[AllowAnonymous]
 		public override async Task<IActionResult> Post([FromBody] RouteModel model)
 		{
+			if (!this.IsAuthorized())
+			{
+				return this.BadRequestCustom(BadRequestError.UserNotFound);
+			}
+
 			bool isAdmin =
 				this.GetUserRole() == "admin";
 
@@ -381,9 +387,14 @@ namespace JwtWebApi.Api.Controllers.ObjectsControllers
 		}
 
 		[HttpDelete()]
-		[Authorize()]
+		[AllowAnonymous]
 		public async Task<IActionResult> Delete(int routeId)
 		{
+			if (!this.IsAuthorized())
+			{
+				return this.BadRequestCustom(BadRequestError.UserNotFound);
+			}
+
 			var can =
 				await CanPerformOperation(routeId);
 
