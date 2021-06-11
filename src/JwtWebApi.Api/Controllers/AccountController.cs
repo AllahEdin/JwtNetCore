@@ -544,8 +544,8 @@ namespace JwtWebApi.Api.Controllers
 		[ProducesResponseType(typeof(bool), 200)]
 		[HttpPost(nameof(RecoverPassword))]
 		[AllowAnonymous]
-		public async Task<IActionResult> RecoverPassword(string email)
-		{
+		public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordSimpleModel model) {
+			var email = model.Email;
 			using (var contextProvider = _contextProviderFactory.Create())
 			{
 				var users =
